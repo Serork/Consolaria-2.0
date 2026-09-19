@@ -1582,6 +1582,9 @@ Mods: {
 				Bestiary: Может, муравьиные львы-альбиносы и не могут сливаться с пейзажами дюн, как это делают их обыкновенные собратья, но одного лишь взгляда на их бледные тела уже достаточно, чтобы заставить любую дичь бояться.
 				DisplayName: Большой муравьиный роитель-альбинос
 			}
+
+			// EternalHorror.DisplayName: Eternal Horror
+			// EternalServant.DisplayName: Eternal Servant
 		}
 
 		Projectiles: {
@@ -1673,6 +1676,7 @@ Mods: {
 			SirenSeaCreature.DisplayName: Морское существо сирены
 			AlbinoRunt.DisplayName: Альбинос-недоросток
 			// .DisplayName: ""
+			// EternalHorrorLaser1.DisplayName: Eternal Horror Laser1
 		}
 
 		Tiles: {

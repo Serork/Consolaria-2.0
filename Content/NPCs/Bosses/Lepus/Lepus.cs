@@ -32,6 +32,9 @@ using Terraria.UI;
 namespace Consolaria.Content.NPCs.Bosses.Lepus {
     [AutoloadBossHead]
     internal class Lepus : ConsolariaModBoss {
+        private int _jumpCount_Cap;
+        private Vector2 _tempPlayerPosition = default;
+
         public static LocalizedText BestiaryText {
             get; private set;
         }
@@ -474,6 +477,8 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
                     NPC.frame.Y = (NPC.velocity.Y == 0f ? currentFrame : (NPC.velocity.Y < 0f ? (int)Frame.Jump1 : (int)Frame.Jump2)) * frameHeight;
                     break;
             }
+
+            //Dust.NewDustPerfect(_tempPlayerPosition, DustID.Adamantite, Vector2.Zero).noGravity = true;
         }
 
         private void GettingHit() {
@@ -611,6 +616,8 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
                         if ((float)Main.rand.NextDouble() < 0.333f && Main.expertMode) {
                             JumpCount = 0;
                             ChangeState(STATE_ADVANCED_JUMP);
+                            _jumpCount_Cap = 0;
+                            _tempPlayerPosition = default;
                             NPC.netUpdate = true;
                             return;
                         }
@@ -676,7 +683,9 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
             NPC.rotation = NPC.velocity.Y / 25f;
             NPC.noTileCollide = false;
             Player player = Main.player[NPC.target];
-            if ((NPC.Center.X > player.Center.X ? (NPC.Center.X - player.Center.X) : (player.Center.X - NPC.Center.X)) < 10 && NPC.Center.Y < player.Center.Y - 150 && JumpCount >= 3) {
+            Vector2 playerCenter = _jumpCount_Cap >= 6 ? _tempPlayerPosition : player.Center;
+            bool closeToPlayer = (NPC.Center.X > playerCenter.X ? (NPC.Center.X - playerCenter.X) : (playerCenter.X - NPC.Center.X)) < 10 && NPC.Center.Y < playerCenter.Y - 150;
+            if (closeToPlayer && JumpCount >= 3) {
                 ChangeState(STATE_APPEARANCE, 1f);
                 AdvancedJumpCount = 0;
                 JumpCount = 0;
@@ -684,6 +693,10 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
                 AdvancedJumped = false;
                 AdvancedJumped2 = true;
                 SpawnBigEgg();
+
+                _jumpCount_Cap = 0;
+                _tempPlayerPosition = default;
+
                 return;
             }
             if (NPC.velocity.Y != 0f) {
@@ -731,6 +744,9 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
                 NPC.netUpdate = true;
             }
             JumpCount++;
+
+            _jumpCount_Cap++;
+            _tempPlayerPosition = new Vector2(Main.player[NPC.target].Center.X, NPC.Center.Y - 25);
         }
 
         private void Jump() {

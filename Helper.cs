@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -20,6 +20,47 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static bool IsClient() => Main.netMode == NetmodeID.MultiplayerClient;
+
+    public static void DrawPrettyStarSparkle(float opacity,
+                                             SpriteEffects dir, 
+                                             Vector2 drawpos,
+                                             Microsoft.Xna.Framework.Color drawColor, 
+                                             Microsoft.Xna.Framework.Color shineColor, 
+                                             float flareCounter, 
+                                             float fadeInStart, 
+                                             float fadeInEnd,
+                                             float fadeOutStart, 
+                                             float fadeOutEnd, 
+                                             float rotation, 
+                                             Vector2 scale,
+                                             Vector2 fatness) {
+        Texture2D value = TextureAssets.Extra[98].Value;
+        Microsoft.Xna.Framework.Color color = shineColor * opacity * 0.5f;
+        color.A = 0;
+        Vector2 origin = value.Size() / 2f;
+        Microsoft.Xna.Framework.Color color2 = drawColor * 0.5f;
+        float num = Utils.GetLerpValue(fadeInStart, fadeInEnd, flareCounter, clamped: true) * Utils.GetLerpValue(fadeOutEnd, fadeOutStart, flareCounter, clamped: true);
+        Vector2 vector = new Vector2(fatness.X * 0.5f, scale.X) * num;
+        Vector2 vector2 = new Vector2(fatness.Y * 0.5f, scale.Y) * num;
+        color *= num;
+        color2 *= num;
+        Main.EntitySpriteDraw(value, drawpos, null, color, (float)Math.PI / 2f + rotation, origin, vector, dir);
+        Main.EntitySpriteDraw(value, drawpos, null, color, 0f + rotation, origin, vector2, dir);
+        Main.EntitySpriteDraw(value, drawpos, null, color2, (float)Math.PI / 2f + rotation, origin, vector * 0.6f, dir);
+        Main.EntitySpriteDraw(value, drawpos, null, color2, 0f + rotation, origin, vector2 * 0.6f, dir);
+    }
+
+    public static void SpawnDebugDusts(Vector2 position) {
+        Dust.NewDustPerfect(position, DustID.Torch, Vector2.Zero).noGravity = true;
+    }
+
+    public static void SpawnDebugDusts(Vector2 position, int type) {
+        Dust.NewDustPerfect(position, type, Vector2.Zero).noGravity = true;
+    }
+
+    public static Asset<Texture2D> RequestTexture(string path) => ModContent.Request<Texture2D>(path);
+
     public static void NewMessage(object text, Color? color = null) {
         if (Main.netMode == NetmodeID.SinglePlayer) {
             Main.NewText(text, color);
@@ -117,6 +158,8 @@ public static class Helper {
         public DrawInfo WithColor(Color color) => this with { Color = Color.MultiplyRGB(color) };
         public DrawInfo WithColorModifier(float colorModifier) => this with { Color = Color * colorModifier };
         public DrawInfo WithColorRGBModifier(float colorModifier) => this with { Color = Color.ModifyRGB(colorModifier) };
+
+        public DrawInfo WithColorOverride(Color color) => this with { Color = color };
 
         public DrawInfo WithRotation(float rotation) => this with { Rotation = Rotation + rotation };
     }

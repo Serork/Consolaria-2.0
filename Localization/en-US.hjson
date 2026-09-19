@@ -1582,6 +1582,9 @@ Mods: {
 				Bestiary: Albino antlions may not be suited to blending into the dunes, but the sight of their pale figure is said to instill primal fear in their prey.
 				DisplayName: Giant Albino Swarmer
 			}
+
+			EternalHorror.DisplayName: Eternal Horror
+			EternalServant.DisplayName: Eternal Servant
 		}
 
 		Projectiles: {
@@ -1673,6 +1676,7 @@ Mods: {
 			SirenSeaCreature.DisplayName: Siren Sea Creature
 			AlbinoRunt.DisplayName: Albino Runt
 			.DisplayName: ""
+			EternalHorrorLaser1.DisplayName: Eternal Horror Laser1
 		}
 
 		Tiles: {

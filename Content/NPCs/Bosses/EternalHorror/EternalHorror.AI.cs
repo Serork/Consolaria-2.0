@@ -1,0 +1,331 @@
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
+
+sealed partial class EternalHorror : ModNPC {
+    private static byte CLONECOUNTAVAILABLE => 3;
+    private static ushort CLONEACTIVETIME => Helper.SecondsToFrames(10);
+
+    private static HashSet<CloneInfo> _cloneDataCache = [];
+
+    private partial void Unload_Caches() {
+        _cloneDataCache.Clear();
+        _cloneDataCache = null;
+    }
+
+    public record struct CloneInfo(Vector2 Position, Vector2 TargetPosition, ushort TimeLeft, 
+                                                                             ushort MaxTimeLeft, 
+                                                                             float Rotation = 0f, 
+                                                                             Vector2 VisualPosition = default,
+                                                                             Vector2 Velocity = default,
+                                                                             bool ShouldUpdateVisualPosition = true,
+                                                                             Vector2[] OldVisualPositions = default,
+                                                                             float[] OldRotations = default,
+                                                                             float DashOpacity = 0f) {
+        public readonly float TimeLeftProgress => Helper.Clamp01((float)TimeLeft / MaxTimeLeft);
+        public readonly bool Active => TimeLeftProgress > 0f;
+        public readonly float Opacity {
+            get {
+                float timeLeftProgress = TimeLeftProgress;
+                float opacity = 1f;
+                opacity *= 1f - Utils.GetLerpValue(0.75f, 1f, timeLeftProgress, true);
+                //opacity *= Utils.GetLerpValue(0f, 0.25f, timeLeftProgress, true);
+                return opacity;
+            }
+        }
+
+        public readonly Vector2 GetFinalClonePosition(Player target) {
+            Vector2 targetCenter = target.Center,
+                    clonePosition = Position,
+                    cloneTargetCenter = TargetPosition;
+            Vector2 position = targetCenter;
+            position += clonePosition - cloneTargetCenter;
+            return position;
+        }
+    }
+
+    private CloneInfo[] _cloneData = null;
+    private Vector2 _dashVelocity;
+    private float _forcedRotationOffset;
+    private Vector2 _tempPosition;
+    private Vector2 _cloneTargetPosition;
+
+    public ref float InitValue => ref NPC.ai[0];
+
+    public ref float AICounter => ref NPC.ai[1];
+    public ref float AICounter2 => ref NPC.ai[2];
+    public ref float AICounter3 => ref NPC.ai[3];
+
+    public ref float AttackCount => ref NPC.localAI[3];
+    public ref float SmoothFactor => ref NPC.localAI[2];
+    public ref float Phase1BurstLaserAttackCount => ref NPC.localAI[1];
+    public ref float Phase1DashAttackCount => ref NPC.localAI[1];
+    public ref float Phase1LaserSpamPreparationSlowDown => ref AICounter3;
+
+    public ref float Phase1CloneSpawn_ShouldDashAfterValue => ref NPC.localAI[0];
+    public ref float Phase1DashAttack_ShouldBurstLaserAfterValue => ref NPC.localAI[0];
+    public ref float Phase1SpawnSummonAttack_DoneValue => ref NPC.localAI[0];
+
+    public bool Init {
+        get => InitValue != 0f;
+        set => InitValue = value.ToInt();
+    }
+
+    public bool Phase1CloneSpawn_ShouldDashAfter {
+        get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
+        set => Phase1CloneSpawn_ShouldDashAfterValue = value.ToInt();
+    }
+
+    public bool Phase1DashAttack_ShouldBurstLaserAfter {
+        get => Phase1DashAttack_ShouldBurstLaserAfterValue != 0f;
+        set => Phase1DashAttack_ShouldBurstLaserAfterValue = value.ToInt();
+    }
+
+    public bool Phase1SpawnSummonAttack_Done {
+        get => Phase1SpawnSummonAttack_DoneValue != 0f;
+        set => Phase1SpawnSummonAttack_DoneValue = value.ToInt();
+    }
+
+    public override bool PreAI() => base.PreAI();
+
+    public override void AI() {
+        OnSpawn();
+        MakeMidnight();
+        UpdateStates();
+        UpdateClones();
+        ForceUpdateRotation();
+    }
+
+    public override void PostAI() {
+        UpdateVisuals();
+    }
+
+    private void OnSpawn() {
+        if (Init) {
+            return;
+        }
+
+        Init = true;
+
+        ResetPhase1LaserAttack(applyIncreasedDelay: true);
+
+        TargetPlayer();
+
+        SpawnFromAbove();
+
+        InitializeClones();
+
+        InitializeStates();
+
+        ActivateState<MoveToPlayer>();
+        ActivateState<Phase1BurstLaserAttack>();
+    }
+
+    private void InitializeClones() {
+        _cloneData = new CloneInfo[CLONECOUNTAVAILABLE];
+    }
+
+    private void SpawnClone() {
+        int nextCloneAddedIndex = 0;
+        OnIterateActiveCloneData((ref cloneInfo) => nextCloneAddedIndex++);
+        if (nextCloneAddedIndex >= CLONECOUNTAVAILABLE) {
+            return;
+        }
+        if (!NPC.HasPlayerTarget) {
+            return;
+        }
+        Player target = NPC.GetTargetPlayer();
+        Vector2 npcCenter = NPC.Center,
+                targetCenter = target.Center;
+        Vector2 clonePosition = targetCenter + (targetCenter - npcCenter);
+        ushort cloneActiveTime = CLONEACTIVETIME;
+        _cloneData[nextCloneAddedIndex] = new CloneInfo(Position: clonePosition,
+                                                        TargetPosition: targetCenter,
+                                                        TimeLeft: cloneActiveTime,
+                                                        MaxTimeLeft: cloneActiveTime,
+                                                        VisualPosition: NPC.Center,
+                                                        Rotation: NPC.rotation,
+                                                        Velocity: default,
+                                                        ShouldUpdateVisualPosition: false,
+                                                        OldVisualPositions: new Vector2[NPC.oldPos.Length],
+                                                        OldRotations: new float[NPC.oldRot.Length],
+                                                        DashOpacity: 0f);
+    }
+
+    private partial void InitializeStates();
+
+    private void MakeMidnight() {
+        float expFactor = 0.025f;
+        if (Main.dayTime) {
+            expFactor *= 4;
+            float to = (float)Main.dayLength;
+            float lerpValue = 1f - MathF.Exp(-expFactor);
+            Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
+        }
+        else {
+            float to = (float)Main.nightLength / 2;
+            float lerpValue = 1f - MathF.Exp(-expFactor);
+            Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
+        }
+    }
+
+    private void UpdateStates() {
+        IAIState[] states = [.. _activeStates];
+        foreach (IAIState activeState in states) {
+            activeState.OnActiveUpdate(npc: NPC, boss: Self);
+        }
+    }
+
+    private void UpdateClones() {
+        for (int i = 0; i < _cloneData.Length; i++) {
+            ref CloneInfo cloneInfo = ref _cloneData[i];
+            if (cloneInfo.Active) {
+                if (cloneInfo.TimeLeft > 1) {
+                    cloneInfo.TimeLeft--;
+                }
+            }
+            else {
+                continue;
+            }
+
+            Player target = NPC.GetTargetPlayer();
+
+            for (int num7 = cloneInfo.OldVisualPositions.Length - 1; num7 > 0; num7--) {
+                cloneInfo.OldVisualPositions[num7] = cloneInfo.OldVisualPositions[num7 - 1];
+                cloneInfo.OldRotations[num7] = cloneInfo.OldRotations[num7 - 1];
+            }
+
+            cloneInfo.OldVisualPositions[0] = cloneInfo.VisualPosition;
+            cloneInfo.OldRotations[0] = cloneInfo.Rotation;
+
+            if (!HasActiveState<Phase1DashAttack>()) {
+                if (!cloneInfo.ShouldUpdateVisualPosition) {
+                    cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target), 0.125f);
+                }
+                else {
+                    cloneInfo.Velocity *= 0.98f;
+                }
+            }
+            else {
+                cloneInfo.ShouldUpdateVisualPosition = true;
+            }
+            cloneInfo.VisualPosition += cloneInfo.Velocity;
+
+            //if (!cloneInfo.ShouldUpdateVisualPosition)
+            {
+                Vector2 targetCenter = _cloneTargetPosition,
+                        clonePosition = cloneInfo.VisualPosition;
+                float angleToTarget = clonePosition.AngleTo(targetCenter) - MathHelper.PiOver2;
+                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP);
+            }
+        }
+    }
+
+    public HashSet<CloneInfo> GetActiveCloneData() {
+        _cloneDataCache.Clear();
+        HashSet<CloneInfo> clonePositions = _cloneDataCache;
+        if (!Init) {
+            return clonePositions;
+        }
+        foreach (CloneInfo cloneInfo in _cloneData) {
+            if (!cloneInfo.Active) {
+                continue;
+            }
+
+            clonePositions.Add(cloneInfo);
+        }
+
+        return clonePositions;
+    }
+
+    private delegate void RefAction<T>(ref T value);
+    private void OnIterateActiveCloneData(RefAction<CloneInfo> actionWithClone) {
+        for (int i = 0; i < _cloneData.Length; i++) {
+            ref CloneInfo cloneInfo = ref _cloneData[i];
+            if (cloneInfo.Active) {
+                actionWithClone(ref cloneInfo);
+            }
+        }
+    }
+
+    private void TargetPlayer(bool faceTarget = false) {
+        if (NPC.ShouldTargetPlayer()) {
+            NPC.TargetClosest(faceTarget: faceTarget);
+        }
+    }
+
+    private void SpawnFromAbove() {
+        Vector2 spawnOffset = new(0f, -850f);
+        NPC.Center = NPC.GetTargetPlayer().Center + spawnOffset;
+    }
+
+    private void ResetPhase1LaserAttack(bool applyIncreasedDelay = false,
+                                        bool applyExtraIncreasedDelay = false) {
+        if (applyIncreasedDelay) {
+            AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 1f);
+            if (applyExtraIncreasedDelay) {
+                AICounter *= 2f;
+            }
+            return;
+        }
+        AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 2f);
+    }
+
+    private void ResetCounters() {
+        AttackCount = 0;
+        AICounter = 0f;
+        AICounter2 = 0f;
+        AICounter3 = 0f;
+    }
+
+    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f) {
+        if (!NPC.HasPlayerTarget) {
+            return;
+        }
+        if (Helper.IsClient()) {
+            return;
+        }
+        const float Speed = 12f;
+        Player target = NPC.GetTargetPlayer();
+        Vector2 vector8 = NPC.Center;
+        SoundEngine.PlaySound(SoundID.Item33, vector8);
+        float rotation = NPC.rotation + MathHelper.PiOver2;
+        if (shootBasedOnRotation) {
+            rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);
+        }
+        rotation += angleShiftToPlayer;
+        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, MathF.Cos(rotation) * Speed, MathF.Sin(rotation) * Speed, ModContent.ProjectileType<EternalHorrorLaser1>(),
+            27, 1.5f, Main.myPlayer);
+    }
+
+    private void ForceUpdateRotation() {
+        NPC.rotation += _forcedRotationOffset;
+        _forcedRotationOffset = _forcedRotationOffset.AngleLerp(0f, 0.75f);
+    }
+
+    private void ResetSmoothFactor(float value = 0f) {
+        SmoothFactor = value;
+    }
+
+    private void DestroyClonesOnContact() {
+        OnIterateActiveCloneData((ref cloneInfo) => {
+            Rectangle hitbox = NPC.Hitbox;
+            Vector2 clonePosition = cloneInfo.VisualPosition;
+            float cloneRotation = cloneInfo.Rotation;
+            Vector2 cloneDirection = Vector2.UnitY.RotatedBy(cloneRotation);
+            Vector2 clonePosition_Start = clonePosition + cloneDirection * NPC.height / 2f,
+                    clonePosition_End = clonePosition + -cloneDirection * NPC.height / 2f;
+            float collisionPoint = 0f;
+            if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, NPC.width, ref collisionPoint)) {
+                cloneInfo.TimeLeft = 0;
+            }
+        });
+    }
+}
