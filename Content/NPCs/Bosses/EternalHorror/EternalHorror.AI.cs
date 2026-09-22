@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -20,6 +21,12 @@ sealed partial class EternalHorror : ModNPC {
         _cloneDataCache = null;
     }
 
+    public record struct CloneStarInfo(Vector2 Position,
+                                       float Progress,
+                                       float Rotation = 0f) {
+        public readonly bool Active => Progress != 0f;
+    }
+
     public record struct CloneInfo(Vector2 Position, Vector2 TargetPosition, ushort TimeLeft, 
                                                                              ushort MaxTimeLeft, 
                                                                              float Rotation = 0f, 
@@ -28,7 +35,9 @@ sealed partial class EternalHorror : ModNPC {
                                                                              bool ShouldUpdateVisualPosition = true,
                                                                              Vector2[] OldVisualPositions = default,
                                                                              float[] OldRotations = default,
-                                                                             float DashOpacity = 0f) {
+                                                                             float DashOpacity = 0f,
+                                                                             bool ShouldFade = false,
+                                                                             CloneStarInfo[] CloneStarData = null) {
         public readonly float TimeLeftProgress => Helper.Clamp01((float)TimeLeft / MaxTimeLeft);
         public readonly bool Active => TimeLeftProgress > 0f;
         public readonly float Opacity {
@@ -36,7 +45,9 @@ sealed partial class EternalHorror : ModNPC {
                 float timeLeftProgress = TimeLeftProgress;
                 float opacity = 1f;
                 opacity *= 1f - Utils.GetLerpValue(0.75f, 1f, timeLeftProgress, true);
-                //opacity *= Utils.GetLerpValue(0f, 0.25f, timeLeftProgress, true);
+                if (ShouldFade) {
+                    opacity *= Utils.GetLerpValue(0f, 0.25f, timeLeftProgress, true);
+                }
                 return opacity;
             }
         }
@@ -48,6 +59,27 @@ sealed partial class EternalHorror : ModNPC {
             Vector2 position = targetCenter;
             position += clonePosition - cloneTargetCenter;
             return position;
+        }
+
+        public readonly void AddStar(Vector2 position) {
+            if (!Active) {
+                return;
+            }
+            int nextStarIndex = 0;
+            for (int i = 0; i < CloneStarData.Length; i++) {
+                if (CloneStarData[i].Progress != 0f) {
+                    nextStarIndex++;
+                }
+            }
+            CloneStarData[nextStarIndex] = new CloneStarInfo(Position: position - VisualPosition,
+                                                             Progress: 1f,
+                                                             Rotation: MathHelper.TwoPi * Main.rand.NextFloat());
+        }
+
+        public readonly void UpdateStars() {
+            for (int i = 0; i < CloneStarData.Length; i++) {
+                CloneStarData[i].Progress = Helper.Approach(CloneStarData[i].Progress, 0f, 0.05f);
+            }
         }
     }
 
@@ -156,7 +188,8 @@ sealed partial class EternalHorror : ModNPC {
                                                         ShouldUpdateVisualPosition: false,
                                                         OldVisualPositions: new Vector2[NPC.oldPos.Length],
                                                         OldRotations: new float[NPC.oldRot.Length],
-                                                        DashOpacity: 0f);
+                                                        DashOpacity: 0f,
+                                                        CloneStarData: new CloneStarInfo[100]);
     }
 
     private partial void InitializeStates();
@@ -187,7 +220,7 @@ sealed partial class EternalHorror : ModNPC {
         for (int i = 0; i < _cloneData.Length; i++) {
             ref CloneInfo cloneInfo = ref _cloneData[i];
             if (cloneInfo.Active) {
-                if (cloneInfo.TimeLeft > 1) {
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f || cloneInfo.ShouldFade) {
                     cloneInfo.TimeLeft--;
                 }
             }
@@ -205,7 +238,7 @@ sealed partial class EternalHorror : ModNPC {
             cloneInfo.OldVisualPositions[0] = cloneInfo.VisualPosition;
             cloneInfo.OldRotations[0] = cloneInfo.Rotation;
 
-            if (!HasActiveState<Phase1DashAttack>()) {
+            if (!HasActiveState<Phase1DashAttack>() || Phase1LastDash) {
                 if (!cloneInfo.ShouldUpdateVisualPosition) {
                     cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target), 0.125f);
                 }
@@ -217,6 +250,8 @@ sealed partial class EternalHorror : ModNPC {
                 cloneInfo.ShouldUpdateVisualPosition = true;
             }
             cloneInfo.VisualPosition += cloneInfo.Velocity;
+
+            cloneInfo.UpdateStars();
 
             //if (!cloneInfo.ShouldUpdateVisualPosition)
             {
@@ -325,7 +360,21 @@ sealed partial class EternalHorror : ModNPC {
             float collisionPoint = 0f;
             if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, NPC.width, ref collisionPoint)) {
                 cloneInfo.TimeLeft = 0;
+
+                Vector2 position = Vector2.Lerp(clonePosition_Start, clonePosition_End, 0.5f);
+                SpawnCloneExplosion(position);
             }
         });
+    }
+
+    private void SpawnCloneExplosion(Vector2 position) {
+        if (!Helper.IsClient()) {
+            IEntitySource source = NPC.GetSource_FromAI();
+            Vector2 velocity = Vector2.Zero;
+            int type = ModContent.ProjectileType<EternalHorrorCloneExplosion>();
+            int damage = 30;
+            float knockBack = 5f;
+            Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack);
+        }
     }
 }

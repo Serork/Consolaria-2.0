@@ -20,6 +20,7 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static bool IsServer() => Main.netMode == NetmodeID.Server;
     public static bool IsClient() => Main.netMode == NetmodeID.MultiplayerClient;
 
     public static void DrawPrettyStarSparkle(float opacity,

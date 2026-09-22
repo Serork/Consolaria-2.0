@@ -309,6 +309,43 @@ sealed partial class EternalHorror : ModNPC {
                    progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
                    opacity: 0.375f,
                    sinStep: _shadowTime);
+
+                foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
+                    if (!cloneStarInfo.Active) {
+                        continue;
+                    }
+
+                    //Vector2 vector43 = Utils.Vector2FromElipse(rCurrentNPC.localAI[0].ToRotationVector2(), vector38 * rCurrentNPC.localAI[1]);
+                    float num149 = 1f;
+                    float num153 = cloneStarInfo.Progress;
+
+                    float framesBeforeSmolBeam = num149 / 2;
+                    float framesBeforeSmolBeam2 = num149 / 10;
+
+                    Vector2 baseStarPosition = cloneInfo.VisualPosition + cloneStarInfo.Position;
+
+                    Vector2 starPosition = cloneInfo.VisualPosition.DirectionTo(baseStarPosition);
+                    float starMaxRotation = (float)num153 * ((float)Math.PI * 2f / num149) * 0.125f;
+
+                    starMaxRotation *= (cloneStarInfo.Rotation < MathHelper.Pi).ToDirectionInt();
+
+                    float starScale = Utils.Remap(num153, num149 - (float)framesBeforeSmolBeam2 - (float)framesBeforeSmolBeam, num149 - (float)framesBeforeSmolBeam2, 1f, 0f);
+                    float starRotation = Utils.Remap(num153, num149 - (float)framesBeforeSmolBeam2 - (float)framesBeforeSmolBeam, num149 - (float)framesBeforeSmolBeam2, 0f, 1f);
+
+                    starScale *= 1f;
+
+                    ShaderLoader.DistortShader.SetDefault(100, 100);
+                    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                        for (int i = 0; i < 1; i++) {
+                            Helper.DrawPrettyStarSparkle(1f, SpriteEffects.None, baseStarPosition - screenPos + starPosition,
+                                Color.Lerp(Color.White, new Color(175, 31, 178), 0.25f) * 1f,
+                                Color.Lerp(MainPurpleColor, Color.BlueViolet, 0.75f) * 1f, starRotation, 0f, 0.5f, 0.9f, 1f,
+                                starMaxRotation * starRotation * starRotation + cloneStarInfo.Rotation,
+                                new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
+                            //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
+                        }
+                    });
+                }
             }
         }
         void drawTrails() {

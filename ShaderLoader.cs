@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using Terraria;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 using Terraria.Initializers;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
@@ -118,6 +120,9 @@ sealed class ShaderLoader : ModSystem {
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
 
+    public static string EternalHorrorShockwaveFilterName => nameof(Consolaria) + "EternalHorrorShockwave";
+    public static Filter EternalHorrorShockwaveFilter => Filters.Scene[EternalHorrorShockwaveFilterName];
+
     // shoutout to Spirit Reforged https://github.com/GabeHasWon/SpiritReforged/blob/3e15095767b31ca7c616282d240d225a6c6147d8/AssetLoader.cs
     private static Dictionary<string, Asset<Effect>> _loadedShaders = [];
 
@@ -127,6 +132,11 @@ sealed class ShaderLoader : ModSystem {
         }
 
         Filters.Scene[EternalHorrorShakeFilterName] = new Filter(new EternalHorrorScreenShaderData("FilterMoonLordShake", aimAtPlayer: false), EffectPriority.VeryHigh);
+        Filters.Scene[EternalHorrorShakeFilterName].Load();
+
+        Asset<Effect> shockwaveShader = ModContent.Request<Effect>("Consolaria/Assets/Effects/Shockwave", AssetRequestMode.ImmediateLoad);
+        Filters.Scene[EternalHorrorShockwaveFilterName] = new Filter(new ScreenShaderData(shockwaveShader, "ShockwavePass"), EffectPriority.VeryHigh);
+        Filters.Scene[EternalHorrorShockwaveFilterName].Load();
 
         var tmodfile = (TmodFile)typeof(Consolaria).GetProperty("File", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Consolaria.Instance);
         var files = (IDictionary<string, FileEntry>)typeof(TmodFile).GetField("files", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(tmodfile);

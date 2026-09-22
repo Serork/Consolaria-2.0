@@ -1783,6 +1783,7 @@ Mods: {
 			AlbinoRunt.DisplayName: Cría Albina
 			// .DisplayName: ""
 			// EternalHorrorLaser1.DisplayName: Eternal Horror Laser1
+			// EternalHorrorCloneExplosion.DisplayName: Eternal Horror Clone Explosion
 		}
 
 		Tiles: {

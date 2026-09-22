@@ -75,6 +75,8 @@ sealed class EternalHorrorLaser1 : ModProjectile {
                 if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, npc.width, ref collisionPoint)) {
                     Projectile.velocity = Projectile.Center.DirectionTo(bossTargetCenter) * Projectile.velocity.Length();
 
+                    cloneInfo.AddStar(Projectile.Center);
+
                     Reflected = true;
                     return;
                 }
@@ -106,9 +108,9 @@ sealed class EternalHorrorLaser1 : ModProjectile {
                 spriteBatch.Draw(drawContext.Texture, newPosition, null, color, drawContext.Rotation, drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * 0.75f, drawContext.Flip, 0f);
                 spriteBatch.Draw(drawContext.Texture, newPosition - Projectile.oldPos[k] * 0.5f + Projectile.oldPos[k + 1] * 0.5f, null, color, drawContext.Rotation, drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * 0.75f, drawContext.Flip, 0f);
             }, sinWaveOffset: Projectile.identity + MathHelper.Pi,
-                applyInnerOpacity: false,
-                forcedOpacity: MathHelper.Lerp(0.125f, 0.25f, 0f),
-                sinWaveOffset_BasedOnEffectIndex: MathHelper.TwoPi * 0.25f);
+               applyInnerOpacity: false,
+               forcedOpacity: MathHelper.Lerp(0.125f, 0.25f, 0f),
+               sinWaveOffset_BasedOnEffectIndex: MathHelper.TwoPi * 0.25f);
         }
 
         return false;
