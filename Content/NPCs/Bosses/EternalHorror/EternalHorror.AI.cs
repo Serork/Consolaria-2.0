@@ -181,7 +181,13 @@ sealed partial class EternalHorror : ModNPC {
         Vector2 npcCenter = NPC.Center,
         targetCenter = target.Center;
         Vector2 clonePosition = targetCenter + (targetCenter - npcCenter);
-        return clonePosition;
+        float offsetFromBoss = 650f;
+        Vector2 result = npcCenter + npcCenter.DirectionTo(clonePosition) * offsetFromBoss;
+        int attempts = 30;
+        while (attempts-- > 0 && result.Distance(targetCenter) < offsetFromBoss / 2f) {
+            result += result.DirectionFrom(targetCenter) * 10f;
+        }
+        return result;
     }
 
     private void SpawnClone() {
@@ -289,7 +295,7 @@ sealed partial class EternalHorror : ModNPC {
                 Vector2 targetCenter = _cloneTargetPosition,
                         clonePosition = cloneInfo.VisualPosition;
                 float angleToTarget = clonePosition.AngleTo(targetCenter) - MathHelper.PiOver2;
-                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.25f);
+                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f);
             }
         }
     }
