@@ -7,6 +7,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -37,7 +38,9 @@ sealed partial class EternalHorror : ModNPC {
                                                                              float[] OldRotations = default,
                                                                              float DashOpacity = 0f,
                                                                              bool ShouldFade = false,
-                                                                             CloneStarInfo[] CloneStarData = null) {
+                                                                             CloneStarInfo[] CloneStarData = null,
+                                                                             float AllStarOpacityFactor = 0f,
+                                                                             float LerpVelocityValue = 1f) {
         public readonly float TimeLeftProgress => Helper.Clamp01((float)TimeLeft / MaxTimeLeft);
         public readonly bool Active => TimeLeftProgress > 0f;
         public readonly float Opacity {
@@ -76,10 +79,19 @@ sealed partial class EternalHorror : ModNPC {
                                                              Rotation: MathHelper.TwoPi * Main.rand.NextFloat());
         }
 
-        public readonly void UpdateStars() {
+        public void UpdateStars() {
+            float starOpacityExtra = 0f;
+            int count = 1;
             for (int i = 0; i < CloneStarData.Length; i++) {
                 CloneStarData[i].Progress = Helper.Approach(CloneStarData[i].Progress, 0f, 0.05f);
+                if (CloneStarData[i].Active) {
+                    starOpacityExtra += 1f - CloneStarData[i].Progress;
+                    count++;
+                }
             }
+            starOpacityExtra /= count;
+            starOpacityExtra *= 1.5f;
+            AllStarOpacityFactor = Helper.Approach(AllStarOpacityFactor, starOpacityExtra, 0.1f);
         }
     }
 
@@ -164,6 +176,14 @@ sealed partial class EternalHorror : ModNPC {
         _cloneData = new CloneInfo[CLONECOUNTAVAILABLE];
     }
 
+    private Vector2 GetCloneSpawnPosition() {
+        Player target = NPC.GetTargetPlayer();
+        Vector2 npcCenter = NPC.Center,
+        targetCenter = target.Center;
+        Vector2 clonePosition = targetCenter + (targetCenter - npcCenter);
+        return clonePosition;
+    }
+
     private void SpawnClone() {
         int nextCloneAddedIndex = 0;
         OnIterateActiveCloneData((ref cloneInfo) => nextCloneAddedIndex++);
@@ -174,9 +194,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
         Player target = NPC.GetTargetPlayer();
-        Vector2 npcCenter = NPC.Center,
-                targetCenter = target.Center;
-        Vector2 clonePosition = targetCenter + (targetCenter - npcCenter);
+        Vector2 targetCenter = target.Center;
+        Vector2 clonePosition = GetCloneSpawnPosition();
         ushort cloneActiveTime = CLONEACTIVETIME;
         _cloneData[nextCloneAddedIndex] = new CloneInfo(Position: clonePosition,
                                                         TargetPosition: targetCenter,
@@ -207,6 +226,10 @@ sealed partial class EternalHorror : ModNPC {
             float lerpValue = 1f - MathF.Exp(-expFactor);
             Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
         }
+
+        //Main.raining = true;
+        //Main.cloudAlpha = 0.5f;
+        //Main.lightning = 0f;
     }
 
     private void UpdateStates() {
@@ -238,16 +261,24 @@ sealed partial class EternalHorror : ModNPC {
             cloneInfo.OldVisualPositions[0] = cloneInfo.VisualPosition;
             cloneInfo.OldRotations[0] = cloneInfo.Rotation;
 
-            if (!HasActiveState<Phase1DashAttack>() || Phase1LastDash) {
-                if (!cloneInfo.ShouldUpdateVisualPosition) {
-                    cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target), 0.125f);
-                }
-                else {
-                    cloneInfo.Velocity *= 0.98f;
-                }
+            //if (!HasActiveState<Phase1DashAttack>() || Phase1LastDash) {
+            //    if (!cloneInfo.ShouldUpdateVisualPosition) {
+            //        cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target), 0.125f * cloneInfo.LerpVelocityValue);
+            //    }
+            //    else {
+            //        cloneInfo.Velocity *= 0.98f;
+            //    }
+            //}
+            //else {
+            //    cloneInfo.ShouldUpdateVisualPosition = true;
+            //}
+            if (!cloneInfo.ShouldUpdateVisualPosition) {
+                float lerpValueFactor = cloneInfo.LerpVelocityValue;
+                cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target),
+                    0.125f * lerpValueFactor);
             }
             else {
-                cloneInfo.ShouldUpdateVisualPosition = true;
+                cloneInfo.Velocity *= 0.98f;
             }
             cloneInfo.VisualPosition += cloneInfo.Velocity;
 
@@ -258,7 +289,7 @@ sealed partial class EternalHorror : ModNPC {
                 Vector2 targetCenter = _cloneTargetPosition,
                         clonePosition = cloneInfo.VisualPosition;
                 float angleToTarget = clonePosition.AngleTo(targetCenter) - MathHelper.PiOver2;
-                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP);
+                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.25f);
             }
         }
     }

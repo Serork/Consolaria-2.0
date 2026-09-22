@@ -224,9 +224,13 @@ sealed partial class EternalHorror : ModNPC {
 
             bool lastDash = boss.Phase1LastDash;
 
+            float dashProgress = boss.AICounter / DASHTIME;
+
             if (lastDash) {
                 boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                    cloneInfo.ShouldUpdateVisualPosition = false;
+                    cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.05f);
+
+                    cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 0.1f);
                 });
                 foreach (CloneInfo cloneInfo in boss._cloneData) {
                     if (cloneInfo.Active) {
@@ -234,6 +238,11 @@ sealed partial class EternalHorror : ModNPC {
                         break;
                     }
                 }
+            }
+            else {
+                boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                    cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 0f, 0.05f);
+                });
             }
 
             boss._cloneTargetPosition = targetCenter;
@@ -243,8 +252,6 @@ sealed partial class EternalHorror : ModNPC {
             targetCenter += targetCenter.DirectionTo(npc.Center) * 10f;
 
             float dashStrength = 40f;
-
-            float dashProgress = boss.AICounter / DASHTIME;
 
             _shakeStrength = Helper.Approach(_shakeStrength, dashProgress, 0.125f);
 

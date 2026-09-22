@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Runtime.CompilerServices;
 using Terraria;
@@ -14,6 +15,18 @@ sealed partial class EternalHorror : ModNPC {
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "DrawSunAndMoon")]
     public extern static void Main_DrawSunAndMoon(Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence);
 
+    private struct Bolt {
+        public Vector2 Position;
+
+        public float Depth;
+
+        public int Life;
+
+        public bool IsAlive;
+
+        public Vector2 Scale;
+    }
+
     public static float ScreenObstruction { get; private set; }
     public static Color FrontColor { get; private set; }
 
@@ -23,6 +36,14 @@ sealed partial class EternalHorror : ModNPC {
     private static float _purpleColorTime, _purpleColorTime2;
     private static float _purpleColorStrength;
 
+    private static bool _active;
+
+    private static Bolt[] _bolts = null;
+    private static int _ticksUntilNextBolt;
+
+    private static Asset<Texture2D> _boltTexture = null,
+                                    _flashTexture = null;
+
     private partial void Load_BackgroundHooks() {
         On_ScreenDarkness.Update += On_ScreenDarkness_Update;
 
@@ -30,6 +51,11 @@ sealed partial class EternalHorror : ModNPC {
         On_ScreenDarkness.DrawFront += On_ScreenDarkness_DrawFront;
 
         On_Main.DrawSunAndMoon += On_Main_DrawSunAndMoon;
+
+        if (!Main.dedServ) {
+            _boltTexture = Main.Assets.Request<Texture2D>("Images/Misc/VortexSky/Bolt", (AssetRequestMode)1);
+            _flashTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/Flash");
+        }
     }
 
     private void On_Main_DrawSunAndMoon(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence) {
@@ -42,6 +68,34 @@ sealed partial class EternalHorror : ModNPC {
         orig();
 
         ApplyScreenDarkness();
+
+        if (!_active) {
+            return;
+        }
+
+        var _random = Main.rand;
+
+        if (_ticksUntilNextBolt <= 0) {
+            _ticksUntilNextBolt = _random.Next(1, 5) * 5;
+            int i;
+            for (i = 0; _bolts[i].IsAlive && i != _bolts.Length - 1; i++) {
+            }
+            _bolts[i].IsAlive = true;
+            _bolts[i].Position.X = (Main.rand.NextBool() ? _random.NextFloat(0f, 0.25f) : _random.NextFloat(0.75f, 1f)) * Main.screenWidth;
+            _bolts[i].Position.Y = (Main.rand.NextBool() ? _random.NextFloat(0f, 0.25f) : _random.NextFloat(0.75f, 1f)) * Main.screenHeight;
+            _bolts[i].Depth = _random.NextFloat();
+            _bolts[i].Life = 100;
+            _bolts[i].Scale = new Vector2(_random.NextFloat(0.5f, 1f), _random.NextFloat(0.5f, 1f));
+        }
+        _ticksUntilNextBolt--;
+        for (int j = 0; j < _bolts.Length; j++) {
+            if (_bolts[j].IsAlive) {
+                _bolts[j].Life--;
+                if (_bolts[j].Life <= 0) {
+                    _bolts[j].IsAlive = false;
+                }
+            }
+        }
     }
 
     private void On_ScreenDarkness_DrawBack(On_ScreenDarkness.orig_DrawBack orig, Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch) {
@@ -56,6 +110,32 @@ sealed partial class EternalHorror : ModNPC {
         orig(spriteBatch);
 
         DrawDarkness_Front(spriteBatch);
+    }
+
+    private void DrawBolts(SpriteBatch spriteBatch, float minDepth, float maxDepth) {
+        float num = Math.Min(1f, (Main.screenPosition.Y - 1000f) / 1000f);
+        Vector2 vector3 = Main.screenPosition + new Vector2(Main.screenWidth >> 1, Main.screenHeight >> 1);
+        Rectangle rectangle = new Rectangle(-1000, -1000, Main.screenWidth + 1000, Main.screenHeight + 1000);
+        for (int i = 0; i < _bolts.Length; i++) {
+            if (!_bolts[i].IsAlive || !(_bolts[i].Depth > minDepth) || !(_bolts[i].Depth < maxDepth)) {
+                continue;
+            }
+            float depth = _bolts[i].Depth * 8f;
+            Vector2 vector4 = new Vector2(1f / depth, 0.9f / depth);
+            Vector2 position = (_bolts[i].Position) * vector4;
+            if (rectangle.Contains((int)position.X, (int)position.Y)) {
+                Texture2D value = _boltTexture.Value;
+                int life = _bolts[i].Life;
+                if (life > 26 && life % 2 == 0) {
+                    value = _flashTexture.Value;
+                }
+                float num2 = (float)life / 100;
+                num2 *= 1f - Utils.GetLerpValue(0.875f, 1f, num2, true);
+                spriteBatch.DrawWithSnapshot(() => {
+                    spriteBatch.Draw(value, position, null, MainPurpleColor_Dynamic * num * num2 * 0.5f * ScreenObstruction, 0f, Vector2.Zero, vector4.X * 20f * _bolts[i].Scale, SpriteEffects.None, 0f);
+                }, blendState: BlendState.Additive);
+            }
+        }
     }
 
     private void ApplyScreenDarkness() {
@@ -75,6 +155,19 @@ sealed partial class EternalHorror : ModNPC {
         amount /= 1f;
 
         ScreenObstruction = Helper.Approach(ScreenObstruction, value, amount);
+
+        if (!_active && ScreenObstruction > 0) {
+            _bolts = new Bolt[500];
+            for (int i = 0; i < _bolts.Length; i++) {
+                _bolts[i].IsAlive = false;
+            }
+
+            _active = true;
+        }
+
+        if (ScreenObstruction <= 0f && _active) {
+            _active = false;
+        }
 
         if (_purpleColorTime == 0f) {
             _purpleColorTime = -Main.rand.NextFloat(Helper.SecondsToFrames(1f), Helper.SecondsToFrames(2.5f));
@@ -129,7 +222,11 @@ sealed partial class EternalHorror : ModNPC {
                                                                     WithColor(color * 0.5f * 1f).
                                                                     WithColorModifier(screenObstructionFactor).
                                                                     WithRotation(sinStep));
+
+                    //DrawBolts(spriteBatch, (i - 1) / (float)count, (i) / (float)count);
                 }
+
+                //DrawBolts(spriteBatch, 0f, 1f);
             }
 
             drawReflections();

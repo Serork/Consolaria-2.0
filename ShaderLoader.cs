@@ -1,4 +1,5 @@
 ﻿using Consolaria.Common.ScreenEffects;
+using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -123,6 +124,9 @@ sealed class ShaderLoader : ModSystem {
     public static string EternalHorrorShockwaveFilterName => nameof(Consolaria) + "EternalHorrorShockwave";
     public static Filter EternalHorrorShockwaveFilter => Filters.Scene[EternalHorrorShockwaveFilterName];
 
+    public static string EternalHorrorTintFilterName => nameof(Consolaria) + "EternalHorrorTint";
+    public static Filter EternalHorrorTintFilter => Filters.Scene[EternalHorrorTintFilterName];
+
     // shoutout to Spirit Reforged https://github.com/GabeHasWon/SpiritReforged/blob/3e15095767b31ca7c616282d240d225a6c6147d8/AssetLoader.cs
     private static Dictionary<string, Asset<Effect>> _loadedShaders = [];
 
@@ -137,6 +141,9 @@ sealed class ShaderLoader : ModSystem {
         Asset<Effect> shockwaveShader = ModContent.Request<Effect>("Consolaria/Assets/Effects/Shockwave", AssetRequestMode.ImmediateLoad);
         Filters.Scene[EternalHorrorShockwaveFilterName] = new Filter(new ScreenShaderData(shockwaveShader, "ShockwavePass"), EffectPriority.VeryHigh);
         Filters.Scene[EternalHorrorShockwaveFilterName].Load();
+
+        Filters.Scene[EternalHorrorTintFilterName] = new Filter(new EternalHorrorScreenShaderData("FilterMoonLord", aimAtPlayer: false).UseColor(EternalHorror.MainPurpleColor), EffectPriority.VeryHigh);
+        Filters.Scene[EternalHorrorTintFilterName].Load();
 
         var tmodfile = (TmodFile)typeof(Consolaria).GetProperty("File", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Consolaria.Instance);
         var files = (IDictionary<string, FileEntry>)typeof(TmodFile).GetField("files", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(tmodfile);

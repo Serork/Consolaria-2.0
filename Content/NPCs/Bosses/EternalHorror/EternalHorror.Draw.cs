@@ -293,6 +293,8 @@ sealed partial class EternalHorror : ModNPC {
                     });
                 }
 
+                float starOpacityExtra = cloneInfo.AllStarOpacityFactor;
+
                 DrawUnderShadowEffect(cloneDrawContext, draw: (newPosition, newColor) => {
                     Vector2 position = newPosition;
                     Color color = newColor;
@@ -307,7 +309,7 @@ sealed partial class EternalHorror : ModNPC {
                     });
                 }, sinWaveOffset: WaveOffset,
                    progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
-                   opacity: 0.375f,
+                   opacity: 0.375f + starOpacityExtra,
                    sinStep: _shadowTime);
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
@@ -325,7 +327,7 @@ sealed partial class EternalHorror : ModNPC {
                     Vector2 baseStarPosition = cloneInfo.VisualPosition + cloneStarInfo.Position;
 
                     Vector2 starPosition = cloneInfo.VisualPosition.DirectionTo(baseStarPosition);
-                    float starMaxRotation = (float)num153 * ((float)Math.PI * 2f / num149) * 0.125f;
+                    float starMaxRotation = (float)num153 * ((float)Math.PI * 2f / num149) * 0.125f * 0.5f;
 
                     starMaxRotation *= (cloneStarInfo.Rotation < MathHelper.Pi).ToDirectionInt();
 

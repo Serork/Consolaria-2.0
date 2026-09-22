@@ -9,6 +9,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalServant : ModNPC {
     private Vector2 _speed;
+    private float _appearanceFactor;
 
     public ref float AttackSpeed => ref NPC.ai[3];
 
@@ -46,13 +47,23 @@ sealed class EternalServant : ModNPC {
         NPC.TargetClosest();
 
         if (NPC.localAI[0] == 0f) {
+            NPC.localAI[0] = 1 / 60f;
+
             NPC.localAI[1] = 1f;
             NPC.localAI[2] = 1f;
 
             NPC.ai[0] = 2f;
             NPC.ai[1] = -480f;
             NPC.ai[2] = 0f;
+
+            _appearanceFactor = -1f;
         }
+
+        _appearanceFactor = Helper.Approach(_appearanceFactor, 1f, 0.1f);
+
+        //if (_appearanceFactor < 0f) {
+        //    return;
+        //}
 
         NPC.localAI[1] = Helper.Approach(NPC.localAI[1], MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1 / 60f * 5f);
 
@@ -164,6 +175,12 @@ sealed class EternalServant : ModNPC {
 
         float timeLeftProgress = NPC.localAI[1];
 
+        if (_appearanceFactor < 0f) {
+            return false;
+        }
+
+        float appearanceFactor = _appearanceFactor;
+
         //float opacity = 1f;
         //opacity *= 1f - Utils.GetLerpValue(0.75f, 1f, timeLeftProgress, true);
 
@@ -174,7 +191,7 @@ sealed class EternalServant : ModNPC {
 
         //drawColor *= opacity;
 
-        float scale = Helper.Clamp01(NPC.localAI[2]);
+        float scale = Helper.Clamp01(NPC.localAI[2]) * appearanceFactor;
 
         SpriteEffects flip = SpriteEffects.None;
 
@@ -227,6 +244,18 @@ sealed class EternalServant : ModNPC {
            sinStep: _shadowTime,
            offsetAmount: 32f / MathHelper.Lerp(1f, 4f, scale),
            shadowPositionOffset: (k) => Vector2.UnitY.RotatedBy(targetAngle) * 10f * (k / MathHelper.TwoPi));
+
+        ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+        ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+            float scale2 = MathHelper.Lerp(3.5f, 1f, appearanceFactor);
+            Color color2 = drawColor;
+            color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor);
+            color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor_Dynamic);
+            color2 = color2.MultiplyAlpha(0.5f);
+            color2 *= 1f - appearanceFactor;
+            color2 *= Utils.GetLerpValue(0f, 0.125f, appearanceFactor, true);
+            NPC.QuickDraw(spriteBatch, screenPos, color2, rotation: 0f, texture: texture, effect: flip, scale: scale2);
+        });
 
         return false;
     }
