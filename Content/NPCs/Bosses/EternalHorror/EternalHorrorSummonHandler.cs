@@ -30,7 +30,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     private static bool _shouldBlink;
     private static bool _in;
-    private static float _progress,
+    private static float _progress = 1f,
                          _delay,
                          _speedFactor;
 
@@ -43,7 +43,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         }
 
         EternalHorrorSummonStarted = true;
-        _eyeData = new EyeInfo[200];
+        _eyeData = new EyeInfo[400];
     }
 
     public override void Load() {
@@ -90,10 +90,13 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 _eyeSpawnCycle = 0;
             }
             int countFactor = _eyeSpawnCycle + 1;
-            int eyeCount = 10 * countFactor;
-            float distanceFromPlayer = 100f * countFactor;
+            int baseCount = 15;
+            int eyeCount = baseCount * countFactor;
+            float distanceFromPlayer = baseCount * 10 * countFactor;
             for (int i = 0; i < eyeCount; i++) {
-                SpawnEye(playerCenter + Vector2.UnitY.RotatedBy(i / (float)eyeCount * MathHelper.TwoPi) * distanceFromPlayer);
+                Vector2 position = playerCenter + Vector2.UnitY.RotatedBy(i / (float)eyeCount * MathHelper.TwoPi) * distanceFromPlayer;
+                position.Y += (position.DirectionTo(playerCenter) * distanceFromPlayer * 0.5f).Y;
+                SpawnEye(position);
             }
             _eyeSpawnCycle++;
         }
@@ -134,9 +137,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         Player player = Main.LocalPlayer;
         Vector2 playerCenter = player.Center;
 
-        position -= playerCenter;
+        Vector2 velocity = position.DirectionTo(playerCenter) * 5f;
 
-        Vector2 velocity = -Vector2.UnitY * 5f;
+        position -= playerCenter;
 
         position += -velocity * 20f;
 
@@ -227,6 +230,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             float eyeRotation = angleToPlayer.ToRotation() * 0.125f;
 
             if (eyeInfo.ShouldLookAtPlayer) {
+                eyeInfo.Velocity += position.DirectionTo(playerCenter) * 0.125f * 0.25f * Helper.Clamp01(position.Distance(playerCenter) / 1200f);
+
                 float maxRotation = 0.25f * 0.75f;
                 eyeInfo.EyeRotation = Helper.Wave(-maxRotation, maxRotation, 3.75f, i);
 
@@ -276,10 +281,6 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     }
 
     private static void DrawBlinking() {
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad2)) {
-            Blink();
-        }
-
         _blinkingVertexes = new VertexPositionColor[192];
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {
             _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(0.125f) * 0.95f;
