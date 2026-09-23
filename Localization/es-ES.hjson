@@ -1784,6 +1784,7 @@ Mods: {
 			// .DisplayName: ""
 			// EternalHorrorLaser1.DisplayName: Eternal Horror Laser1
 			// EternalHorrorCloneExplosion.DisplayName: Eternal Horror Clone Explosion
+			// EternalHorrorCloneExplosionSkull.DisplayName: Eternal Horror Clone Explosion Skull
 		}
 
 		Tiles: {

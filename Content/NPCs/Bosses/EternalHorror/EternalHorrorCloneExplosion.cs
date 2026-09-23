@@ -1,6 +1,8 @@
-﻿using Humanizer;
+﻿using Consolaria.Common.Particles;
+using Humanizer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Mono.Cecil;
 using System;
 using System.Runtime.CompilerServices;
 using Terraria;
@@ -12,15 +14,13 @@ using Terraria.Graphics.Renderers;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
+using ThoriumMod.Empowerments;
 using ThoriumMod.Projectiles;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorCloneExplosion : ModProjectile {
     private static float EXPLOSIONSCALEMODIFIER => 1.5f;
-
-    [UnsafeAccessor(UnsafeAccessorKind.StaticField, Name = "_poolFading")]
-    public extern static ref ParticlePool<FadingParticle> ParticleOrchestrator__poolFading(ParticleOrchestrator self);
 
     public override string Texture => "Consolaria/Assets/Textures/Empty";
 
@@ -52,6 +52,16 @@ sealed class EternalHorrorCloneExplosion : ModProjectile {
 
         if (Projectile.localAI[0] == 0f) {
             Projectile.localAI[0] = 1f;
+
+            if (!Helper.IsClient()) {
+                int skullCount = 15;
+                const float SkullSpeed = 12f;
+                for (int i = 0; i < skullCount; i++) {
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center,
+                        Vector2.UnitY.RotatedBy(MathHelper.TwoPi * i / skullCount) * SkullSpeed * 2f,
+                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), Projectile.damage, Projectile.knockBack);
+                }
+            }
 
             Projectile.scale = 0f;
 
@@ -96,7 +106,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile {
             for (float num2 = 0f; num2 < 1f; num2 += 0.04f) {
                 float num3 = 25f;
                 float num4 = (float)Math.PI * 2f * num2;
-                FadingParticle fadingParticle5 = ParticleOrchestrator__poolFading(null).RequestParticle();
+                FadingParticle fadingParticle5 = ParticlePools.ParticleOrchestrator__poolFading(null).RequestParticle();
                 Color colorTint = Main.rand.NextFromList([color1, color2, color3]) with { A = 20 };
                 fadingParticle5.SetBasicInfo(TextureAssets.Extra[89], null, num4.ToRotationVector2() * (4f + 7f * Main.rand.NextFloat()), position + num4.ToRotationVector2() * (10f + 90f * Main.rand.NextFloat()));
                 fadingParticle5.Velocity *= Main.rand.NextFloat(1f, 1.5f);

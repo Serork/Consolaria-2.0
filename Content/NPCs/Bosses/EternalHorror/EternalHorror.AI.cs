@@ -1,10 +1,13 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Consolaria.Common.Particles;
+using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
@@ -284,11 +287,44 @@ sealed partial class EternalHorror : ModNPC {
                     0.125f * lerpValueFactor);
             }
             else {
-                cloneInfo.Velocity *= 0.98f;
+                //cloneInfo.Velocity *= 0.98f;
             }
             cloneInfo.VisualPosition += cloneInfo.Velocity;
 
             cloneInfo.UpdateStars();
+
+            if (Main.rand.NextChance(cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH) && Main.rand.NextBool(1)) {
+                Color colorTint = MainPurpleColor * 0.5f;
+
+                Vector2 position = cloneInfo.VisualPosition 
+                    + Vector2.One.RotatedBy(cloneInfo.Rotation) * new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
+                Vector2 velocity = cloneInfo.Velocity;
+                position += velocity;
+                velocity *= 0.2f;
+                FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                FadingParticle fadingParticle2 = fadingParticle;
+                fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.ColorTint.A = 30;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = fadingParticle2.Rotation;
+                fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+            }
 
             //if (!cloneInfo.ShouldUpdateVisualPosition)
             {
@@ -361,9 +397,7 @@ sealed partial class EternalHorror : ModNPC {
         if (!NPC.HasPlayerTarget) {
             return;
         }
-        if (Helper.IsClient()) {
-            return;
-        }
+
         const float Speed = 12f;
         Player target = NPC.GetTargetPlayer();
         Vector2 vector8 = NPC.Center;
@@ -373,7 +407,35 @@ sealed partial class EternalHorror : ModNPC {
             rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);
         }
         rotation += angleShiftToPlayer;
-        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, MathF.Cos(rotation) * Speed, MathF.Sin(rotation) * Speed, ModContent.ProjectileType<EternalHorrorLaser1>(),
+        float speedX = MathF.Cos(rotation) * Speed;
+        float speedY = MathF.Sin(rotation) * Speed;
+
+        Vector2 center = vector8;
+        Vector2 velocity = new(speedX, speedY);
+
+        int num5 = Main.rand.Next(20, 40);
+        Vector2 positionInWorld = center;
+        Vector2 movementVector = velocity * Main.rand.NextFloatDirection();
+        PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+        prettySparkleParticle.ColorTint = EternalHorror.MainRedColor_Dynamic.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+        prettySparkleParticle.LocalPosition = positionInWorld;
+        prettySparkleParticle.Rotation = (float)Math.PI / 2f;
+        prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+        prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+        prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+        prettySparkleParticle.TimeToLive = num5;
+        prettySparkleParticle.FadeOutEnd = num5;
+        prettySparkleParticle.FadeInEnd = num5 / 2;
+        prettySparkleParticle.FadeOutStart = num5 / 2;
+        prettySparkleParticle.AdditiveAmount = 0.35f;
+        prettySparkleParticle.Velocity = movementVector;
+        prettySparkleParticle.Velocity *= 0.3f;
+        Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+
+        if (Helper.IsClient()) {
+            return;
+        }
+        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser1>(),
             27, 1.5f, Main.myPlayer);
     }
 

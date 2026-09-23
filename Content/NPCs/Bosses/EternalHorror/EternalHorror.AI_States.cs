@@ -1,9 +1,12 @@
-﻿using Consolaria.Content.NPCs.Bosses.Ocram;
+﻿using Consolaria.Common.Particles;
+using Consolaria.Content.NPCs.Bosses.Ocram;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -215,6 +218,7 @@ sealed partial class EternalHorror : ModNPC {
         public static float DASHTIME => Helper.SecondsToFrames(0.75f);
         public static float LASERATTACKCOUNTNEEDED => 5;
         public static float DASHATTACKCOUNT => 5;
+        public static float DASHSTRENGTH => 40f;
 
         public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
 
@@ -260,7 +264,7 @@ sealed partial class EternalHorror : ModNPC {
 
             targetCenter += targetCenter.DirectionTo(npc.Center) * 10f;
 
-            float dashStrength = 40f;
+            float dashStrength = DASHSTRENGTH;
 
             _shakeStrength = Helper.Approach(_shakeStrength, dashProgress, 0.125f);
 
@@ -595,9 +599,48 @@ sealed partial class EternalHorror : ModNPC {
 
                 if (boss._dashOpacity >= dashOpacity / 4f && boss.AICounter % 6 == 0) {
                     SoundEngine.PlaySound(SummonSpawnSound, npc.Center);
+
+                    Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
+                    void makeSpawnDust() {
+                        Color colorTint = MainPurpleColor * 0.75f;
+
+                        Vector2 position = getPosition() + Main.rand.NextVector2Circular(npc.width, npc.height) * 0.25f;
+                        Vector2 velocity = Vector2.UnitY.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat()) * 2.5f * Main.rand.NextFloat();
+                        FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                        fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                        float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                        fadingParticle.SetTypeInfo(num);
+                        fadingParticle.AccelerationPerFrame = velocity / num;
+                        fadingParticle.ColorTint = colorTint;
+                        fadingParticle.FadeInNormalizedTime = 0.5f;
+                        fadingParticle.FadeOutNormalizedTime = 0.5f;
+                        fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                        fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+                        Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                        FadingParticle fadingParticle2 = fadingParticle;
+                        fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                        fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                        fadingParticle.SetTypeInfo(num);
+                        fadingParticle.AccelerationPerFrame = velocity / num;
+                        fadingParticle.ColorTint = colorTint;
+                        fadingParticle.ColorTint.A = 30;
+                        fadingParticle.FadeInNormalizedTime = 0.5f;
+                        fadingParticle.FadeOutNormalizedTime = 0.5f;
+                        fadingParticle.Rotation = fadingParticle2.Rotation;
+                        fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                        Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                    }
+
+                    for (int l = 0; l < 4; l++) {
+                        if (Main.rand.NextBool()) {
+                            continue;
+                        }
+                        makeSpawnDust();
+                    }
+
                     if (!Helper.IsClient()) {
                         for (int i = 0; i < 1; i++) {
-                            Vector2 spawnPosition = npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
+                            Vector2 spawnPosition = getPosition();
                             int servantIndex = NPC.NewNPC(npc.GetSource_FromAI(), (int)spawnPosition.X, (int)spawnPosition.Y, ModContent.NPCType<EternalServant>());
                             Main.npc[servantIndex].velocity += npc.velocity * 0.75f;
                         }

@@ -1,7 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Consolaria.Common.Particles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.GameContent;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -57,6 +60,8 @@ sealed class EternalServant : ModNPC {
             NPC.ai[2] = 0f;
 
             _appearanceFactor = -1f;
+
+            NPC.position.Y += NPC.height / 2;
         }
 
         _appearanceFactor = Helper.Approach(_appearanceFactor, 1f, 0.1f);
@@ -64,6 +69,8 @@ sealed class EternalServant : ModNPC {
         //if (_appearanceFactor < 0f) {
         //    return;
         //}
+
+        Lighting.AddLight(NPC.Center, new Vector3(0.4f, 0.1f, 0.5f) * _appearanceFactor * 0.25f);
 
         NPC.localAI[1] = Helper.Approach(NPC.localAI[1], MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1 / 60f * 5f);
 
@@ -76,6 +83,42 @@ sealed class EternalServant : ModNPC {
         NPC.noTileCollide = true;
         NPC.noGravity = true;
         //NPC.Center += NPC.velocity;
+
+        if (Main.rand.NextChance(NPC.velocity.Length() / 30f) && Main.rand.NextBool(10)) {
+            void makeSpawnDust() {
+                Color colorTint = EternalHorror.MainPurpleColor * 0.75f;
+
+                Vector2 position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) * 0.5f;
+                Vector2 velocity = NPC.velocity;
+                position += velocity;
+                velocity *= 0.2f;
+                FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                FadingParticle fadingParticle2 = fadingParticle;
+                fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.ColorTint.A = 30;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = fadingParticle2.Rotation;
+                fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+            }
+
+            makeSpawnDust();
+        }
 
         if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead)
             NPC.TargetClosest();
@@ -138,6 +181,8 @@ sealed class EternalServant : ModNPC {
                 NPC.netUpdate = true;
                 NPC.ai[0] = 0f;
                 NPC.ai[1] = 0f;
+
+                _appearanceFactor = 0f;
             }
         }
 
@@ -254,7 +299,7 @@ sealed class EternalServant : ModNPC {
             color2 = color2.MultiplyAlpha(0.5f);
             color2 *= 1f - appearanceFactor;
             color2 *= Utils.GetLerpValue(0f, 0.125f, appearanceFactor, true);
-            NPC.QuickDraw(spriteBatch, screenPos, color2, rotation: 0f, texture: texture, effect: flip, scale: scale2);
+            NPC.QuickDraw(spriteBatch, screenPos, color2, texture: texture, effect: flip, scale: scale2);
         });
 
         return false;

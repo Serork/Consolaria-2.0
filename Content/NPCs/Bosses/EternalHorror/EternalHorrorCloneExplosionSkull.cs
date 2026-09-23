@@ -11,7 +11,7 @@ using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
-sealed class EternalHorrorLaser1 : ModProjectile {
+sealed class EternalHorrorCloneExplosionSkull : ModProjectile {
     public ref float ReflectedValue => ref Projectile.ai[2];
 
     public bool Reflected {
@@ -25,45 +25,91 @@ sealed class EternalHorrorLaser1 : ModProjectile {
     }
 
     public override void SetDefaults() {
-        Projectile.CloneDefaults(ProjectileID.EyeLaser);
-        AIType = ProjectileID.EyeLaser;
+        Projectile.SetSizeValues(20);
+
+        Projectile.aiStyle = -1;
 
         Projectile.hostile = true;
         Projectile.tileCollide = false;
-
+            
         Projectile.scale = 1f;
         Projectile.alpha = 255;
 
-        Projectile.width = 6;
-
         Projectile.timeLeft = 900;
         Projectile.penetrate = -1;
-
-        Projectile.light = 0.1f;
     }
 
     public override void AI() {
+        Projectile.direction = Projectile.spriteDirection = (Projectile.velocity.X > 0).ToDirectionInt();
+
         if (Projectile.localAI[2] == 0f) {
             Projectile.localAI[2] = 1f;
+
+            int num5 = Main.rand.Next(20, 40);
+            Vector2 positionInWorld = Projectile.Center;
+            Vector2 movementVector = Projectile.velocity;
+            PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+            prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+            prettySparkleParticle.LocalPosition = positionInWorld;
+            prettySparkleParticle.Rotation = (float)Math.PI / 2f;
+            prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+            prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+            prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+            prettySparkleParticle.TimeToLive = num5;
+            prettySparkleParticle.FadeOutEnd = num5;
+            prettySparkleParticle.FadeInEnd = num5 / 2;
+            prettySparkleParticle.FadeOutStart = num5 / 2;
+            prettySparkleParticle.AdditiveAmount = 0.35f;
+            prettySparkleParticle.Velocity = movementVector;
+            prettySparkleParticle.Velocity *= 0.3f;
+            Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
         }
 
         if (Projectile.timeLeft <= 895) Projectile.alpha = 50;
-        if (Reflected) {
-            Lighting.AddLight(Projectile.Center, 0.4f, 0.1f, 0.5f);
-        }
-        else {
-            Lighting.AddLight(Projectile.Center, 0.6f, 0.1f, 0.1f);
-        }
+        Lighting.AddLight(Projectile.Center, 0.4f, 0.1f, 0.5f);
 
-        ReflectFromEternalHorrorClones();
+        //ReflectFromEternalHorrorClones();
 
-        if (Main.rand.NextBool(50)) {
-            MakeMovementSparkle();
+        if (Main.rand.NextBool(2)) {
+            void makeSpawnDust() {
+                Color colorTint = EternalHorror.MainPurpleColor * 0.75f;
+
+                Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * 0.5f;
+                Vector2 velocity = Projectile.velocity;
+                velocity += Vector2.UnitY.RotatedBy(Projectile.identity + Main.GlobalTimeWrappedHourly * -15f + MathHelper.PiOver2) * Main.rand.NextFloat(Projectile.velocity.Length()) * 0.75f * Projectile.spriteDirection;
+                position += velocity;
+                velocity *= 0.2f;
+                FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                FadingParticle fadingParticle2 = fadingParticle;
+                fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.ColorTint.A = 30;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = fadingParticle2.Rotation;
+                fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+            }
+
+            makeSpawnDust();
         }
     }
 
     private void MakeMovementSparkle() {
-        Color colorTint = Reflected ? EternalHorror.MainPurpleColor : EternalHorror.MainRedColor_Dynamic;
+        Color colorTint = true ? EternalHorror.MainPurpleColor : EternalHorror.MainRedColor_Dynamic;
 
         Vector2 position = Projectile.Center;
         Vector2 velocity = Projectile.velocity;
@@ -151,7 +197,7 @@ sealed class EternalHorrorLaser1 : ModProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
-        Texture2D texture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/Projectiles/LightTrail_1");
+        Texture2D texture = Projectile.GetTexture();
         Vector2 position = Projectile.Center;
         Rectangle clip = texture.Bounds;
         Color drawColor = Color.Lerp(lightColor, Color.White, 0.5f);
@@ -163,16 +209,31 @@ sealed class EternalHorrorLaser1 : ModProjectile {
 
         Vector2 drawOrigin = clip.Centered();
 
-        for (int k = 0; k < Projectile.oldPos.Length - 1; k++) {
+        for (int k = 0; k < Projectile.oldPos.Length - 1; k += 1) {
             Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
+            position = drawPos;
+
+            float scaleFactor = Helper.Wave(0.75f, 1.5f, 20f, k * 10);
+
             position = drawPos;
             rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
             EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, clip, drawColor, rotation, flip, screenPos);
             EternalHorror.DrawUnderGlowEffect(drawContext, (newPosition, newColor) => {
-                Color color = Reflected ? new Color(60 - k * 5, 10, 60 + k * 4, 40 + k * 4) : new Color(60 + k * 4, 20 - k, 10 + k * 4, 60 + k * 4);
+                Color color = true ? new Color(60 - k * 5, 10, 60 + k * 4, 40 + k * 4) : new Color(60 + k * 4, 20 - k, 10 + k * 4, 60 + k * 4);
+                color = Color.White;
                 color = color.MultiplyRGBA(newColor);
-                spriteBatch.Draw(drawContext.Texture, newPosition, null, color, drawContext.Rotation, drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * 0.75f, drawContext.Flip, 0f);
-                spriteBatch.Draw(drawContext.Texture, newPosition - Projectile.oldPos[k] * 0.5f + Projectile.oldPos[k + 1] * 0.5f, null, color, drawContext.Rotation, drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * 0.75f, drawContext.Flip, 0f);
+                color = color.MultiplyRGBA(EternalHorror.MainPurpleColor);
+                drawColor = color;
+
+                newPosition = Vector2.Lerp(newPosition, position, 0.875f);
+
+                newPosition += Vector2.UnitY.RotatedBy(Projectile.identity + k + Projectile.oldRot[k] + Main.GlobalTimeWrappedHourly * -15f) * 10f * Projectile.spriteDirection;
+
+                drawColor *= 0.2f;
+
+                rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
+                spriteBatch.Draw(texture, newPosition, null, drawColor, Projectile.oldRot[k], drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * scaleFactor, Projectile.spriteDirection.ToSpriteEffects(), 0f);
+                spriteBatch.Draw(texture, newPosition - Projectile.oldPos[k] * 0.5f + Projectile.oldPos[k + 1] * 0.5f, null, drawColor, Projectile.oldRot[k], drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * scaleFactor, Projectile.spriteDirection.ToSpriteEffects(), 0f);
             }, sinWaveOffset: Projectile.identity + MathHelper.Pi,
                applyInnerOpacity: false,
                forcedOpacity: MathHelper.Lerp(0.125f, 0.25f, 0f),

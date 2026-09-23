@@ -309,7 +309,7 @@ sealed partial class EternalHorror : ModNPC {
                     });
                 }, sinWaveOffset: WaveOffset,
                    progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
-                   opacity: 0.375f + starOpacityExtra,
+                   opacity: 0.375f + starOpacityExtra + cloneInfo.DashOpacity / 4f,
                    sinStep: _shadowTime);
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
