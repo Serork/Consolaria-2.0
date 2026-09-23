@@ -20,6 +20,10 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static Vector2 AngleToVector(float angleRadians, float length) {
+        return new Vector2((float)Math.Cos((double)angleRadians) * length, (float)Math.Sin((double)angleRadians) * length);
+    }
+
     public static bool IsServer() => Main.netMode == NetmodeID.Server;
     public static bool IsClient() => Main.netMode == NetmodeID.MultiplayerClient;
 

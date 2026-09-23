@@ -143,6 +143,12 @@ sealed partial class EternalHorror : ModNPC {
     public override bool PreAI() => base.PreAI();
 
     public override void AI() {
+        if (!EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned) {
+            EternalHorrorSummonHandler.StartSummoningEternalHorror();
+            NPC.KillNPC();
+            return;
+        }
+
         OnSpawn();
         MakeMidnight();
         UpdateStates();

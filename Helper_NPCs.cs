@@ -5,11 +5,20 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Consolaria;
 
 public static class Helper_NPCs {
+    public static void KillNPC(this NPC npc) {
+        npc.active = false;
+        npc.life = -1;
+        if (!Helper.IsClient()) {
+            NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npc.whoAmI, 0f, 0f, 0f, 0, 0, 0);
+        }
+    }
+
     public static bool NearestTheSame(this NPC NPC, out NPC npc2, int type = -1) {
         for (int i = 0; i < Main.npc.Length; i++) {
             NPC npc = Main.npc[i];

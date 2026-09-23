@@ -117,6 +117,7 @@ sealed class ShaderLoader : ModSystem {
     }
 
     public static Asset<Effect> Distort => _loadedShaders["Distort"];
+    public static Asset<Effect> Primitive => _loadedShaders["Primitive"];
 
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
