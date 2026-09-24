@@ -69,14 +69,18 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     }
 
     private void ResetSummoning() {
+        if (!EternalHorrorSummonEnded) {
+            return;
+        }
+
         EternalHorrorSummonEnded = false;
         EternalHorrorSummonStarted = false;
 
         _eyeSpawnCD = 0;
         _eyeSpawnCycle = 0;
 
-        Main.dayTime = true;
-        Main.time = Main.dayLength / 2;
+        //Main.dayTime = true;
+        //Main.time = Main.dayLength / 2;
 
         _bossSpawnCounter = 0;
 
@@ -87,11 +91,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         HandleBlinking();
         HandleEyes();
 
-        if (EternalHorrorSummonEnded && !NPC.AnyNPCs(EternalHorror.SelfType)) {
+        bool bossAlive = NPC.AnyNPCs(EternalHorror.SelfType);
+        if (EternalHorrorSummonEnded && !bossAlive) {
             EternalHorror.MakeMidnight();
         }
 
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
+        if (!bossAlive && EternalHorrorShouldBeSummoned) {
             ResetSummoning();
         }
 
@@ -104,7 +109,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             float bossSpawnProgress = _bossSpawnCounter / (float)TIMEBEFOREBOSSSPAWN;
             if (!EternalHorrorShouldBeSummoned) {
-                EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, bossSpawnProgress, 0.125f);
+                EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, bossSpawnProgress * 0.75f, 0.125f);
             }
 
             if (_bossSpawnCounter >= TIMEBEFOREBOSSSPAWN) {

@@ -498,7 +498,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private static void ApplyShake() {
         float lerpValue = 0.1f;
-        _shakeIntensity = Helper.Approach(_shakeIntensity, EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned.ToInt(), lerpValue);
+        _shakeIntensity = Helper.Approach(_shakeIntensity, EternalHorrorSummonHandler.EternalHorrorSummonEnded.ToInt(), lerpValue);
     }
 
     public static Color GetLaserGlowColor(Color drawColor) => drawColor.MultiplyRGBA(MainRedColor_Dynamic);
