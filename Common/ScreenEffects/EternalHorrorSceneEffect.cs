@@ -6,11 +6,11 @@ using Terraria.ModLoader;
 namespace Consolaria.Common.ScreenEffects;
 
 sealed class EternalHorrorSceneEffect : ModSceneEffect {
-    public override SceneEffectPriority Priority => base.Priority;
+    public override SceneEffectPriority Priority => SceneEffectPriority.BossHigh;
 
-    public override bool IsSceneEffectActive(Player player) {
-        return base.IsSceneEffectActive(player);
-    }
+    public override int Music => MusicLoader.GetMusicSlot(Mod, EternalHorror.EERIEOCRAM_MUSICPATH);
+
+    public override bool IsSceneEffectActive(Player player) => EternalHorrorSummonHandler.EternalHorrorSummonStarted;
 
     public override void SpecialVisuals(Player player, bool isActive) {
         player.ManageSpecialBiomeVisuals(ShaderLoader.EternalHorrorTintFilterName, EternalHorrorSummonHandler.EternalHorrorSummonEnded);

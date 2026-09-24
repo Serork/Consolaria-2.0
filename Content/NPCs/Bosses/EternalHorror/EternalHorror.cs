@@ -2,11 +2,10 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 
-
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed partial class EternalHorror : ModNPC {
-    private static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
+    public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
     public static ushort SelfType => (ushort)ModContent.NPCType<EternalHorror>();
 
