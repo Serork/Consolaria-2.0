@@ -85,6 +85,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         //Main.dayTime = true;
         //Main.time = Main.dayLength / 2;
 
+        _in = false;
+
         _bossSpawnCounter = 0;
 
         EternalHorrorShouldBeSummoned = false;
@@ -112,7 +114,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             float bossSpawnProgress = _bossSpawnCounter / (float)TIMEBEFOREBOSSSPAWN;
             if (!EternalHorrorShouldBeSummoned) {
-                EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, bossSpawnProgress * 0.75f, 0.125f);
+                EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, bossSpawnProgress * 0.75f, 0.125f / 3f);
             }
 
             if (_bossSpawnCounter >= TIMEBEFOREBOSSSPAWN) {
@@ -258,6 +260,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             drawColor = Color.Lerp(drawColor, drawColor.MultiplyRGBA(EternalHorror.MainPurpleColor) * scaleFactor, 1f - scaleFactor);
 
             Color color = drawColor;
+
+            color = color.MultiplyAlpha(Helper.Wave(0.75f, 1f, 15f, i));
+
             float rotation = eyeInfo.EyeRotation;
             Helper.DrawInfo drawInfo = new() {
                 Clip = clip,
@@ -274,19 +279,24 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
                 batch.Draw(eyeTexture1, position, drawInfo);
 
+                float minScale = 1f,
+                      maxScale = 1f;
+
                 float eyeScaleFactor = 0.125f;
                 float eyeScaleWaveSpeedFactor = 2.5f;
 
                 if (eyeInfo.ShouldLookAtPlayer) {
-                    eyeScaleFactor = 0.25f;
-                    eyeScaleWaveSpeedFactor = 5f;
+                    eyeScaleFactor = MathHelper.Lerp(0.25f, 0.375f, 0f);
+                    eyeScaleWaveSpeedFactor = 12.5f;
+
+                    //maxScale *= 0.875f;
                 }
 
                 Vector2 eyePupilPosition = position + eyeInfo.PupilVelocity;
                 batch.Draw(eyeTexture2, eyePupilPosition, drawInfo
                     .WithRotation(0f)
                     .WithColorOverride(color)
-                    .WithScaleOverride(eyePupilScale * Helper.Wave(1f - eyeScaleFactor, 1f + eyeScaleFactor, eyeScaleWaveSpeedFactor, i)));
+                    .WithScaleOverride(eyePupilScale * Helper.Wave(minScale - eyeScaleFactor, maxScale + eyeScaleFactor / 2f, eyeScaleWaveSpeedFactor, i)));
             });
         }
 
@@ -352,8 +362,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             if (bossSpawned) {
                 //eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, EYESCALEMAX, 0.1f);
 
-                float offset = Utils.RandomFloat(ref seed);
-                eyeInfo.RunAwayProgress = Helper.Approach(eyeInfo.RunAwayProgress, 1f, 0.025f * Utils.Remap(offset, 0f, 1f, 0.5f, 1f, true));
+                eyeInfo.RunAwayProgress = Helper.Approach(eyeInfo.RunAwayProgress, 1f, 0.025f * Utils.Remap(Utils.RandomFloat(ref seed), 0f, 1f, 0.5f, 1f, true));
 
                 //float progressFactor = eyeInfo.RunAwayProgress;
                 //progressFactor = Ease.BounceIn(progressFactor);
@@ -362,7 +371,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             else {
             }
 
-            eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, 1f, 0.1f);
+            eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, 1f, 0.1f * Utils.Remap(Utils.RandomFloat(ref seed), 0f, 1f, 0.75f, 1f, true));
 
             eyeInfo.TargetPosition = Vector2.Lerp(eyeInfo.TargetPosition, playerCenter, 0.75f);
         }
@@ -370,6 +379,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     private static void HandleBlinking() {
         if (_shouldBlink) {
+            EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, 1f, 0.125f);
+            EternalHorrorSummonEnded = true;
+
             float lerpValue = 1 / 60f;
             lerpValue *= _speedFactor;
             float progressOffset = _delay;
@@ -383,8 +395,6 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                     eyeInfo.ShouldLookAtPlayer = true;
                 }
-
-                EternalHorrorSummonEnded = true;
             }
 
             if (_in) {
