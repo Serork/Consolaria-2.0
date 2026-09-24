@@ -144,12 +144,22 @@ sealed partial class EternalHorror : ModNPC {
         float value = 0f;
         float amount = 1f / 60f;
         Vector2 mountedCenter = player.MountedCenter;
-        for (int i = 0; i < 200; i++) {
-            if (Main.npc[i].active && Main.npc[i].type == SelfType && Main.npc[i].Distance(mountedCenter) < 3000f) {
-                value = 0.95f;
-                FrontColor = new Color(22, 21, 18) * 0.3f;
-                //amount = 0.03f;
-            }
+
+        bool drawBackground = false;
+        //for (int i = 0; i < 200; i++) {
+        //    if (Main.npc[i].active && Main.npc[i].type == SelfType && Main.npc[i].Distance(mountedCenter) < 3000f) {
+        //        drawBackground = true;
+        //        //amount = 0.03f;
+        //    }
+        //}
+
+        if (EternalHorrorSummonHandler.EternalHorrorSummonEnded) {
+            drawBackground = true;
+        }
+
+        if (drawBackground) {
+            value = 0.95f;
+            FrontColor = new Color(22, 21, 18) * 0.3f;
         }
 
         amount /= 1f;

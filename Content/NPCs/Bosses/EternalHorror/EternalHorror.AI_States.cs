@@ -266,7 +266,7 @@ sealed partial class EternalHorror : ModNPC {
 
             float dashStrength = DASHSTRENGTH;
 
-            _shakeStrength = Helper.Approach(_shakeStrength, dashProgress, 0.125f);
+            ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
 
             bool didAtLeastOneDash = boss.Phase1DashAttackCount > 0;
 
@@ -652,7 +652,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss._copiesIntensity = preparationProgress2;
 
-                _shakeStrength = Helper.Approach(_shakeStrength, preparationProgress2, 0.125f);
+                ShakeStrength = Helper.Approach(ShakeStrength, preparationProgress2, 0.125f);
 
                 lookAtTarget();
 

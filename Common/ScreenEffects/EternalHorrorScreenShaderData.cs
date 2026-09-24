@@ -34,6 +34,9 @@ sealed class EternalHorrorScreenShaderData : ScreenShaderData {
             UseTargetPosition(Main.LocalPlayer.Center);
         else if (_eternalHorrorIndex != -1)
             UseTargetPosition(Main.npc[_eternalHorrorIndex].Center);
+        else {
+            UseTargetPosition(Main.LocalPlayer.Center);
+        }
 
         base.Apply();
     }

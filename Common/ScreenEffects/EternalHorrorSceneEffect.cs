@@ -13,7 +13,7 @@ sealed class EternalHorrorSceneEffect : ModSceneEffect {
     }
 
     public override void SpecialVisuals(Player player, bool isActive) {
-        player.ManageSpecialBiomeVisuals(ShaderLoader.EternalHorrorTintFilterName, NPC.AnyNPCs(ModContent.NPCType<EternalHorror>()));
+        player.ManageSpecialBiomeVisuals(ShaderLoader.EternalHorrorTintFilterName, EternalHorrorSummonHandler.EternalHorrorSummonEnded);
         if (ShaderLoader.EternalHorrorTintFilter.IsActive()) {
             ShaderLoader.EternalHorrorTintFilter.GetShader()
                 .UseOpacity(0.125f)

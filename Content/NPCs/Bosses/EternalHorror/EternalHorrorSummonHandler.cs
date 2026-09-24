@@ -3,11 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using Terraria;
+using Terraria.GameContent.Events;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorSummonHandler : ModSystem {
+    private static ushort TIMEBEFOREBOSSSPAWN => Helper.SecondsToFrames(2);
+
     private record struct EyeInfo(int TimeLeft,
                                   int MaxTimeLeft,
                                   Vector2 PositionOffset,
@@ -15,7 +18,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                   Vector2 Velocity = default,
                                   float EyeRotation = 0f,
                                   Vector2 PupilVelocity = default,
-                                  bool ShouldLookAtPlayer = false) {
+                                  bool ShouldLookAtPlayer = false,
+                                  float RunAwayProgress = 0f) {
         public readonly bool Active => TimeLeft > 0;
     }
 
@@ -34,7 +38,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                          _delay,
                          _speedFactor;
 
+    private static int _bossSpawnCounter;
+
     public static bool EternalHorrorSummonStarted;
+    public static bool EternalHorrorSummonEnded { get; private set; }
     public static bool EternalHorrorShouldBeSummoned { get; private set; }
 
     public static void StartSummoningEternalHorror() {
@@ -49,7 +56,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     public override void Load() {
         _blinkingVertexes = new VertexPositionColor[192];
 
-        On_Main.DrawInterface += On_Main_DrawInterface;
+        On_ScreenObstruction.Draw += On_ScreenObstruction_Draw;
 
         if (!Main.dedServ) {
             _eyeTexture1 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalHorror_WanderingEye1");
@@ -61,11 +68,53 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         _blinkingVertexes = null;
     }
 
+    private void ResetSummoning() {
+        EternalHorrorSummonEnded = false;
+        EternalHorrorSummonStarted = false;
+
+        _eyeSpawnCD = 0;
+        _eyeSpawnCycle = 0;
+
+        Main.dayTime = true;
+        Main.time = Main.dayLength / 2;
+
+        _bossSpawnCounter = 0;
+
+        EternalHorrorShouldBeSummoned = false;
+    }
+
     public override void PostUpdateNPCs() {
         HandleBlinking();
         HandleEyes();
 
+        if (EternalHorrorSummonEnded && !NPC.AnyNPCs(EternalHorror.SelfType)) {
+            EternalHorror.MakeMidnight();
+        }
+
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
+            ResetSummoning();
+        }
+
         if (!EternalHorrorSummonStarted) {
+            return;
+        }
+
+        if (EternalHorrorSummonEnded) {
+            _bossSpawnCounter++;
+
+            float bossSpawnProgress = _bossSpawnCounter / (float)TIMEBEFOREBOSSSPAWN;
+            if (!EternalHorrorShouldBeSummoned) {
+                EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, bossSpawnProgress, 0.125f);
+            }
+
+            if (_bossSpawnCounter >= TIMEBEFOREBOSSSPAWN) {
+                if (!EternalHorrorShouldBeSummoned) {
+                    EternalHorrorShouldBeSummoned = true;
+
+                    NPC.SpawnOnPlayer(Main.LocalPlayer.whoAmI, EternalHorror.SelfType);
+                }
+            }
+
             return;
         }
 
@@ -95,7 +144,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             float distanceFromPlayer = baseCount * 10 * countFactor;
             for (int i = 0; i < eyeCount; i++) {
                 Vector2 position = playerCenter + Vector2.UnitY.RotatedBy(i / (float)eyeCount * MathHelper.TwoPi) * distanceFromPlayer;
-                position.Y += (position.DirectionTo(playerCenter) * distanceFromPlayer * 0.5f).Y;
+                //position.Y += (position.DirectionTo(playerCenter) * distanceFromPlayer * 0.5f).Y;
                 SpawnEye(position);
             }
             _eyeSpawnCycle++;
@@ -122,11 +171,11 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         _speedFactor = speedFactor;
     }
 
-    private void On_Main_DrawInterface(On_Main.orig_DrawInterface orig, Main self, Microsoft.Xna.Framework.GameTime gameTime) {
-        DrawEyes();
-        DrawBlinking();
+    private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch) {
+        DrawEyes(spriteBatch);
+        DrawBlinking(spriteBatch);
 
-        orig(self, gameTime);
+        orig(spriteBatch);
     }
 
     private static void SpawnEye(Vector2 position) {
@@ -158,7 +207,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                       Velocity: velocity);
     }
 
-    private static void DrawEyes() {
+    private static void DrawEyes(SpriteBatch spriteBatch) {
         if (!EternalHorrorSummonStarted) {
             return;
         }
@@ -166,8 +215,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         Player player = Main.LocalPlayer;
         Vector2 playerCenter = player.Center;
 
-        SpriteBatch batch = Main.spriteBatch;
+        SpriteBatch batch = spriteBatch;
 
+        Helper.SpriteBatchSnapshot snapshot = batch.CaptureSnapshot();
+        batch.End();
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
 
         Texture2D eyeTexture1 = _eyeTexture1.Value;
@@ -182,7 +233,11 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             Rectangle clip = eyeTexture1.Bounds;
             Vector2 origin = clip.Centered();
-            Color color = Color.White;
+
+            Color drawColor = Lighting.GetColor(position.ToTileCoordinates());
+            drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+
+            Color color = drawColor;
             float rotation = eyeInfo.EyeRotation;
             Helper.DrawInfo drawInfo = new() {
                 Clip = clip,
@@ -198,6 +253,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         }
 
         batch.End();
+        batch.Begin(snapshot);
     }
 
     private static void HandleEyes() {
@@ -206,6 +262,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         }
 
         Player player = Main.LocalPlayer;
+
+        bool bossSpawned = EternalHorrorShouldBeSummoned;
 
         for (int i = 0; i < _eyeData.Length; i++) {
             ref EyeInfo eyeInfo = ref _eyeData[i];
@@ -230,12 +288,20 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             float eyeRotation = angleToPlayer.ToRotation() * 0.125f;
 
             if (eyeInfo.ShouldLookAtPlayer) {
-                eyeInfo.Velocity += position.DirectionTo(playerCenter) * 0.125f * 0.25f * Helper.Clamp01(position.Distance(playerCenter) / 1200f);
+                eyeInfo.Velocity += position.DirectionTo(playerCenter) * 0.125f * 0.25f * Helper.Clamp01(position.Distance(playerCenter) / 300f);
 
                 float maxRotation = 0.25f * 0.75f;
                 eyeInfo.EyeRotation = Helper.Wave(-maxRotation, maxRotation, 3.75f, i);
 
                 eyeInfo.PupilVelocity = Vector2.Lerp(eyeInfo.PupilVelocity, position.DirectionTo(player.Center) * 5f, 0.25f) + Main.rand.NextVector2Circular(1f, 1f);
+            }
+
+            if (bossSpawned) {
+                eyeInfo.RunAwayProgress = Helper.Approach(eyeInfo.RunAwayProgress, 1f, 0.05f);
+
+                float progressFactor = eyeInfo.RunAwayProgress;
+                progressFactor = Ease.BounceIn(progressFactor);
+                eyeInfo.Velocity += position.DirectionFrom(playerCenter) * 2.5f * progressFactor;
             }
 
             eyeInfo.TargetPosition = Vector2.Lerp(eyeInfo.TargetPosition, playerCenter, 0.75f);
@@ -257,6 +323,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                     eyeInfo.ShouldLookAtPlayer = true;
                 }
+
+                EternalHorrorSummonEnded = true;
             }
 
             if (_in) {
@@ -271,7 +339,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 }
             }
             else {
-                float to = 0f - progressOffset / 2f;
+                float to = 0f - progressOffset * 1f;
                 _progress = Helper.Approach(_progress, to, lerpValue);
                 if (_progress <= to) {
                     _in = true;
@@ -280,10 +348,13 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         }
     }
 
-    private static void DrawBlinking() {
+    private static void DrawBlinking(SpriteBatch spriteBatch) {
+        Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
+        spriteBatch.End();
+
         _blinkingVertexes = new VertexPositionColor[192];
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {
-            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(0.125f) * 0.95f;
+            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(0.125f) * 0.975f;
         }
         int num = (int)Main.screenWidth;
         int num2 = (int)Main.screenHeight;
@@ -357,5 +428,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         graphicsDevice.RasterizerState = RasterizerState.CullNone;
         graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _blinkingVertexes, 0, _blinkingVertexes.Length / 3);
         graphicsDevice.RasterizerState = previousState;
+
+        spriteBatch.Begin(snapshot);
     }
 }

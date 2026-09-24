@@ -143,7 +143,7 @@ sealed partial class EternalHorror : ModNPC {
     public override bool PreAI() => base.PreAI();
 
     public override void AI() {
-        if (!EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned) {
+        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded && !EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned) {
             EternalHorrorSummonHandler.StartSummoningEternalHorror();
             NPC.KillNPC();
             return;
@@ -228,7 +228,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private partial void InitializeStates();
 
-    private void MakeMidnight() {
+    public static void MakeMidnight() {
         float expFactor = 0.025f;
         if (Main.dayTime) {
             expFactor *= 4;

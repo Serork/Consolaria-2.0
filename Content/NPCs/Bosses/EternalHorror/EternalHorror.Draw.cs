@@ -19,8 +19,9 @@ sealed partial class EternalHorror : ModNPC {
                                     _shadowTexture = null,
                                     _backgroundTexture = null;
 
-    private static float _shakeIntensity,
-                         _shakeStrength;
+    private static float _shakeIntensity;
+
+    public static float ShakeStrength;
 
     private float _glowOpacity,
                   _shadowProgress,
@@ -473,7 +474,7 @@ sealed partial class EternalHorror : ModNPC {
         //    _shadowTime = 0;
         //}
         _dashOpacity = Helper.Approach(_dashOpacity, 0f, 1 / 60f);
-        _shakeStrength = Helper.Approach(_shakeStrength, 0f, 1 / 60f);
+        ShakeStrength = Helper.Approach(ShakeStrength, 0f, 1 / 60f);
 
         OnIterateActiveCloneData((ref cloneInfo) => {
             cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 1 / 60f);
@@ -491,13 +492,13 @@ sealed partial class EternalHorror : ModNPC {
         if (!ShaderLoader.EternalHorrorShakeFilter.IsActive()) {
             Filters.Scene.Activate(ShaderLoader.EternalHorrorShakeFilterName, shakeCenter);
         }
-        float strength = MathHelper.Lerp(Helper.Wave(0.125f, 0.375f, 5f, 0f), 1f, _shakeStrength) * _shakeIntensity;
+        float strength = MathHelper.Lerp(Helper.Wave(0.125f, 0.375f, 5f, 0f), 1f, ShakeStrength) * _shakeIntensity;
         Filters.Scene[ShaderLoader.EternalHorrorShakeFilterName].GetShader().UseIntensity(strength);
     }
 
     private static void ApplyShake() {
         float lerpValue = 0.1f;
-        _shakeIntensity = Helper.Approach(_shakeIntensity, NPC.AnyNPCs(SelfType).ToInt(), lerpValue);
+        _shakeIntensity = Helper.Approach(_shakeIntensity, EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned.ToInt(), lerpValue);
     }
 
     public static Color GetLaserGlowColor(Color drawColor) => drawColor.MultiplyRGBA(MainRedColor_Dynamic);
