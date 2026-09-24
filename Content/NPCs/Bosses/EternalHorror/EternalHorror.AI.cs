@@ -165,6 +165,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
+        PlaySpawnRoarSound();
+
         Init = true;
 
         ResetPhase1LaserAttack(applyIncreasedDelay: true);
@@ -179,6 +181,10 @@ sealed partial class EternalHorror : ModNPC {
 
         ActivateState<MoveToPlayer>();
         ActivateState<Phase1BurstLaserAttack>();
+    }
+
+    private void PlaySpawnRoarSound() {
+        SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoar"), Main.player[NPC.target].Center);
     }
 
     private void InitializeClones() {
