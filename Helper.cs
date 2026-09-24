@@ -160,6 +160,8 @@ public static class Helper {
         public DrawInfo WithScaleX(float scale) => this with { Scale = new Vector2(Scale.X * scale, Scale.Y) };
         public DrawInfo WithScaleY(float scale) => this with { Scale = new Vector2(Scale.X, Scale.Y * scale) };
 
+        public DrawInfo WithScaleOverride(Vector2 scale) => this with { Scale = scale };
+
         public DrawInfo WithColor(Color color) => this with { Color = Color.MultiplyRGB(color) };
         public DrawInfo WithColorModifier(float colorModifier) => this with { Color = Color * colorModifier };
         public DrawInfo WithColorRGBModifier(float colorModifier) => this with { Color = Color.ModifyRGB(colorModifier) };
