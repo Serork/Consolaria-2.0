@@ -6,6 +6,7 @@ using Mono.Cecil;
 using System;
 using System.Runtime.CompilerServices;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Drawing;
@@ -52,6 +53,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile {
 
         if (Projectile.localAI[0] == 0f) {
             Projectile.localAI[0] = 1f;
+
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorrorExplosion"), Projectile.Center);
 
             if (!Helper.IsClient()) {
                 int skullCount = 15;
