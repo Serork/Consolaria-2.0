@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Utilities;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent.Events;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
@@ -32,6 +35,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     private static VertexPositionColor[] _blinkingVertexes = null;
     private static EyeInfo[] _eyeData = null;
 
+    private static SlotId? _spawnSoundSlotID = null;
+
     private static int _eyeSpawnCD,
                        _eyeSpawnCycle;
 
@@ -51,6 +56,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         if (EternalHorrorSummonStarted) {
             return;
         }
+
+        _spawnSoundSlotID = SoundEngine.PlaySound(SoundID.Zombie89 with { Pitch = -1f }, Main.LocalPlayer.Center);
 
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
@@ -93,6 +100,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     }
 
     public override void PostUpdateNPCs() {
+        if (_spawnSoundSlotID is not null && SoundEngine.TryGetActiveSound(_spawnSoundSlotID.Value, out ActiveSound result)) {
+            result.Position = Main.LocalPlayer.Center;
+        } 
+
         HandleBlinking();
         HandleEyes();
 
@@ -245,6 +256,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             Vector2 origin = clip.Centered();
 
             Color drawColor = Lighting.GetColor(position.ToTileCoordinates());
+            float brightness = drawColor.ToVector3().Length() / 3f;
+            brightness = Ease.CubeOut(brightness);
             drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
 
             //float scaleFactor = 1f - Utils.GetLerpValue(1f, EYESCALEMAX, eyeInfo.Scale, true);
@@ -261,7 +274,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             Color color = drawColor;
 
-            color = color.MultiplyAlpha(Helper.Wave(0.75f, 1f, 15f, i));
+            float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
+            color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
 
             float rotation = eyeInfo.EyeRotation;
             Helper.DrawInfo drawInfo = new() {
@@ -325,6 +339,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             float offsetY = 10f;
             playerCenter.Y += Helper.Wave(-offsetY, offsetY, 1f, i);
+            playerCenter.Y += Helper.Wave(-offsetY, offsetY, 1f, MathHelper.PiOver2 + i) / 2f;
 
             eyeInfo.TimeLeft--;
 
@@ -426,8 +441,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {
             _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(0.125f) * 0.95f;
         }
-        int num = (int)Main.screenWidth;
-        int num2 = (int)Main.screenHeight;
+        int num = 1920;
+        int num2 = 1080;
         float num3 = _progress;
         num3 = Helper.Clamp01(num3);
         Vector2 vector = new Vector2(num, num2) / 2f;

@@ -1,23 +1,34 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Consolaria.Common.Particles;
+using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Peripherals.RGB;
 using System;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Graphics.Effects;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.Map;
 using Terraria.ModLoader;
+using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed partial class EternalHorror : ModNPC {
+    private record struct RayInfo(float Angle,
+                                  float Progress = 0f) {
+        public readonly bool Active => Progress > 0f;
+    }
+
     public readonly record struct DrawContext(SpriteBatch SpriteBatch, Vector2 Position, Texture2D Texture, Rectangle Clip, Color DrawColor, float Rotation, SpriteEffects Flip, Vector2 ScreenPosition);
 
     private static Asset<Texture2D> _eyeTexture = null,
                                     _glowTexture = null,
                                     _shadowTexture = null,
-                                    _backgroundTexture = null;
+                                    _backgroundTexture = null,
+                                    _rayTexture = null;
 
     private static float _shakeIntensity;
 
@@ -29,6 +40,110 @@ sealed partial class EternalHorror : ModNPC {
                   _dashOpacity,
                   _copiesIntensity;
 
+    private RayInfo[] _rayData = null;
+
+    private void InitializeRays() {
+        _rayData = new RayInfo[RAYCOUNTMAX];
+    }
+
+    private void SpawnRay() {
+        int index = 0;
+        for (; index < _rayData.Length; index++) {
+            RayInfo rayInfo = _rayData[index];
+            if (!rayInfo.Active) {
+                break;
+            }
+        }
+        float angle = index / (float)SPAWNRAYCOUNTONSPAWN * MathHelper.TwoPi;
+        _rayData[index] = new RayInfo(Angle: angle,
+                                      Progress: RAYSTARTPROGRESS);
+    }
+
+    private void HandleRays() {
+        if (!Init) {
+            return;
+        }
+
+        ulong seed = (ulong)WaveOffset;
+
+        float getRandomValue() => Utils.RandomFloat(ref seed);
+
+        for (int i = 0; i < _rayData.Length; i++) {
+            ref RayInfo rayInfo = ref _rayData[i];
+            if (!rayInfo.Active) {
+                continue;
+            }
+
+            float rayProgress = rayInfo.Progress;
+            rayProgress = Helper.Clamp01(rayProgress);
+            int directon = (i % 2 == 0).ToDirectionInt();
+            rayInfo.Angle += Main.GlobalTimeWrappedHourly * rayProgress * directon 
+                * 0.01f * 0.01f * 0.25f
+                * Utils.Remap(getRandomValue(), 0f, 1f, 0.125f, 1f, true);
+
+            rayInfo.Progress = Helper.Approach(rayInfo.Progress, 0f, 1 / 60f * 1.5f);
+        }
+
+        for (int i = 0; i < 1; i++) {
+            if (Main.rand.NextChance(Ease.CubeOut(GetAllRayProgress())) && Main.rand.NextBool()) {
+                Color colorTint = Color.Lerp(MainRedColor_Dynamic, MainPurpleColor, 1f/*Main.rand.NextFloat()*/) * 0.5f;
+
+                Vector2 position = NPC.Center
+                    + Vector2.One.RotatedBy(NPC.rotation).RotatedByRandom(MathHelper.TwoPi) * new Vector2(NPC.width, NPC.height) * 0.5f * new Vector2(Main.rand.NextFloat(0.5f, 1f), Main.rand.NextFloat(0.5f, 1f));
+                Vector2 velocity = NPC.velocity;
+                position -= velocity;
+                velocity *= 0.2f;
+                velocity += Vector2.Normalize(NPC.Center - position) * Main.rand.NextFloat(1f, 2f);
+                FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat()) * 1.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                FadingParticle fadingParticle2 = fadingParticle;
+                fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.ColorTint.A = 30;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = fadingParticle2.Rotation;
+                fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+            }
+        }
+
+        //if (Main.rand.NextBool(1) && Main.rand.NextChance(GetAllRayProgress())) {
+        //    int index2 = Dust.NewDust(new Vector2(NPC.Center.X, NPC.Center.Y), 0, 0, DustID.LavaMoss, 0f, 0f, 100, new Color(255, 0, 244), Main.rand.NextFloat(1f, 1.5f));
+        //    Main.dust[index2].noGravity = true;
+        //    Main.dust[index2].noLight = false;
+        //    Main.dust[index2].fadeIn = Main.rand.NextFloat(0, 1.5f);
+        //    Main.dust[index2].position += new Vector2(Main.rand.Next(80, 120), 0).RotatedByRandom(MathHelper.TwoPi);
+        //    Main.dust[index2].velocity = Vector2.Normalize(NPC.Center - Main.dust[index2].position) * Main.rand.NextFloat(1f, 2f);
+        //}
+    }
+
+    public float GetAllRayProgress() {
+        float rayAllProgress = 0f;
+        if (Init) {
+            for (int i = 0; i < _rayData.Length; i++) {
+                if (_rayData[i].Active) {
+                    rayAllProgress += _rayData[i].Progress;
+                }
+            }
+            rayAllProgress /= _rayData.Length;
+        }
+        rayAllProgress /= 2f;
+        return rayAllProgress;
+    }
+
     private float WaveOffset => NPC.whoAmI;
 
     private partial void Load_Textures() {
@@ -36,6 +151,7 @@ sealed partial class EternalHorror : ModNPC {
         _glowTexture = Helper.RequestTexture(Texture + "_Glow");
         _shadowTexture = Helper.RequestTexture(Texture + "_Shadow");
         _backgroundTexture = Helper.RequestTexture(Texture + "_Background");
+        _rayTexture = Helper.RequestTexture(Texture + "_Ray");
     }
 
     private partial void Load_ApplyShaderEffects() {
@@ -436,8 +552,81 @@ sealed partial class EternalHorror : ModNPC {
                 //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
             }
         }
+        void drawRays() {
+            if (!Init) {
+                return;
+            }
+
+            ulong seed = (ulong)WaveOffset;
+
+            for (int i = 0; i < _rayData.Length; i++) {
+                RayInfo rayInfo = _rayData[i];
+                if (!rayInfo.Active) {
+                    continue;
+                }
+
+                float rayWaveOffset = i;
+
+                float rotation = rayInfo.Angle;
+
+                float rayProgress = rayInfo.Progress;
+                float step = 0.125f;
+                rayProgress *= Utils.GetLerpValue(0f, step, rayProgress, true);
+                rayProgress *= Utils.GetLerpValue(RAYSTARTPROGRESS, RAYSTARTPROGRESS - step, rayProgress, true);
+
+                float getRandomValue() => Utils.RandomFloat(ref seed);
+                float getRemappedRandomValue(float min, float max) => Utils.Remap(getRandomValue(), 0f, 1f, min, max, true);
+
+                Vector2 scale = Vector2.One;
+                scale *= 1f;
+                scale.X *= 2f * getRemappedRandomValue(0.5f, 1f);
+                scale.Y *= 2.5f * getRemappedRandomValue(0.25f, 1f);
+
+                scale.Y *= rayProgress;
+
+                Color color = MainPurpleColor;
+                color *= Helper.Wave(0.75f, 1f, 15f, rayWaveOffset);
+                color *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
+
+                color *= rayProgress;
+
+                Texture2D texture = _rayTexture.Value;
+                Rectangle clip = texture.Frame(2, 1, frameX: 0);
+                Vector2 origin = clip.Centered();
+                Helper.DrawInfo drawInfo = new() {
+                    Clip = clip,
+                    Origin = origin,
+                    Rotation = rotation,
+                    Color = color,
+                    Scale = scale
+                };
+
+                Vector2 position = NPC.Center;
+                Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation);
+                angleDirection *= origin.Y / 3f;
+                position += angleDirection;
+
+                ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                    int drawCount = 3;
+                    for (int k = 0; k < drawCount; k++) {
+                        float progress = k / (float)drawCount;
+                        progress -= 0.5f;
+                        spriteBatch.Draw(texture, position,
+                            drawInfo
+                            .WithRotation(progress * 0.125f * 0.5f)
+                            .WithColorOverride(
+                                Color.Lerp(color,
+                                Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+                                getRemappedRandomValue(0f, 0.125f))
+                                .MultiplyAlpha(0f)));
+                    }
+                });
+            }
+        }
 
         drawTrails();
+        drawRays();
         drawShadows();
         drawClones();
         drawSelf();

@@ -1,5 +1,4 @@
 ﻿using Consolaria.Common.Particles;
-using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,13 +9,15 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed partial class EternalHorror : ModNPC {
     private static byte CLONECOUNTAVAILABLE => 3;
     private static ushort CLONEACTIVETIME => Helper.SecondsToFrames(10);
+    private static byte RAYCOUNTMAX => 10;
+    private static byte SPAWNRAYCOUNTONSPAWN => RAYCOUNTMAX;
+    private static float RAYSTARTPROGRESS => 2f;
 
     private static HashSet<CloneInfo> _cloneDataCache = [];
 
@@ -158,12 +159,15 @@ sealed partial class EternalHorror : ModNPC {
 
     public override void PostAI() {
         UpdateVisuals();
+        HandleRays();
     }
 
     private void OnSpawn() {
         if (Init) {
             return;
         }
+
+        ResetFlashTime();
 
         PlaySpawnRoarSound();
 
@@ -181,6 +185,11 @@ sealed partial class EternalHorror : ModNPC {
 
         ActivateState<MoveToPlayer>();
         ActivateState<Phase1BurstLaserAttack>();
+
+        InitializeRays();
+        for (int i = 0; i < SPAWNRAYCOUNTONSPAWN; i++) {
+            SpawnRay();
+        }
     }
 
     private void PlaySpawnRoarSound() {
@@ -382,7 +391,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void SpawnFromAbove() {
-        Vector2 spawnOffset = new(0f, -850f);
+        Vector2 spawnOffset = new(0f, -850f * 0.875f);
         NPC.Center = NPC.GetTargetPlayer().Center + spawnOffset;
     }
 

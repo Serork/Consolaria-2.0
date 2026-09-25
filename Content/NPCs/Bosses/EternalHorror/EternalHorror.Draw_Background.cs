@@ -112,6 +112,10 @@ sealed partial class EternalHorror : ModNPC {
         DrawDarkness_Front(spriteBatch);
     }
 
+    public static void ResetFlashTime() {
+        _purpleColorTime = 0;
+    }
+
     private void DrawBolts(SpriteBatch spriteBatch, float minDepth, float maxDepth) {
         float num = Math.Min(1f, (Main.screenPosition.Y - 1000f) / 1000f);
         Vector2 vector3 = Main.screenPosition + new Vector2(Main.screenWidth >> 1, Main.screenHeight >> 1);
@@ -146,12 +150,15 @@ sealed partial class EternalHorror : ModNPC {
         Vector2 mountedCenter = player.MountedCenter;
 
         bool drawBackground = false;
-        //for (int i = 0; i < 200; i++) {
-        //    if (Main.npc[i].active && Main.npc[i].type == SelfType && Main.npc[i].Distance(mountedCenter) < 3000f) {
-        //        drawBackground = true;
-        //        //amount = 0.03f;
-        //    }
-        //}
+
+        NPC boss = null;
+        for (int i = 0; i < 200; i++) {
+            if (Main.npc[i].active && Main.npc[i].type == SelfType/* && Main.npc[i].Distance(mountedCenter) < 3000f*/) {
+                boss = Main.npc[i];
+                //drawBackground = true;
+                //amount = 0.03f;
+            }
+        }
 
         if (EternalHorrorSummonHandler.EternalHorrorSummonEnded) {
             drawBackground = true;
@@ -179,8 +186,14 @@ sealed partial class EternalHorror : ModNPC {
             _active = false;
         }
 
+        float rayAllProgress = 0f;
+        if (boss is not null) {
+            rayAllProgress += boss.As<EternalHorror>().GetAllRayProgress();
+        }
+        rayAllProgress /= 2f;
+
         if (_purpleColorTime == 0f) {
-            _purpleColorTime = -Main.rand.NextFloat(Helper.SecondsToFrames(1f), Helper.SecondsToFrames(2.5f));
+            _purpleColorTime = -MathHelper.Lerp(Helper.SecondsToFrames(0f), Main.rand.NextFloat(Helper.SecondsToFrames(1f), Helper.SecondsToFrames(2.5f)), 1f - rayAllProgress);
             _purpleColorTime2 = _purpleColorTime;
             _purpleColorTime *= 1.5f;
             _purpleColorStrength = Main.rand.NextFloat(0.75f);
