@@ -572,7 +572,7 @@ sealed partial class EternalHorror : ModNPC {
                 float rayProgress = rayInfo.Progress;
                 float step = 0.125f;
                 rayProgress *= Utils.GetLerpValue(0f, step, rayProgress, true);
-                rayProgress *= Utils.GetLerpValue(RAYSTARTPROGRESS, RAYSTARTPROGRESS - step, rayProgress, true);
+                rayProgress *= Utils.GetLerpValue(RAYSTARTPROGRESS, RAYSTARTPROGRESS - step * 2f, rayProgress, true);
 
                 float getRandomValue() => Utils.RandomFloat(ref seed);
                 float getRemappedRandomValue(float min, float max) => Utils.Remap(getRandomValue(), 0f, 1f, min, max, true);
