@@ -415,7 +415,7 @@ sealed partial class EternalHorror : ModNPC {
                 float distanceFactor = npc.Distance(position) / maxDistance;
                 distanceFactor = Helper.Clamp01(distanceFactor);
                 distanceFactor = 1f - distanceFactor;
-                npc.Center += npc.DirectionFrom(position) * distanceFactor * 5f;
+                npc.Center += npc.DirectionFrom(position) * distanceFactor * 2.5f;
             });
 
             lookAtTarget();
