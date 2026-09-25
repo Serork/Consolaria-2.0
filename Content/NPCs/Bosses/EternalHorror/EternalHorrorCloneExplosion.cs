@@ -54,7 +54,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile {
         if (Projectile.localAI[0] == 0f) {
             Projectile.localAI[0] = 1f;
 
-            SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorrorExplosion"), Projectile.Center);
+            SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorrorExplosion") with { Pitch = 0f, Volume = 0.75f }, Projectile.Center);
 
             if (!Helper.IsClient()) {
                 int skullCount = 15;
