@@ -315,7 +315,7 @@ sealed partial class EternalHorror : ModNPC {
             cloneInfo.UpdateStars();
 
             if (Main.rand.NextChance(cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH) && Main.rand.NextBool(1)) {
-                Color colorTint = MainPurpleColor * 0.5f;
+                Color colorTint = MainPurpleColor * 0.375f;
 
                 Vector2 position = cloneInfo.VisualPosition 
                     + Vector2.One.RotatedBy(cloneInfo.Rotation) * new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));

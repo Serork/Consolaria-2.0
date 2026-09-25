@@ -193,7 +193,7 @@ sealed partial class EternalHorror : ModNPC {
         rayAllProgress /= 2f;
 
         if (_purpleColorTime == 0f) {
-            _purpleColorTime = -MathHelper.Lerp(Helper.SecondsToFrames(0f), Main.rand.NextFloat(Helper.SecondsToFrames(1f), Helper.SecondsToFrames(2.5f)), 1f - rayAllProgress);
+            _purpleColorTime = -MathHelper.Lerp(Helper.SecondsToFrames(0f), Main.rand.NextFloat(Helper.SecondsToFrames(1f), Helper.SecondsToFrames(2.5f)), 1f - Ease.SineOut(rayAllProgress));
             _purpleColorTime2 = _purpleColorTime;
             _purpleColorTime *= 1.5f;
             _purpleColorStrength = Main.rand.NextFloat(0.75f);

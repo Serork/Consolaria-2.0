@@ -439,7 +439,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         _blinkingVertexes = new VertexPositionColor[192];
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {
-            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(0.125f) * 0.95f;
+            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(MathHelper.Lerp(0.125f, 0.25f, 0.25f)) * 0.95f;
         }
         int num = 1920;
         int num2 = 1080;

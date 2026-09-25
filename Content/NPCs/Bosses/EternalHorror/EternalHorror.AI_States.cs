@@ -409,6 +409,15 @@ sealed partial class EternalHorror : ModNPC {
                 return;
             }
 
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                Vector2 position = cloneInfo.VisualPosition;
+                float maxDistance = 600f;
+                float distanceFactor = npc.Distance(position) / maxDistance;
+                distanceFactor = Helper.Clamp01(distanceFactor);
+                distanceFactor = 1f - distanceFactor;
+                npc.Center += npc.DirectionFrom(position) * distanceFactor;
+            });
+
             lookAtTarget();
             extraSlowDownAfterDash();
         }
@@ -602,7 +611,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
                     void makeSpawnDust() {
-                        Color colorTint = MainPurpleColor * 0.75f;
+                        Color colorTint = MainPurpleColor * 0.5f;
 
                         Vector2 position = getPosition() + Main.rand.NextVector2Circular(npc.width, npc.height) * 0.25f;
                         Vector2 velocity = Vector2.UnitY.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat()) * 2.5f * Main.rand.NextFloat();
