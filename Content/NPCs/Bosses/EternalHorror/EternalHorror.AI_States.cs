@@ -238,37 +238,37 @@ sealed partial class EternalHorror : ModNPC {
             dustProgress = Helper.YoYo(dustProgress);
             boss.SpawnPreparationDust_Shadow(dustProgress);
 
-            if (boss.Phase1LastDash) {
-                boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                    //if (cloneInfo.LerpVelocityValue == 0f) {
-                    //    Player target = npc.GetTargetPlayer();
-                    //    Vector2 targetCenter = target.Center;
-                    //    Vector2 clonePosition = boss.GetCloneSpawnPosition();
-                    //    cloneInfo.TargetPosition = Vector2.Lerp(cloneInfo.TargetPosition, targetCenter, 0.1f);
-                    //    cloneInfo.Position = Vector2.Lerp(cloneInfo.Position, clonePosition, 0.1f);
-                    //}
+            //if (boss.Phase1LastDash) {
+            //    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+            //        //if (cloneInfo.LerpVelocityValue == 0f) {
+            //        //    Player target = npc.GetTargetPlayer();
+            //        //    Vector2 targetCenter = target.Center;
+            //        //    Vector2 clonePosition = boss.GetCloneSpawnPosition();
+            //        //    cloneInfo.TargetPosition = Vector2.Lerp(cloneInfo.TargetPosition, targetCenter, 0.1f);
+            //        //    cloneInfo.Position = Vector2.Lerp(cloneInfo.Position, clonePosition, 0.1f);
+            //        //}
 
-                    //cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.05f);
+            //        //cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.05f);
 
-                    //cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 0.1f);
-                });
-                foreach (CloneInfo cloneInfo in boss._cloneData) {
-                    if (cloneInfo.Active) {
-                        Vector2 targetCenter2 = targetCenter;
-                        targetCenter = Vector2.Lerp(npc.Center, cloneInfo.VisualPosition, 0.875f);
-                        targetCenter = Vector2.Lerp(targetCenter, targetCenter2, 0.875f);
-                        break;
-                    }
-                }
-            }
-            else {
-                //boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                //    cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 0f, 0.05f);
-                //    if (cloneInfo.LerpVelocityValue <= 0f) {
-                //        cloneInfo.ShouldUpdateVisualPosition = false;
-                //    }
-                //});
-            }
+            //        //cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 0.1f);
+            //    });
+            //    foreach (CloneInfo cloneInfo in boss._cloneData) {
+            //        if (cloneInfo.Active) {
+            //            Vector2 targetCenter2 = targetCenter;
+            //            targetCenter = Vector2.Lerp(npc.Center, cloneInfo.VisualPosition, 0.875f);
+            //            targetCenter = Vector2.Lerp(targetCenter, targetCenter2, 0.875f);
+            //            break;
+            //        }
+            //    }
+            //}
+            //else {
+            //    //boss.OnIterateActiveCloneData((ref cloneInfo) => {
+            //    //    cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 0f, 0.05f);
+            //    //    if (cloneInfo.LerpVelocityValue <= 0f) {
+            //    //        cloneInfo.ShouldUpdateVisualPosition = false;
+            //    //    }
+            //    //});
+            //}
 
             boss._cloneTargetPosition = targetCenter;
 
@@ -406,7 +406,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             void destroyClones() {
                 bool shouldDestroyClones = npc.velocity.Length() > dashStrength * MathHelper.Lerp(0.5f, 0.875f, 0.5f);
-                if (boss.Phase1LastDash && shouldDestroyClones) {
+                if (/*boss.Phase1LastDash && */shouldDestroyClones) {
                     boss.DestroyClonesOnContact();
                 }
             }

@@ -272,7 +272,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
             index++;
         }
-        int timeLeft = 30 + Main.rand.Next(10);
+        int timeLeft = 27 + Main.rand.Next(10);
         _soulData[index] = new SoulInfo(TimeLeft: timeLeft,
                                         MaxTimeLeft: timeLeft,
                                         PositionOffset: position,
