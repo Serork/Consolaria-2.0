@@ -339,12 +339,21 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 Scale = eyeScale
             };
 
-            Vector2 eyePupilScale = Ease.CubeIn(eyeInfo.Scale) * baseScale;
+            void drawSelf(Vector2 positionOffset = default, float colorFactor = 1f) {
+                float fadeProgress = 1f - eyeInfo.RunAwayProgress;
 
-            ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
-            ShaderLoader.DistortShader.Strength = MathF.Max((_shouldBlink || EternalHorrorSummonEnded).ToInt(), _eyeSpawnCycle / (float)EYESPAWNCYCLECOUNT);
-            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                batch.Draw(eyeTexture1, position, drawInfo);
+                baseScale.Y *= Utils.Remap(fadeProgress, 1f, 0f, 1f, 15f, true);
+
+                Vector2 eyePupilScale = Ease.CubeIn(eyeInfo.Scale) * baseScale;
+
+                color = Color.Lerp(color, EternalHorror.MainPurpleColor with { A = 0 }
+                , Ease.QuintOut(eyeInfo.RunAwayProgress));
+
+                color *= MathF.Pow(fadeProgress, 10f); 
+
+                Vector2 position2 = position + positionOffset;
+                batch.Draw(eyeTexture1, position2, drawInfo.WithColorOverride(color * 0.75f)
+                    .WithScaleOverride(baseScale));
 
                 float minScale = 1f,
                       maxScale = 1f;
@@ -359,12 +368,29 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                     //maxScale *= 0.875f;
                 }
 
-                Vector2 eyePupilPosition = position + eyeInfo.PupilVelocity;
+                //color *= colorFactor;
+
+                Vector2 eyePupilPosition = position2 + eyeInfo.PupilVelocity;
                 batch.Draw(eyeTexture2, eyePupilPosition, drawInfo
                     .WithRotation(0f)
                     .WithColorOverride(color)
                     .WithScaleOverride(eyePupilScale * Helper.Wave(minScale - eyeScaleFactor, maxScale + eyeScaleFactor / 2f, eyeScaleWaveSpeedFactor, i)));
+            }
+
+            ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
+            ShaderLoader.DistortShader.Strength = MathF.Max((_shouldBlink || EternalHorrorSummonEnded).ToInt(), _eyeSpawnCycle / (float)EYESPAWNCYCLECOUNT);
+            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                drawSelf();
             });
+
+            //else {
+            //    ShaderLoader.BlurShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
+            //    ShaderLoader.BlurShader.Pixel = Vector2.One * 2;
+            //    ShaderLoader.BlurShader.Fade = fadeProgress;
+            //    ShaderLoader.ApplyEffect(ShaderLoader.BlurShader.Effect, spriteBatch, () => {
+            //        drawSelf();
+            //    });
+            //}
         }
 
         //batch.End();
@@ -511,6 +537,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             if (bossSpawned) {
                 //eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, EYESCALEMAX, 0.1f);
+
+                eyeInfo.Velocity += position.DirectionTo(bossCenter) * eyeInfo.RunAwayProgress;
 
                 eyeInfo.RunAwayProgress = Helper.Approach(eyeInfo.RunAwayProgress, 1f, 0.025f * Utils.Remap(Utils.RandomFloat(ref seed), 0f, 1f, 0.5f, 1f, true));
                 if (eyeInfo.RunAwayProgress >= 0.125f && !eyeInfo.SpawnedSoul) {

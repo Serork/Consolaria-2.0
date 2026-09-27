@@ -21,6 +21,37 @@ using static Terraria.ModLoader.Core.TmodFile;
 namespace Consolaria;
 
 sealed class ShaderLoader : ModSystem {
+    public static class BlurShader {
+        public static Effect Effect => Blur.Value;
+
+        private static Vector2 _pixel;
+        public static Vector2 Pixel {
+            get => _pixel;
+            set => Effect?.Parameters["pixel"].SetValue(_pixel = value);
+        }
+
+        private static float _fade;
+        public static float Fade {
+            get => _fade;
+            set => Effect?.Parameters["fade"].SetValue(_fade = value);
+        }
+
+        public static void SetFrameSize(float width, float height) {
+            Vector4 sourceRectangle = new(-width / 2f, -height / 2f, width, height);
+            Vector2 size = new(width, height);
+            Effect.Parameters["uSourceRect"].SetValue(sourceRectangle);
+            Effect.Parameters["uLegacyArmorSourceRect"].SetValue(sourceRectangle);
+            Effect.Parameters["uImageSize0"].SetValue(size);
+            Effect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly);
+        }
+
+        public static void SetDefault(float width, float height) {
+            SetFrameSize(width, height);
+            Pixel = Vector2.One * 2f;
+            Fade = 0f;
+        }
+    }
+
     // shoutout to NoelFB https://github.com/NoelFB/CelesteEffects/blob/main/Distort.fx
     public static class DistortShader {
         public static Effect Effect => Distort.Value;
@@ -118,6 +149,7 @@ sealed class ShaderLoader : ModSystem {
 
     public static Asset<Effect> Distort => _loadedShaders["Distort"];
     public static Asset<Effect> Primitive => _loadedShaders["Primitive"];
+    public static Asset<Effect> Blur => _loadedShaders["Blur"];
 
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
