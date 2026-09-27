@@ -25,8 +25,20 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                   Vector2 PupilVelocity = default,
                                   bool ShouldLookAtPlayer = false,
                                   float RunAwayProgress = 0f,
-                                  float Scale = 0f) {
+                                  float Scale = 0f,
+                                  bool SpawnedSoul = false) {
         public readonly bool Active => TimeLeft > 0;
+        public readonly Vector2 VisualPosition => TargetPosition + PositionOffset;
+    }
+
+    private record struct SoulInfo(int TimeLeft,
+                                   int MaxTimeLeft,
+                                   Vector2 PositionOffset,
+                                   Vector2 TargetPosition,
+                                   Vector2 Velocity = default,
+                                   Vector2 TargetVelocity = default) {
+        public readonly bool Active => TimeLeft > 0;
+        public readonly Vector2 VisualPosition => TargetPosition + PositionOffset;
     }
 
     private static Asset<Texture2D> _eyeTexture1 = null,
@@ -34,6 +46,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     private static VertexPositionColor[] _blinkingVertexes = null;
     private static EyeInfo[] _eyeData = null;
+    private static SoulInfo[] _soulData = null;
 
     private static SlotId? _spawnSoundSlotID = null;
 
@@ -61,6 +74,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
+        _soulData = new SoulInfo[400];
     }
 
     public override void Load() {
@@ -72,6 +86,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             _eyeTexture1 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalHorror_WanderingEye1");
             _eyeTexture2 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalHorror_WanderingEye2");
         }
+
+        On_Main.DrawNPCs += On_Main_DrawNPCs;
+    }
+
+    private void On_Main_DrawNPCs(On_Main.orig_DrawNPCs orig, Main self, bool behindTiles) {
+        orig(self, behindTiles);
     }
 
     public override void Unload() {
@@ -106,6 +126,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         HandleBlinking();
         HandleEyes();
+        HandleSouls();
 
         bool bossAlive = NPC.AnyNPCs(EternalHorror.SelfType);
         if (EternalHorrorSummonEnded && !bossAlive) {
@@ -194,6 +215,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch) {
         DrawEyes(spriteBatch);
+        DrawSouls(spriteBatch);
         DrawBlinking(spriteBatch);
 
         orig(spriteBatch);
@@ -228,6 +250,37 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                       Velocity: velocity);
     }
 
+    private static void SpawnSoul(EyeInfo eyeInfo) {
+        if (!EternalHorrorSummonStarted) {
+            return;
+        }
+
+        Player player = Main.LocalPlayer;
+        Vector2 playerCenter = player.Center;
+
+        Vector2 position = eyeInfo.VisualPosition;
+
+        Vector2 velocity = -Vector2.UnitY * 50f;
+        velocity.X *= Main.rand.NextFloat(0.5f, 1f);
+
+        position -= playerCenter;
+
+        int index = 0;
+        for (int i = 0; i < _soulData.Length; i++) {
+            if (!_soulData[index].Active) {
+                break;
+            }
+            index++;
+        }
+        int timeLeft = 30 + Main.rand.Next(10);
+        _soulData[index] = new SoulInfo(TimeLeft: timeLeft,
+                                        MaxTimeLeft: timeLeft,
+                                        PositionOffset: position,
+                                        TargetPosition: playerCenter,
+                                        Velocity: Vector2.Zero,
+                                        TargetVelocity: velocity);
+    }
+
     private static void DrawEyes(SpriteBatch spriteBatch) {
         if (!EternalHorrorSummonStarted) {
             return;
@@ -250,7 +303,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 continue;
             }
 
-            Vector2 position = eyeInfo.TargetPosition + eyeInfo.PositionOffset;
+            Vector2 position = eyeInfo.VisualPosition;
 
             Rectangle clip = eyeTexture1.Bounds;
             Vector2 origin = clip.Centered();
@@ -318,6 +371,85 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         //batch.Begin(snapshot);
     }
 
+    private static void DrawSouls(SpriteBatch spriteBatch) {
+        if (!EternalHorrorSummonStarted) {
+            return;
+        }
+
+        Texture2D texture = EternalHorror.RayTexture.Value;
+
+        ulong seed = 0u;
+
+        float getRandomValue() => Utils.RandomFloat(ref seed);
+        float getRemappedRandomValue(float min, float max) => Utils.Remap(getRandomValue(), 0f, 1f, min, max, true);
+
+        for (int i = 0; i < _soulData.Length; i++) {
+            SoulInfo soulInfo = _soulData[i];
+            if (!soulInfo.Active) {
+                continue;
+            }
+
+            Vector2 position = soulInfo.VisualPosition;
+
+            float progress = 1f - soulInfo.TimeLeft / (float)soulInfo.MaxTimeLeft,
+                  progress2 = progress;
+            float step = 0.125f;
+            float progressStep1 = Utils.GetLerpValue(0f, step / 2f, progress2, true);
+            float progressStep2 = 1f - Utils.GetLerpValue(1f - step * 4f, 1f, progress2, true);
+            progress = progressStep1;
+            progress *= progressStep2;
+
+            Rectangle clip = texture.Frame(2, 1, frameX: 1);
+            Vector2 origin = clip.Centered();
+
+            Color color = Color.White;
+            color = color.MultiplyRGBA(EternalHorror.MainPurpleColor);
+
+            //color = Color.Lerp(color,
+            //                   Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+            //                   getRemappedRandomValue(0f, 0.125f));
+
+            color *= progress;
+
+            color *= 1f;
+
+            float rotation = soulInfo.Velocity.ToRotation() + MathHelper.PiOver2;
+            Vector2 scale = Vector2.One;
+
+            //scale *= progress;
+
+            scale.X *= 1.5f;
+
+            scale.Y *= progressStep1;
+            scale.Y *= Utils.Remap(progressStep2, 0f, 1f, 0f, 5f, true);
+
+            Helper.DrawInfo drawInfo = new() {
+                Clip = clip,
+                Origin = origin,
+                Color = color,
+                Rotation = rotation,
+                Scale = scale
+            };
+
+            ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                int drawCount = 3;
+                for (int k = 0; k < drawCount; k++) {
+                    float progress = k / (float)drawCount;
+                    progress -= 0.5f;
+
+                    spriteBatch.Draw(texture, position, drawInfo
+                            .WithRotation(progress * 0.125f * 0.5f)
+                            .WithColorOverride(
+                                Color.Lerp(color,
+                                Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+                                getRemappedRandomValue(0f, 0.125f))
+                                .MultiplyAlpha(0f) * 0.125f * 0.5f));
+                }
+            });
+        }
+    }
+
     private static void HandleEyes() {
         if (!EternalHorrorSummonStarted) {
             return;
@@ -347,18 +479,21 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             eyeInfo.Velocity *= 0.95f;
 
-            Vector2 position = eyeInfo.TargetPosition + eyeInfo.PositionOffset;
+            Vector2 position = eyeInfo.VisualPosition;
 
             Vector2 angleToPlayer = position.DirectionTo(playerCenter);
             float eyeRotation = angleToPlayer.ToRotation() * 0.125f;
 
             Vector2 bossCenter = playerCenter;
+            float bossRotation = 0f;
             foreach (NPC npc in Main.ActiveNPCs) {
                 if (npc.type == EternalHorror.SelfType) {
+                    bossRotation = npc.rotation;
                     bossCenter = npc.Center;
                     break;
                 }
             }
+            bossCenter -= Vector2.UnitY.RotatedBy(bossRotation) * 600f;
 
             float getDistanceFactor(float maxDistance = 300f) => Helper.Clamp01(position.Distance(playerCenter) / maxDistance);
 
@@ -378,6 +513,13 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 //eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, EYESCALEMAX, 0.1f);
 
                 eyeInfo.RunAwayProgress = Helper.Approach(eyeInfo.RunAwayProgress, 1f, 0.025f * Utils.Remap(Utils.RandomFloat(ref seed), 0f, 1f, 0.5f, 1f, true));
+                if (eyeInfo.RunAwayProgress >= 0.125f && !eyeInfo.SpawnedSoul) {
+                    eyeInfo.SpawnedSoul = true;
+
+                    if (Main.rand.NextBool()) {
+                        SpawnSoul(eyeInfo);
+                    }
+                }
 
                 //float progressFactor = eyeInfo.RunAwayProgress;
                 //progressFactor = Ease.BounceIn(progressFactor);
@@ -389,6 +531,49 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, 1f, 0.1f * Utils.Remap(Utils.RandomFloat(ref seed), 0f, 1f, 0.75f, 1f, true));
 
             eyeInfo.TargetPosition = Vector2.Lerp(eyeInfo.TargetPosition, playerCenter, 0.75f);
+        }
+    }
+
+    private static void HandleSouls() {
+        if (!EternalHorrorSummonStarted) {
+            return;
+        }
+
+        Player player = Main.LocalPlayer;
+
+        bool bossSpawned = EternalHorrorShouldBeSummoned;
+
+        ulong seed = 0u;
+
+        for (int i = 0; i < _soulData.Length; i++) {
+            ref SoulInfo soulInfo = ref _soulData[i];
+            if (!soulInfo.Active) {
+                continue;
+            }
+
+            Vector2 playerCenter = player.Center;
+
+            Vector2 position = soulInfo.VisualPosition;
+
+            soulInfo.TimeLeft--;
+
+            soulInfo.PositionOffset += soulInfo.Velocity;
+
+            soulInfo.Velocity = Vector2.Lerp(soulInfo.Velocity, soulInfo.TargetVelocity, 0.125f * 0.5f);
+
+            Vector2 bossCenter = playerCenter;
+            foreach (NPC npc in Main.ActiveNPCs) {
+                if (npc.type == EternalHorror.SelfType) {
+                    bossCenter = npc.Center;
+                    break;
+                }
+            }
+
+            Vector2 velocity = position.DirectionTo(bossCenter) * 50f;
+
+            soulInfo.TargetVelocity = Vector2.Lerp(soulInfo.TargetVelocity, velocity, 0.25f);
+
+            soulInfo.TargetPosition = Vector2.Lerp(soulInfo.TargetPosition, playerCenter, 0.875f);
         }
     }
 

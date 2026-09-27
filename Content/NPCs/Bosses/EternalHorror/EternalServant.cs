@@ -150,6 +150,7 @@ sealed class EternalServant : ModNPC {
             NPC.velocity *= 0.99f;
 
             NPC.ai[1] += 1f;
+            NPC.ai[1] += 1f;
 
             if (NPC.ai[1] >= 100f) {
                 NPC.netUpdate = true;
@@ -171,6 +172,7 @@ sealed class EternalServant : ModNPC {
             NPC.velocity *= 0.96f;
             NPC.velocity *= 0.96f;
 
+            NPC.ai[1] += 10f;
             NPC.ai[1] += 10f;
             NPC.ai[1] += 10f;
 

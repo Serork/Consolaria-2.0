@@ -27,8 +27,9 @@ sealed partial class EternalHorror : ModNPC {
     private static Asset<Texture2D> _eyeTexture = null,
                                     _glowTexture = null,
                                     _shadowTexture = null,
-                                    _backgroundTexture = null,
-                                    _rayTexture = null;
+                                    _backgroundTexture = null;
+
+    public static Asset<Texture2D> RayTexture { get; private set; }
 
     private static float _shakeIntensity;
 
@@ -158,7 +159,7 @@ sealed partial class EternalHorror : ModNPC {
         _glowTexture = Helper.RequestTexture(Texture + "_Glow");
         _shadowTexture = Helper.RequestTexture(Texture + "_Shadow");
         _backgroundTexture = Helper.RequestTexture(Texture + "_Background");
-        _rayTexture = Helper.RequestTexture(Texture + "_Ray");
+        RayTexture = Helper.RequestTexture(Texture + "_Ray");
     }
 
     private partial void Load_ApplyShaderEffects() {
@@ -597,7 +598,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 color *= rayProgress;
 
-                Texture2D texture = _rayTexture.Value;
+                Texture2D texture = RayTexture.Value;
                 Rectangle clip = texture.Frame(2, 1, frameX: 0);
                 Vector2 origin = clip.Centered();
                 Helper.DrawInfo drawInfo = new() {

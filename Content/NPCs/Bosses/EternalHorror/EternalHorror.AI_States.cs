@@ -215,7 +215,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase1DashAttack : IAIState {
-        public static float DASHTIME => Helper.SecondsToFrames(0.75f);
+        public static float DASHTIME => Helper.SecondsToFrames(0.75f * 0.75f);
         public static float LASERATTACKCOUNTNEEDED => 5;
         public static float DASHATTACKCOUNT => 5;
         public static float DASHSTRENGTH => 40f;
@@ -497,9 +497,9 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase1SummonSpawnAttack : IAIState {
-        public static float MOVETOPLAYERTIME => Helper.SecondsToFrames(1f);
-        public static float SLOWDOWNTIME => Helper.SecondsToFrames(1f);
-        public static float ATTACKTIME => Helper.SecondsToFrames(1.5f);
+        public static float MOVETOPLAYERTIME => Helper.SecondsToFrames(1f * 0.75f);
+        public static float SLOWDOWNTIME => Helper.SecondsToFrames(1f * 0.75f);
+        public static float ATTACKTIME => Helper.SecondsToFrames(1.5f * 0.75f);
 
         public static SoundStyle SummonSpawnSound => SoundID.NPCDeath45;
 
@@ -599,6 +599,9 @@ sealed partial class EternalHorror : ModNPC {
                 Vector2 velocity = npc.DirectionTo(destination);
                 float wave = MathF.Sin(attackProgress * 60f * 0.15f + npc.IsFacingLeft().ToInt() * MathHelper.Pi);
                 npc.velocity = Vector2.Lerp(npc.velocity, velocity.RotatedBy(wave) * WaveMovementSpeed, lerpValue);
+
+                npc.velocity += npc.DirectionTo(targetCenter) * 5f * lerpValue;
+
                 npc.rotation = npc.rotation.AngleLerp(npc.velocity.ToRotation() - MathHelper.PiOver2, lerpValue);
 
                 if (attackProgress >= 1f) {
