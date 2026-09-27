@@ -244,7 +244,9 @@ sealed partial class EternalHorror : ModNPC {
                 });
                 foreach (CloneInfo cloneInfo in boss._cloneData) {
                     if (cloneInfo.Active) {
+                        Vector2 targetCenter2 = targetCenter;
                         targetCenter = Vector2.Lerp(npc.Center, cloneInfo.VisualPosition, 0.875f);
+                        targetCenter = Vector2.Lerp(targetCenter, targetCenter2, 0.875f);
                         break;
                     }
                 }
