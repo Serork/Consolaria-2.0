@@ -406,7 +406,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             void destroyClones() {
                 bool shouldDestroyClones = npc.velocity.Length() > dashStrength * MathHelper.Lerp(0.5f, 0.875f, 0.5f);
-                if (/*boss.Phase1LastDash && */shouldDestroyClones) {
+                if (boss.Phase1AtLeast1Dash && shouldDestroyClones) {
                     boss.DestroyClonesOnContact();
                 }
             }
@@ -706,6 +706,7 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase1ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase1CloneSpawn.SHADOWSPAWNTIME);
     public float Phase1LaserSpamAttackProgress => Ease.SineIn(Helper.Clamp01(AICounter / Phase1LaserSpamAttack.BEFORESPAMTIME));
     public bool Phase1LastDash => Phase1DashAttackCount >= Phase1DashAttack.DASHATTACKCOUNT - 1;
+    public bool Phase1AtLeast1Dash => Phase1DashAttackCount > 1;
 
     private partial void InitializeStates() {
         _states = [];
