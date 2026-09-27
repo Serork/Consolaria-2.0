@@ -195,7 +195,7 @@ sealed partial class EternalHorror : ModNPC {
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
 
                 float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
-                dustProgress = Helper.YoYo(dustProgress) * 2f;
+                dustProgress = Helper.YoYo(dustProgress);
                 boss.SpawnPreparationDust_Shadow(dustProgress);
 
                 if (shadowSpawnProgress) {
@@ -235,7 +235,7 @@ sealed partial class EternalHorror : ModNPC {
             float dashProgress = boss.AICounter / DASHTIME;
 
             float dustProgress = dashProgress;
-            dustProgress = Helper.YoYo(dustProgress) * 2f;
+            dustProgress = Helper.YoYo(dustProgress);
             boss.SpawnPreparationDust_Shadow(dustProgress);
 
             if (boss.Phase1LastDash) {
@@ -560,7 +560,7 @@ sealed partial class EternalHorror : ModNPC {
             float preparationProgress = boss.AICounter / MOVETOPLAYERTIME;
 
             float dustProgress = preparationProgress;
-            dustProgress = Helper.YoYo(dustProgress) * 2f;
+            dustProgress = Helper.YoYo(dustProgress);
             boss.SpawnPreparationDust_Shadow(dustProgress);
 
             bool shouldStopPreparing = boss.AICounter >= MOVETOPLAYERTIME;
