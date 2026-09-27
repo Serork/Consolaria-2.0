@@ -155,11 +155,12 @@ sealed partial class EternalHorror : ModNPC {
         UpdateStates();
         UpdateClones();
         ForceUpdateRotation();
+
+        UpdateVisuals();
+        HandleRays();
     }
 
     public override void PostAI() {
-        UpdateVisuals();
-        HandleRays();
     }
 
     private void OnSpawn() {

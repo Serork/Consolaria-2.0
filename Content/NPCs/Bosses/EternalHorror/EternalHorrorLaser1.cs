@@ -99,7 +99,7 @@ sealed class EternalHorrorLaser1 : ModProjectile {
 
         foreach (NPC npc in Main.ActiveNPCs) {
             if (npc.type != EternalHorror.SelfType) {
-                return;
+                continue;
             }
 
             EternalHorror boss = npc.As<EternalHorror>();
