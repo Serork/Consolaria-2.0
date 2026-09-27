@@ -34,6 +34,8 @@ sealed partial class EternalHorror : ModNPC {
 
     public static float ShakeStrength;
 
+    private float _seed;
+
     private float _glowOpacity,
                   _shadowProgress,
                   _shadowTime,
@@ -44,6 +46,8 @@ sealed partial class EternalHorror : ModNPC {
 
     private void InitializeRays() {
         _rayData = new RayInfo[RAYCOUNTMAX];
+
+        _seed = Main.rand.NextFloat(100f);
     }
 
     private void SpawnRay() {
@@ -64,7 +68,7 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
-        ulong seed = (ulong)WaveOffset;
+        ulong seed = (ulong)_seed;
 
         float getRandomValue() => Utils.RandomFloat(ref seed);
 
@@ -79,7 +83,7 @@ sealed partial class EternalHorror : ModNPC {
             int directon = (i % 2 == 0).ToDirectionInt();
             rayInfo.Angle += Main.GlobalTimeWrappedHourly * rayProgress * directon 
                 * 0.01f * 0.01f * 0.25f
-                * Utils.Remap(getRandomValue(), 0f, 1f, 0.125f, 1f, true);
+                * Utils.Remap(getRandomValue(), 0f, 1f, 1f, 0.25f, true);
 
             rayInfo.Progress = Helper.Approach(rayInfo.Progress, 0f, 1 / 60f * 1.5f);
         }
@@ -557,7 +561,7 @@ sealed partial class EternalHorror : ModNPC {
                 return;
             }
 
-            ulong seed = (ulong)WaveOffset;
+            ulong seed = (ulong)_seed;
 
             for (int i = 0; i < _rayData.Length; i++) {
                 RayInfo rayInfo = _rayData[i];

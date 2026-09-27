@@ -437,12 +437,17 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
         spriteBatch.End();
 
+        float brightness = Lighting.GetColor(Main.LocalPlayer.Center.ToTileCoordinates()).ToVector3().Length() / 3f;
+
         _blinkingVertexes = new VertexPositionColor[192];
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {
-            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(MathHelper.Lerp(0.125f, 0.25f, 0.25f)) * 0.95f;
+            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(MathHelper.Lerp(MathHelper.Lerp(0.125f, 0.25f, 0.25f), 1f, brightness * 0f)) * 0.95f;
         }
-        int num = 1920;
-        int num2 = 1080;
+        DisplayMode desktop = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
+        int screenWidth = desktop.Width;
+        int screenHeight = desktop.Height;
+        int num = screenWidth;
+        int num2 = screenHeight;
         float num3 = _progress;
         num3 = Helper.Clamp01(num3);
         Vector2 vector = new Vector2(num, num2) / 2f;
