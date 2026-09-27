@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static tModPorter.ProgressUpdate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -192,6 +193,11 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
+
+                float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
+                dustProgress = Helper.YoYo(dustProgress) * 2f;
+                boss.SpawnPreparationDust_Shadow(dustProgress);
+
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
@@ -227,6 +233,10 @@ sealed partial class EternalHorror : ModNPC {
             Vector2 targetCenter = target.Center;
 
             float dashProgress = boss.AICounter / DASHTIME;
+
+            float dustProgress = dashProgress;
+            dustProgress = Helper.YoYo(dustProgress) * 2f;
+            boss.SpawnPreparationDust_Shadow(dustProgress);
 
             if (boss.Phase1LastDash) {
                 boss.OnIterateActiveCloneData((ref cloneInfo) => {
@@ -548,6 +558,11 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             float preparationProgress = boss.AICounter / MOVETOPLAYERTIME;
+
+            float dustProgress = preparationProgress;
+            dustProgress = Helper.YoYo(dustProgress) * 2f;
+            boss.SpawnPreparationDust_Shadow(dustProgress);
+
             bool shouldStopPreparing = boss.AICounter >= MOVETOPLAYERTIME;
             if (!shouldStopPreparing) {
                 float preparationSlowDown = 1f - preparationProgress;
@@ -603,6 +618,8 @@ sealed partial class EternalHorror : ModNPC {
                 npc.velocity += npc.DirectionTo(targetCenter) * 5f * lerpValue;
 
                 npc.rotation = npc.rotation.AngleLerp(npc.velocity.ToRotation() - MathHelper.PiOver2, lerpValue);
+
+                boss.SpawnPreparationDust_Shadow(1f);
 
                 if (attackProgress >= 1f) {
                     boss.ResetCounters();

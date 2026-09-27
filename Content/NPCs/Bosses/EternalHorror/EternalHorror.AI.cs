@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static tModPorter.ProgressUpdate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -332,7 +333,7 @@ sealed partial class EternalHorror : ModNPC {
                 fadingParticle.FadeInNormalizedTime = 0.5f;
                 fadingParticle.FadeOutNormalizedTime = 0.5f;
                 fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
-                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat()) * 1.25f;
                 Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
                 FadingParticle fadingParticle2 = fadingParticle;
                 fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
@@ -496,6 +497,44 @@ sealed partial class EternalHorror : ModNPC {
             int damage = 30;
             float knockBack = 5f;
             Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack);
+        }
+    }
+
+    private void SpawnPreparationDust_Shadow(float progress) {
+        for (int i = 0; i < 1; i++) {
+            if (Main.rand.NextChance(Ease.CubeOut(progress)) && Main.rand.NextBool()) {
+                Color colorTint = Color.Lerp(MainRedColor_Dynamic, MainPurpleColor, 1f/*Main.rand.NextFloat()*/) * 0.5f;
+
+                Vector2 position = NPC.Center
+                    + Vector2.One.RotatedBy(NPC.rotation).RotatedByRandom(MathHelper.TwoPi) * new Vector2(NPC.width, NPC.height) * 0.5f * new Vector2(Main.rand.NextFloat(0.5f, 1f), Main.rand.NextFloat(0.5f, 1f));
+                Vector2 velocity = NPC.velocity;
+                position -= velocity;
+                velocity *= 0.2f;
+                velocity += Vector2.Normalize(NPC.Center - position) * Main.rand.NextFloat(1f, 2f);
+                FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat()) * 1.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                FadingParticle fadingParticle2 = fadingParticle;
+                fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                fadingParticle.SetTypeInfo(num);
+                fadingParticle.AccelerationPerFrame = velocity / num;
+                fadingParticle.ColorTint = colorTint;
+                fadingParticle.ColorTint.A = 30;
+                fadingParticle.FadeInNormalizedTime = 0.5f;
+                fadingParticle.FadeOutNormalizedTime = 0.5f;
+                fadingParticle.Rotation = fadingParticle2.Rotation;
+                fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+            }
         }
     }
 }

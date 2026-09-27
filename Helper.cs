@@ -20,6 +20,13 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static float YoYo(float value) {
+        if (value <= 0.5f) {
+            return value * 2f;
+        }
+        return 1f - (value - 0.5f) * 2f;
+    }
+
     public static Vector2 AngleToVector(float angleRadians, float length) {
         return new Vector2((float)Math.Cos((double)angleRadians) * length, (float)Math.Sin((double)angleRadians) * length);
     }
