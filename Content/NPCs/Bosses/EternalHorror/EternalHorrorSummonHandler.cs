@@ -401,7 +401,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                 EternalHorror.DrawContext drawContext = new(spriteBatch, position, eyeTexture2, clip, drawColor, 0f, default, Main.screenPosition);
                 EternalHorror.DrawUnderShadowEffect(drawContext, (newPosition, newColor) => {
-                    drawSelf();
+                    ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
+                    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                        drawSelf();
+                    });
                 }, sinWaveOffset: WaveOffset,
                    progress: timeLeftProgress * 0.25f,
                    opacity: 0.375f,
