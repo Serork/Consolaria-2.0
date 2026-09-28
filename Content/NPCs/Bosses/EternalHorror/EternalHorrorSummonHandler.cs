@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.Events;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static Terraria.GameContent.Animations.Actions.Sprites;
 
@@ -76,6 +77,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
         _soulData = new SoulInfo[400];
+
+        Helper.NewMessage(Language.GetTextValue("Mods.Consolaria.EternalHorrorSpawnMessage"), new Color(50, 255, 130));
     }
 
     public override void Load() {
