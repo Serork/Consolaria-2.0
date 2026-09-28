@@ -1481,6 +1481,11 @@ Mods: {
 				DisplayName: Garrafa de Lejía
 				Tooltip: Invoca a una mascota cría albina
 			}
+
+			SuspiciousLookingSkull_EternalHorror: {
+				// DisplayName: Suspicious Looking Skull_ Eternal Horror
+				// Tooltip: ""
+			}
 		}
 
 		NPCs: {

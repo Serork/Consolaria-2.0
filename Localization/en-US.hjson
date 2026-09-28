@@ -1375,6 +1375,11 @@ Mods: {
 				DisplayName: Bleach Canister
 				Tooltip: Summons a pet albino runt
 			}
+
+			SuspiciousLookingSkull_EternalHorror: {
+				DisplayName: Suspicious Looking Skull_ Eternal Horror
+				Tooltip: ""
+			}
 		}
 
 		NPCs: {

@@ -1466,6 +1466,11 @@ Mods: {
 				DisplayName: Vasilha de água sanitária
 				Tooltip: Invoca um filhote albino de estimação
 			}
+
+			SuspiciousLookingSkull_EternalHorror: {
+				// DisplayName: Suspicious Looking Skull_ Eternal Horror
+				// Tooltip: ""
+			}
 		}
 
 		NPCs: {
