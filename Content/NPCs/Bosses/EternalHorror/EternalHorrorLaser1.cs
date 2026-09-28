@@ -137,7 +137,7 @@ sealed class EternalHorrorLaser1 : ModProjectile {
 
                     Reflected = true;
 
-                    SoundEngine.PlaySound(SoundID.Item150 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 1f), Volume = 0.5f }, Projectile.Center);
+                    SoundEngine.PlaySound(SoundID.Item150 with { Pitch = -MathHelper.Lerp(0.25f, 0.5f, 0.5f), Volume = 0.5f }, Projectile.Center);
 
                     int num5 = Main.rand.Next(20, 40);
                     Vector2 positionInWorld = Projectile.Center;
