@@ -343,7 +343,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             void drawSelf(Vector2 positionOffset = default, float colorFactor = 1f) {
                 float fadeProgress = 1f - eyeInfo.RunAwayProgress;
 
-                baseScale.Y *= Utils.Remap(fadeProgress, 1f, 0f, 1f, 10f, true);
+                float rotationAmount = Utils.Remap(fadeProgress, 1f, 0f, 1f, 7.5f, true) - 1f;
+                float pupilRotation = eyeInfo.PupilVelocity.ToRotation();
+                float cos = MathF.Cos(pupilRotation);
+                float sin = MathF.Sin(pupilRotation);
+                baseScale.X *= 1f + rotationAmount * Math.Abs(cos);
+                baseScale.Y *= 1f + rotationAmount * Math.Abs(sin);
 
                 Vector2 eyePupilScale = Ease.CubeIn(eyeInfo.Scale) * baseScale;
 

@@ -54,7 +54,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile {
         if (Projectile.localAI[0] == 0f) {
             Projectile.localAI[0] = 1f;
 
-            SoundEngine.PlaySound(SoundID.Item14 with { Pitch = -0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item14 with { Pitch = -Main.rand.NextFloat(0.75f, 1f) }, Projectile.Center);
 
             if (!Helper.IsClient()) {
                 int skullCount = 15;
