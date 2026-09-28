@@ -477,10 +477,13 @@ sealed partial class EternalHorror : ModNPC {
             Vector2 clonePosition = cloneInfo.VisualPosition;
             float cloneRotation = cloneInfo.Rotation;
             Vector2 cloneDirection = Vector2.UnitY.RotatedBy(cloneRotation);
-            Vector2 clonePosition_Start = clonePosition + cloneDirection * NPC.height / 2f,
-                    clonePosition_End = clonePosition + -cloneDirection * NPC.height / 2f;
+            int width = NPC.width;
+            float fluffFactor = 0.875f;
+            width = (int)(width * fluffFactor);
+            Vector2 clonePosition_Start = clonePosition + cloneDirection * NPC.height / 2f * fluffFactor,
+                    clonePosition_End = clonePosition + -cloneDirection * NPC.height / 2f * fluffFactor;
             float collisionPoint = 0f;
-            if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, NPC.width, ref collisionPoint)) {
+            if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, width, ref collisionPoint)) {
                 cloneInfo.TimeLeft = 0;
 
                 Vector2 position = Vector2.Lerp(clonePosition_Start, clonePosition_End, 0.5f);

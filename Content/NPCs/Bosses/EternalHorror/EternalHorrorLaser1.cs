@@ -115,10 +115,13 @@ sealed class EternalHorrorLaser1 : ModProjectile {
                 Vector2 clonePosition = cloneInfo.VisualPosition;
                 float cloneRotation = cloneInfo.Rotation;
                 Vector2 cloneDirection = Vector2.UnitY.RotatedBy(cloneRotation);
-                Vector2 clonePosition_Start = clonePosition + cloneDirection * npc.height / 2f,
-                        clonePosition_End = clonePosition + -cloneDirection * npc.height / 2f;
+                int width = npc.width;
+                float fluffFactor = 0.875f;
+                width = (int)(width * fluffFactor);
+                Vector2 clonePosition_Start = clonePosition + cloneDirection * npc.height / 2f * fluffFactor,
+                        clonePosition_End = clonePosition + -cloneDirection * npc.height / 2f * fluffFactor;
                 float collisionPoint = 0f;
-                if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, npc.width, ref collisionPoint)) {
+                if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, width, ref collisionPoint)) {
                     Projectile.velocity = Projectile.Center.DirectionTo(bossTargetCenter) * Projectile.velocity.Length();
 
                     cloneInfo.AddStar(Projectile.Center);
