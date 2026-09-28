@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -66,8 +67,8 @@ sealed partial class EternalHorror : ModNPC {
                                spawnSlots: 10f,
                                boss: true);
 
-        NPC.SetHitSounds(hitSound: SoundID.NPCHit18,
-                         deathSound: SoundID.NPCDeath18);
+        NPC.SetHitSounds(hitSound: SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) },
+                         deathSound: SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) });
 
         NPC.SetMiscellaneousProperties(dropCoins: Item.buyPrice(gold: 15),
                                        lavaImmune: true);

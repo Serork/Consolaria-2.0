@@ -335,7 +335,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     npc.ResetTrails();
 
-                    SoundEngine.PlaySound(DashSound, npc.Center);
+                    SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     boss.AICounter = -DASHTIME;
 
@@ -629,7 +629,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 if (boss._dashOpacity >= dashOpacity / 4f && boss.AICounter % 6 == 0) {
-                    SoundEngine.PlaySound(SummonSpawnSound, npc.Center);
+                    SoundEngine.PlaySound(SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
                     void makeSpawnDust() {

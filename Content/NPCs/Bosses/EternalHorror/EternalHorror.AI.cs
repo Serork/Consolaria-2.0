@@ -195,7 +195,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void PlaySpawnRoarSound() {
-        SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoar"), Main.player[NPC.target].Center);
+        SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoar") with { Pitch = -0.25f }, Main.player[NPC.target].Center);
     }
 
     private void InitializeClones() {

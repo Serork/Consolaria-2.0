@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -42,9 +43,17 @@ sealed class EternalHorrorLaser1 : ModProjectile {
         Projectile.light = 0.1f;
     }
 
+    public override bool PreAI() {
+        Projectile.ai[1] = 1f;
+
+        return true;
+    }
+
     public override void AI() {
         if (Projectile.localAI[2] == 0f) {
             Projectile.localAI[2] = 1f;
+
+            SoundEngine.PlaySound(SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, Projectile.Center);
         }
 
         if (Projectile.timeLeft <= 895) Projectile.alpha = 50;
