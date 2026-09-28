@@ -508,8 +508,8 @@ sealed partial class EternalHorror : ModNPC {
 
     private readonly struct Phase1SummonSpawnAttack : IAIState {
         public static float MOVETOPLAYERTIME => Helper.SecondsToFrames(1f * 0.75f);
-        public static float SLOWDOWNTIME => Helper.SecondsToFrames(1f * 0.75f);
-        public static float ATTACKTIME => Helper.SecondsToFrames(1.5f * 0.75f);
+        public static float SLOWDOWNTIME => Helper.SecondsToFrames(1f * 1f);
+        public static float ATTACKTIME => Helper.SecondsToFrames(1.5f * 1f);
 
         public static SoundStyle SummonSpawnSound => SoundID.NPCDeath45;
 
