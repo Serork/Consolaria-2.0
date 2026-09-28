@@ -8,6 +8,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -342,14 +343,14 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             void drawSelf(Vector2 positionOffset = default, float colorFactor = 1f) {
                 float fadeProgress = 1f - eyeInfo.RunAwayProgress;
 
-                baseScale.Y *= Utils.Remap(fadeProgress, 1f, 0f, 1f, 15f, true);
+                baseScale.Y *= Utils.Remap(fadeProgress, 1f, 0f, 1f, 10f, true);
 
                 Vector2 eyePupilScale = Ease.CubeIn(eyeInfo.Scale) * baseScale;
 
                 color = Color.Lerp(color, EternalHorror.MainPurpleColor with { A = 0 }
                 , Ease.QuintOut(eyeInfo.RunAwayProgress));
 
-                color *= MathF.Pow(fadeProgress, 10f); 
+                color *= MathF.Pow(fadeProgress, 15f);
 
                 Vector2 position2 = position + positionOffset;
                 batch.Draw(eyeTexture1, position2, drawInfo.WithColorOverride(color * 0.75f)
@@ -377,11 +378,28 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                     .WithScaleOverride(eyePupilScale * Helper.Wave(minScale - eyeScaleFactor, maxScale + eyeScaleFactor / 2f, eyeScaleWaveSpeedFactor, i)));
             }
 
-            ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
-            ShaderLoader.DistortShader.Strength = MathF.Max((_shouldBlink || EternalHorrorSummonEnded).ToInt(), _eyeSpawnCycle / (float)EYESPAWNCYCLECOUNT);
-            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                drawSelf();
-            });
+            if (!eyeInfo.SpawnedSoul) {
+                ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
+                ShaderLoader.DistortShader.Strength = MathF.Max((_shouldBlink || EternalHorrorSummonEnded).ToInt(), _eyeSpawnCycle / (float)EYESPAWNCYCLECOUNT);
+                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                    drawSelf();
+                });
+            }
+            else {
+                float WaveOffset = 0f;
+                float _shadowTime = 0f;
+                float scale = 1f;
+                float timeLeftProgress = 1f;
+
+                EternalHorror.DrawContext drawContext = new(spriteBatch, position, eyeTexture2, clip, drawColor, 0f, default, Main.screenPosition);
+                EternalHorror.DrawUnderShadowEffect(drawContext, (newPosition, newColor) => {
+                    drawSelf();
+                }, sinWaveOffset: WaveOffset,
+                   progress: timeLeftProgress * 0.25f,
+                   opacity: 0.375f,
+                   sinStep: _shadowTime,
+                   offsetAmount: 32f / MathHelper.Lerp(1f, 4f, scale));
+            }
 
             //else {
             //    ShaderLoader.BlurShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
