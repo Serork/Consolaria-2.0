@@ -602,7 +602,7 @@ sealed partial class EternalHorror : ModNPC {
                 float smoothFactor_End = 1f - Utils.GetLerpValue(1f - smoothFactor, 1f, attackProgress, true);
                 //lerpValue *= 1f - Utils.GetLerpValue(1f - smoothFactor, 1f, attackProgress, true);
                 lerpValue *= Utils.GetLerpValue(0f, smoothFactor, attackProgress, true);
-                lerpValue *= 2f;
+                lerpValue *= 1.75f;
 
                 float dashOpacity = 0.5f;
                 boss._dashOpacity = Helper.Approach(boss._dashOpacity, dashOpacity, smoothFactor * 0.25f);
