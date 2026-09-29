@@ -86,8 +86,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         On_ScreenObstruction.Draw += On_ScreenObstruction_Draw;
 
         if (!Main.dedServ) {
-            _eyeTexture1 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalHorror_WanderingEye1");
-            _eyeTexture2 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalHorror_WanderingEye2");
+            _eyeTexture1 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant");
+            _eyeTexture2 = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Eye");
         }
 
         On_Main.DrawNPCs += On_Main_DrawNPCs;
@@ -300,6 +300,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         Texture2D eyeTexture1 = _eyeTexture1.Value;
         Texture2D eyeTexture2 = _eyeTexture2.Value;
+
+        ulong seed = 0u;
+
+        float getRandomValue() => Utils.RandomFloat(ref seed);
+        float getRemappedRandomValue(float min, float max) => Utils.Remap(getRandomValue(), 0f, 1f, min, max, true);
+
         for (int i = 0; i < _eyeData.Length; i++) {
             EyeInfo eyeInfo = _eyeData[i];
             if (!eyeInfo.Active) {
@@ -308,13 +314,17 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             Vector2 position = eyeInfo.VisualPosition;
 
-            Rectangle clip = eyeTexture1.Bounds;
+            float waveOffset = (Main.GlobalTimeWrappedHourly + i);
+
+            int maxFrames = 4;
+            int frameY = (int)(waveOffset * 7.5f % maxFrames);
+            Rectangle clip = eyeTexture1.Frame(1, maxFrames, frameY: frameY);
             Vector2 origin = clip.Centered();
 
             Color drawColor = Lighting.GetColor(position.ToTileCoordinates());
             float brightness = drawColor.ToVector3().Length() / 3f;
             brightness = Ease.CubeOut(brightness);
-            drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+            drawColor = Color.Lerp(drawColor, Color.White, 0.375f);
 
             //float scaleFactor = 1f - Utils.GetLerpValue(1f, EYESCALEMAX, eyeInfo.Scale, true);
             //scaleFactor = Ease.CubeIn(scaleFactor);
@@ -323,6 +333,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             float scaleFactor = 1f - eyeInfo.RunAwayProgress;
             Vector2 baseScale = Vector2.One * new Vector2(1f, scaleFactor);
+
+            baseScale *= MathHelper.Lerp(0.875f, 1f, 0.5f);
 
             Vector2 eyeScale = eyeInfo.Scale * baseScale;
 
@@ -333,7 +345,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
             color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
 
-            float rotation = eyeInfo.EyeRotation;
+            float rotation = eyeInfo.EyeRotation + (eyeInfo.RunAwayProgress <= 0f).ToInt() * getRemappedRandomValue(-1f, 1f) * MathHelper.TwoPi * 0.125f * 0.125f;
             Helper.DrawInfo drawInfo = new() {
                 Clip = clip,
                 Origin = origin,
@@ -379,9 +391,17 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 //color *= colorFactor;
 
                 Vector2 eyePupilPosition = position2 + eyeInfo.PupilVelocity;
-                batch.Draw(eyeTexture2, eyePupilPosition, drawInfo
+                int pupilMaxFrames = 2;
+                int pupilFrameY = (int)(waveOffset * 7.5f % pupilMaxFrames);
+                Rectangle pupilClip = eyeTexture2.Frame(1, pupilMaxFrames, frameY: pupilFrameY);
+                Vector2 pupilOrigin = pupilClip.Centered();
+                batch.Draw(eyeTexture2, eyePupilPosition, (drawInfo with { Clip = pupilClip, Origin = pupilOrigin })
                     .WithRotation(0f)
-                    .WithColorOverride(color)
+                    .WithColorOverride(Color.Lerp(color,
+                                       Color.Lerp(color,
+                                       Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+                                       getRemappedRandomValue(0f, 0.125f)),
+                                       (eyeInfo.RunAwayProgress <= 0f).ToInt()))
                     .WithScaleOverride(eyePupilScale * Helper.Wave(minScale - eyeScaleFactor, maxScale + eyeScaleFactor / 2f, eyeScaleWaveSpeedFactor, i)));
             }
 

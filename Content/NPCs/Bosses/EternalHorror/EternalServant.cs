@@ -1,6 +1,7 @@
 ﻿using Consolaria.Common.Particles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.GameContent;
@@ -11,6 +12,8 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalServant : ModNPC {
+    private static Asset<Texture2D> _eyeTexture = null;
+
     private Vector2 _speed;
     private float _appearanceFactor;
 
@@ -19,11 +22,15 @@ sealed class EternalServant : ModNPC {
     public override void SetStaticDefaults() {
         NPC.SetTrail(trailingMode: 7, length: 10 / 2);
 
-        Main.npcFrameCount[NPC.type] = 2;
+        Main.npcFrameCount[NPC.type] = 4;
 
         NPCID.Sets.DontDoHardmodeScaling[Type] = true;
         NPCID.Sets.CantTakeLunchMoney[Type] = true;
         NPCID.Sets.BossBestiaryPriority.Add(Type);
+
+        if (!Main.dedServ) {
+            _eyeTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Eye");
+        }
     }
 
     public override void SetDefaults() {
@@ -31,7 +38,7 @@ sealed class EternalServant : ModNPC {
         NPC.Size = new Vector2(width, height);
 
         NPC.aiStyle = -1;
-        AnimationType = NPCID.ServantofCthulhu;
+        //AnimationType = NPCID.ServantofCthulhu;
 
         NPC.lifeMax = 500;
         NPC.damage = 90;
@@ -44,6 +51,22 @@ sealed class EternalServant : ModNPC {
 
         NPC.noTileCollide = true;
         NPC.noGravity = true;
+    }
+
+    public override void FindFrame(int frameHeight) {
+        int frame = NPC.GetCurrentFrame(frameHeight);
+
+        ref double frameCounter = ref NPC.frameCounter;
+
+        if (++frameCounter > 4) {
+            frameCounter = 0;
+            frame++;
+            if (frame >= Main.npcFrameCount[Type]) {
+                frame = 0;
+            }
+        }
+
+        NPC.SetCurrentFrame(frame, frameHeight);
     }
 
     public override void AI() {
@@ -213,7 +236,7 @@ sealed class EternalServant : ModNPC {
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
         drawColor = NPC.GetNPCColorTintedByBuffs(npcColor: drawColor);
-        drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+        drawColor = Color.Lerp(drawColor, Color.White, 0.375f);
         Texture2D texture = NPC.GetTexture();
         Vector2 position = NPC.Center;
 
@@ -240,6 +263,12 @@ sealed class EternalServant : ModNPC {
 
         float scale = Helper.Clamp01(NPC.localAI[2]) * appearanceFactor;
 
+        float waveOffset = Main.GlobalTimeWrappedHourly + NPC.whoAmI;
+
+        int pupilMaxFrames = 2;
+        int pupilFrameY = (int)(waveOffset * 7.5f % pupilMaxFrames);
+        Rectangle pupilClip = _eyeTexture.Frame(1, pupilMaxFrames, frameY: pupilFrameY);
+
         SpriteEffects flip = SpriteEffects.None;
 
         float _dashOpacity = 0.5f;
@@ -248,7 +277,7 @@ sealed class EternalServant : ModNPC {
         for (int num173 = 1; num173 < length; num173 += 1) {
             _ = ref NPC.oldPos[num173];
             Color color39 = drawColor;
-            color39 = color39.MultiplyRGBA(EternalHorror.MainPurpleColor_Dynamic);
+            color39 = color39.MultiplyRGBA(EternalHorror.MainPurpleColor);
             color39.R = (byte)(1f * (double)(int)color39.R * (double)(length - num173) / length);
             color39.G = (byte)(1f * (double)(int)color39.G * (double)(length - num173) / length);
             color39.B = (byte)(1f * (double)(int)color39.B * (double)(length - num173) / length);
@@ -276,32 +305,40 @@ sealed class EternalServant : ModNPC {
             });
         }
 
-        EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, NPC.frame, drawColor, 0f, default, screenPos);
-        EternalHorror.DrawUnderShadowEffect(drawContext, (newPosition, newColor) => {
-            Vector2 center = NPC.Center;
-            NPC.Center = newPosition;
-            ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
-            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                NPC.QuickDraw(spriteBatch, screenPos, newColor, texture: texture, effect: flip, scale: scale);
-            });
-            NPC.Center = center;
-        }, sinWaveOffset: WaveOffset,
-           progress: timeLeftProgress * 0.25f,
-           opacity: 0.375f,
-           sinStep: _shadowTime,
-           offsetAmount: 32f / MathHelper.Lerp(1f, 4f, scale),
-           shadowPositionOffset: (k) => Vector2.UnitY.RotatedBy(targetAngle) * 10f * (k / MathHelper.TwoPi));
+        ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+        ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+            NPC.QuickDraw(spriteBatch, screenPos, drawColor, texture: texture, effect: flip, scale: scale);
+            NPC.QuickDraw(spriteBatch, screenPos, drawColor, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale);
+        });
+
+        //EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, NPC.frame, drawColor, 0f, default, screenPos);
+        //EternalHorror.DrawUnderShadowEffect(drawContext, (newPosition, newColor) => {
+        //    Vector2 center = NPC.Center;
+        //    NPC.Center = newPosition;
+        //    ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+        //    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+        //        NPC.QuickDraw(spriteBatch, screenPos, newColor, texture: texture, effect: flip, scale: scale);
+        //        NPC.QuickDraw(spriteBatch, screenPos, newColor, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale);
+        //    });
+        //    NPC.Center = center;
+        //}, sinWaveOffset: WaveOffset,
+        //   progress: timeLeftProgress * 0.25f,
+        //   opacity: 0.375f,
+        //   sinStep: _shadowTime,
+        //   offsetAmount: 32f / MathHelper.Lerp(1f, 4f, scale),
+        //   shadowPositionOffset: (k) => Vector2.UnitY.RotatedBy(targetAngle) * 10f * (k / MathHelper.TwoPi));
 
         ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
             float scale2 = MathHelper.Lerp(3.5f, 1f, appearanceFactor);
             Color color2 = drawColor;
             color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor);
-            color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor_Dynamic);
+            //color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor_Dynamic);
             color2 = color2.MultiplyAlpha(0.5f);
             color2 *= 1f - appearanceFactor;
             color2 *= Utils.GetLerpValue(0f, 0.125f, appearanceFactor, true);
             NPC.QuickDraw(spriteBatch, screenPos, color2, texture: texture, effect: flip, scale: scale2);
+            NPC.QuickDraw(spriteBatch, screenPos, color2, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale2);
         });
 
         return false;
