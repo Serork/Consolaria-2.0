@@ -205,7 +205,9 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
-        Draw(spriteBatch, screenPos, drawColor);
+        if (Init || NPC.IsABestiaryIconDummy) {
+            Draw(spriteBatch, screenPos, drawColor);
+        }
 
         return false;
     }
