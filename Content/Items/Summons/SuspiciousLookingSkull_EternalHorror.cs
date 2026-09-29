@@ -1,12 +1,9 @@
 using Consolaria.Content.NPCs.Bosses.EternalHorror;
-using Consolaria.Content.NPCs.Bosses.Ocram;
 
 using Microsoft.Xna.Framework;
 
 using Terraria;
-using Terraria.Chat;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.Items.Summons {

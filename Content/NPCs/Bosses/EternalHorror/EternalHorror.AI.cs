@@ -175,7 +175,7 @@ sealed partial class EternalHorror : ModNPC {
 
         Init = true;
 
-        ResetPhase1LaserAttack(applyIncreasedDelay: true);
+        ResetPhase1LaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay2: true);
 
         TargetPlayer();
 
@@ -398,11 +398,15 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void ResetPhase1LaserAttack(bool applyIncreasedDelay = false,
-                                        bool applyExtraIncreasedDelay = false) {
+                                        bool applyExtraIncreasedDelay = false,
+                                        bool applyExtraIncreasedDelay2 = false) {
         if (applyIncreasedDelay) {
             AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 1f);
             if (applyExtraIncreasedDelay) {
                 AICounter *= 2f;
+            }
+            if (applyExtraIncreasedDelay2) {
+                AICounter *= 1.5f;
             }
             return;
         }
