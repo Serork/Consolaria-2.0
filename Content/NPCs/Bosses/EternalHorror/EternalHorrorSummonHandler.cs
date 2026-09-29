@@ -334,7 +334,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             float scaleFactor = 1f - eyeInfo.RunAwayProgress;
             Vector2 baseScale = Vector2.One * new Vector2(1f, scaleFactor);
 
-            baseScale *= MathHelper.Lerp(0.875f, 1f, 0.5f);
+            baseScale *= MathHelper.Lerp(0.875f, 1f, 0.25f);
 
             Vector2 eyeScale = eyeInfo.Scale * baseScale;
 
