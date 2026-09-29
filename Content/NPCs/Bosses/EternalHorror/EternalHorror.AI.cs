@@ -20,6 +20,8 @@ sealed partial class EternalHorror : ModNPC {
     private static byte SPAWNRAYCOUNTONSPAWN => RAYCOUNTMAX;
     private static float RAYSTARTPROGRESS => 2f;
 
+    public static float SPAWNOFFSETY => -850f * 0.875f;
+
     private static HashSet<CloneInfo> _cloneDataCache = [];
 
     private partial void Unload_Caches() {
@@ -393,7 +395,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void SpawnFromAbove() {
-        Vector2 spawnOffset = new(0f, -850f * 0.875f);
+        Vector2 spawnOffset = new(0f, SPAWNOFFSETY);
         NPC.Center = NPC.GetTargetPlayer().Center + spawnOffset;
     }
 

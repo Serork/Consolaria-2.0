@@ -19,6 +19,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     private record struct EyeInfo(int TimeLeft,
                                   int MaxTimeLeft,
+                                  int MaxTimeLeftForSelfCollapse,
                                   Vector2 PositionOffset,
                                   Vector2 TargetPosition,
                                   Vector2 Velocity = default,
@@ -37,7 +38,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                    Vector2 PositionOffset,
                                    Vector2 TargetPosition,
                                    Vector2 Velocity = default,
-                                   Vector2 TargetVelocity = default) {
+                                   Vector2 TargetVelocity = default,
+                                   Vector2 ForcedBossPosition = default) {
         public readonly bool Active => TimeLeft > 0;
         public readonly Vector2 VisualPosition => TargetPosition + PositionOffset;
     }
@@ -246,14 +248,18 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             index++;
         }
         int timeLeft = 360;
+
+        int timeLeft2 = 0;
+
         _eyeData[index] = new EyeInfo(TimeLeft: timeLeft,
                                       MaxTimeLeft: timeLeft,
+                                      MaxTimeLeftForSelfCollapse: timeLeft2,
                                       PositionOffset: position,
                                       TargetPosition: playerCenter,
                                       Velocity: velocity);
     }
 
-    private static void SpawnSoul(EyeInfo eyeInfo) {
+    private static void SpawnSoul(EyeInfo eyeInfo, Vector2 forcedBossPosition = default) {
         if (!EternalHorrorSummonStarted) {
             return;
         }
@@ -281,7 +287,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                         PositionOffset: position,
                                         TargetPosition: playerCenter,
                                         Velocity: Vector2.Zero,
-                                        TargetVelocity: velocity);
+                                        TargetVelocity: velocity,
+                                        ForcedBossPosition: forcedBossPosition);
     }
 
     private static void DrawEyes(SpriteBatch spriteBatch) {
@@ -528,8 +535,6 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         Player player = Main.LocalPlayer;
 
-        bool bossSpawned = EternalHorrorShouldBeSummoned;
-
         ulong seed = 0u;
 
         for (int i = 0; i < _eyeData.Length; i++) {
@@ -537,6 +542,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             if (!eyeInfo.Active) {
                 continue;
             }
+
+            bool bossSpawned = EternalHorrorShouldBeSummoned;
 
             Vector2 playerCenter = player.Center;
 
@@ -566,6 +573,18 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
             bossCenter -= Vector2.UnitY.RotatedBy(bossRotation) * 600f;
 
+            bool bossSpawned2 = eyeInfo.TimeLeft <= eyeInfo.MaxTimeLeftForSelfCollapse;
+            if (bossSpawned2 && !bossSpawned) {
+                bossCenter.Y += EternalHorror.SPAWNOFFSETY;
+
+                if (eyeInfo.TimeLeft == eyeInfo.MaxTimeLeftForSelfCollapse) {
+                    SoundEngine.PlaySound(SoundID.NPCDeath6 with { MaxInstances = 25, Pitch = 0.5f + Main.rand.NextFloat(0.5f, 1f), Volume = 0.125f * 0.25f }, position);
+                }
+
+                bossSpawned = true;
+                //playerCenter = bossCenter;
+            }
+
             float getDistanceFactor(float maxDistance = 300f) => Helper.Clamp01(position.Distance(playerCenter) / maxDistance);
 
             if (eyeInfo.ShouldLookAtPlayer) {
@@ -580,6 +599,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                     0.25f) + Main.rand.NextVector2Circular(1f, 1f);
             }
 
+
             if (bossSpawned) {
                 //eyeInfo.Scale = Helper.Approach(eyeInfo.Scale, EYESCALEMAX, 0.1f);
 
@@ -590,7 +610,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                     eyeInfo.SpawnedSoul = true;
 
                     if (Main.rand.NextBool()) {
-                        SpawnSoul(eyeInfo);
+                        SpawnSoul(eyeInfo, bossSpawned2 ? bossCenter : default);
                     }
                 }
 
@@ -642,6 +662,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 }
             }
 
+            if (soulInfo.ForcedBossPosition != default) {
+                bossCenter = soulInfo.ForcedBossPosition;
+            }
+
             Vector2 velocity = position.DirectionTo(bossCenter) * 50f;
 
             soulInfo.TargetVelocity = Vector2.Lerp(soulInfo.TargetVelocity, velocity, 0.25f);
@@ -653,6 +677,19 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     private static void HandleBlinking() {
         if (_shouldBlink) {
             EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, 1f, 0.125f);
+
+            if (!EternalHorrorSummonEnded) {
+                for (int i = 0; i < _eyeData.Length; i++) {
+                    ref EyeInfo eyeInfo = ref _eyeData[i];
+                    if (!eyeInfo.Active) {
+                        continue;
+                    }
+
+                    eyeInfo.TimeLeft = eyeInfo.MaxTimeLeft;
+                    eyeInfo.MaxTimeLeftForSelfCollapse = (int)(eyeInfo.MaxTimeLeft * Main.rand.NextFloat(0f, MathHelper.Lerp(0.75f, 0.875f, 0.5f)));
+                }
+            }
+
             EternalHorrorSummonEnded = true;
 
             float lerpValue = 1 / 60f;
