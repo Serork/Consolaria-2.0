@@ -573,16 +573,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
             bossCenter -= Vector2.UnitY.RotatedBy(bossRotation) * 600f;
 
-            float bossSpawnProgress = _bossSpawnCounter / (float)TIMEBEFOREBOSSSPAWN;
-            float collapseFactor = bossSpawnProgress;
-            collapseFactor = Ease.SineOut(collapseFactor) * 1.5f;
-            if (collapseFactor < 1f) {
-                collapseFactor = 1f;
-            }
-            else {
-                collapseFactor = MathF.Pow(collapseFactor, 1.25f);
-            }
-            bool bossSpawned2 = eyeInfo.TimeLeft <= eyeInfo.MaxTimeLeftForSelfCollapse * collapseFactor;
+            float bossSpawnProgressFactor = _bossSpawnCounter / (float)TIMEBEFOREBOSSSPAWN;
+            bossSpawnProgressFactor = MathF.Pow(bossSpawnProgressFactor, 2f);
+            float bossSpawnProgress = Utils.Remap(bossSpawnProgressFactor, 0f, 1f, 1f, 1.5f, true);
+            bool bossSpawned2 = eyeInfo.TimeLeft <= eyeInfo.MaxTimeLeftForSelfCollapse * bossSpawnProgress;
             if (bossSpawned2 && !bossSpawned) {
                 bossCenter.Y += EternalHorror.SPAWNOFFSETY;
 
