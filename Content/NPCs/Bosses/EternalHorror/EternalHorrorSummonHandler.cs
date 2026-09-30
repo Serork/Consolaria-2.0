@@ -583,7 +583,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 bossCenter.Y += EternalHorror.SPAWNOFFSETY;
 
                 if (eyeInfo.TimeLeft == eyeInfo.MaxTimeLeftForSelfCollapse) {
-                    SoundEngine.PlaySound(SoundID.NPCDeath6 with { MaxInstances = 25, Pitch = 0.5f + Main.rand.NextFloat(0.5f, 1f), Volume = 0.125f * 0.25f }, position);
+                    SoundEngine.PlaySound(SoundID.NPCDeath6 with { MaxInstances = 100, Pitch = 0.5f + Main.rand.NextFloat(0.5f, 1f), Volume = 0.125f * 0.25f }, position);
                 }
 
                 bossSpawned = true;
