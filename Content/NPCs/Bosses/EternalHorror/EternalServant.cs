@@ -308,7 +308,8 @@ sealed class EternalServant : ModNPC {
         ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
             NPC.QuickDraw(spriteBatch, screenPos, drawColor, texture: texture, effect: flip, scale: scale);
-            NPC.QuickDraw(spriteBatch, screenPos, drawColor, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale);
+            NPC.QuickDraw(spriteBatch, screenPos, drawColor, rotation: 0f, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale,
+                position: NPC.Center + NPC.DirectionTo(NPC.GetTargetPlayer().Center) * 5f);
         });
 
         //EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, NPC.frame, drawColor, 0f, default, screenPos);
@@ -338,7 +339,8 @@ sealed class EternalServant : ModNPC {
             color2 *= 1f - appearanceFactor;
             color2 *= Utils.GetLerpValue(0f, 0.125f, appearanceFactor, true);
             NPC.QuickDraw(spriteBatch, screenPos, color2, texture: texture, effect: flip, scale: scale2);
-            NPC.QuickDraw(spriteBatch, screenPos, color2, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale2);
+            NPC.QuickDraw(spriteBatch, screenPos, color2, rotation: 0f, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale2,
+                position: NPC.Center + NPC.DirectionTo(NPC.GetTargetPlayer().Center) * 5f);
         });
 
         return false;
