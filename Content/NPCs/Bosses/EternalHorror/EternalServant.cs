@@ -227,7 +227,7 @@ sealed class EternalServant : ModNPC {
         //float inertia = inertiaValue * 3.75f - extraInertiaValue * extraInertiaFactor;
         //NPC.MoveTo(targetCenter, 30f, inertia);
 
-        NPC.rotation += NPC.velocity.Length() * (NPC.velocity.X > 0f).ToDirectionInt() * 0.125f * 0.5f * 0.5f;
+        NPC.rotation += NPC.velocity.Length() * (NPC.velocity.X > 0f).ToDirectionInt() * 0.125f * 0.5f * 0.5f * 0.25f;
 
         NPC.localAI[0] += 1 / 60f;
 
