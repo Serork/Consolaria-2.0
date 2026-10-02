@@ -361,8 +361,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             Color color = drawColor;
 
-            //float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
-            //color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
+            float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
+            color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
 
             float rotation = eyeInfo.EyeRotation + (eyeInfo.RunAwayProgress <= 0f).ToInt() * getRemappedRandomValue(-1f, 1f) * MathHelper.TwoPi * 0.125f * 0.125f;
             Helper.DrawInfo drawInfo = new() {
@@ -425,11 +425,16 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (!eyeInfo.SpawnedSoul) {
-                ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
-                ShaderLoader.DistortShader.Strength = MathF.Max((_shouldBlink || EternalHorrorSummonEnded).ToInt(), _eyeSpawnCycle / (float)EYESPAWNCYCLECOUNT);
-                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                if (eyeInfo.ShouldLookAtPlayer) {
+                    ShaderLoader.DistortShader.SetDefault(eyeTexture1.Width * 2, eyeTexture1.Height * 2);
+                    ShaderLoader.DistortShader.Strength = MathF.Max((_shouldBlink || EternalHorrorSummonEnded).ToInt(), _eyeSpawnCycle / (float)EYESPAWNCYCLECOUNT);
+                    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                        drawSelf();
+                    });
+                }
+                else {
                     drawSelf();
-                });
+                }
             }
             else {
                 float WaveOffset = 0f;
