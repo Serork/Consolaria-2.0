@@ -28,7 +28,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                                   bool ShouldLookAtPlayer = false,
                                   float RunAwayProgress = 0f,
                                   float Scale = 0f,
-                                  bool SpawnedSoul = false) {
+                                  bool SpawnedSoul = false
+                                  //,
+                                  //bool SoulSpawnNatureally = false
+                                  ) {
         public readonly bool Active => TimeLeft > 0;
         public readonly Vector2 VisualPosition => TargetPosition + PositionOffset;
     }
@@ -52,6 +55,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     private static SoulInfo[] _soulData = null;
 
     private static SlotId? _spawnSoundSlotID = null;
+    private static bool _soulWhooshPlayed;
 
     private static int _eyeSpawnCD,
                        _eyeSpawnCycle;
@@ -73,7 +77,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        _spawnSoundSlotID = SoundEngine.PlaySound(SoundID.Zombie89 with { Pitch = -1f }, Main.LocalPlayer.Center);
+        _spawnSoundSlotID = SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoarSummon"), Main.LocalPlayer.Center);
 
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
@@ -122,6 +126,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         _bossSpawnCounter = 0;
 
         EternalHorrorShouldBeSummoned = false;
+
+        _soulWhooshPlayed = false;
     }
 
     public override void PostUpdateNPCs() {
@@ -152,6 +158,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             float bossSpawnProgress = _bossSpawnCounter / (float)TIMEBEFOREBOSSSPAWN;
             if (!EternalHorrorShouldBeSummoned) {
                 EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, bossSpawnProgress * 0.75f, 0.125f / 3f);
+            }
+
+            if (bossSpawnProgress >= 0f && !_soulWhooshPlayed) {
+                SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/SoulWhoosh") with { Pitch = 0.25f, Volume = 0.5f }, Main.LocalPlayer.Center);
+
+                _soulWhooshPlayed = true;
             }
 
             if (_bossSpawnCounter >= TIMEBEFOREBOSSSPAWN) {
@@ -349,8 +361,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             Color color = drawColor;
 
-            float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
-            color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
+            //float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
+            //color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
 
             float rotation = eyeInfo.EyeRotation + (eyeInfo.RunAwayProgress <= 0f).ToInt() * getRemappedRandomValue(-1f, 1f) * MathHelper.TwoPi * 0.125f * 0.125f;
             Helper.DrawInfo drawInfo = new() {
@@ -400,7 +412,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 Vector2 eyePupilPosition = position2 + eyeInfo.PupilVelocity;
                 int pupilMaxFrames = 2;
                 int pupilFrameY = (int)(waveOffset * 7.5f % pupilMaxFrames);
-                Rectangle pupilClip = eyeTexture2.Frame(1, pupilMaxFrames, frameY: pupilFrameY);
+                Rectangle pupilClip = eyeTexture2.Frame(1, pupilMaxFrames/*, frameY: pupilFrameY*/);
                 Vector2 pupilOrigin = pupilClip.Centered();
                 batch.Draw(eyeTexture2, eyePupilPosition, (drawInfo with { Clip = pupilClip, Origin = pupilOrigin })
                     .WithRotation(0f)
