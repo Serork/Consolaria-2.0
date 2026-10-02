@@ -161,12 +161,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (bossSpawnProgress >= 0f && !_soulWhooshPlayed) {
-                SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/SoulWhoosh") with { Pitch = 0.25f, Volume = 0.5f }, Main.LocalPlayer.Center);
+                SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/SoulWhoosh") with { Pitch = 0.375f, Volume = 0.5f }, Main.LocalPlayer.Center);
 
                 _soulWhooshPlayed = true;
             }
 
-            if (_bossSpawnCounter >= TIMEBEFOREBOSSSPAWN) {
+            if (_bossSpawnCounter >= TIMEBEFOREBOSSSPAWN * 0.875f) {
                 if (!EternalHorrorShouldBeSummoned) {
                     EternalHorrorShouldBeSummoned = true;
 
