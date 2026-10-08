@@ -129,6 +129,8 @@ sealed partial class EternalHorror : ModNPC {
         set => InitValue = value.ToInt();
     }
 
+    public bool IsInSecondPhase => NPC.life < NPC.lifeMax / 2f;
+
     public bool Phase1CloneSpawn_ShouldDashAfter {
         get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
         set => Phase1CloneSpawn_ShouldDashAfterValue = value.ToInt();

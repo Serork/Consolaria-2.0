@@ -361,7 +361,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             Color color = drawColor;
 
-            float alphaModifier = Helper.Wave(0.75f, 1f, 15f, i);
+            float alphaModifier_Start = MathHelper.Lerp(0.75f, MathHelper.Lerp(0.75f, 0.875f, 0.5f), brightness);
+            float alphaModifier_Speed = MathHelper.Lerp(15f, 10f, brightness);
+
+            float alphaModifier = Helper.Wave(alphaModifier_Start, 1f, alphaModifier_Speed, i);
             color = Color.Lerp(color.ModifyRGB(alphaModifier), color.MultiplyAlpha(alphaModifier), brightness);
 
             float rotation = eyeInfo.EyeRotation + (eyeInfo.RunAwayProgress <= 0f).ToInt() * getRemappedRandomValue(-1f, 1f) * MathHelper.TwoPi * 0.125f * 0.125f;
@@ -755,10 +758,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         spriteBatch.End();
 
         float brightness = Lighting.GetColor(Main.LocalPlayer.Center.ToTileCoordinates()).ToVector3().Length() / 3f;
+        brightness = Ease.CubeOut(brightness);
+        Color color = Color.Lerp(EternalHorror.MainPurpleColor_Dynamic, EternalHorror.MainPurpleColor, brightness);
 
         _blinkingVertexes = new VertexPositionColor[192];
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {
-            _blinkingVertexes[i2].Color = EternalHorror.MainPurpleColor_Dynamic.ModifyRGB(MathHelper.Lerp(MathHelper.Lerp(0.125f, 0.25f, 0.25f), 1f, brightness * 0f)) * 0.95f;
+            _blinkingVertexes[i2].Color = color.ModifyRGB(MathHelper.Lerp(MathHelper.Lerp(0.125f, 0.25f, 0.25f), 1f, brightness * 0f)) * 0.95f;
         }
         DisplayMode desktop = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
         int screenWidth = desktop.Width;

@@ -186,22 +186,34 @@ sealed partial class EternalHorror : ModNPC {
     public static Color MainRedColor_Dynamic => Color.Lerp(new(255, 10, 25), MainPurpleColor_Dynamic, Helper.Wave(0f, 1f, 25f, 0f) * 0.25f);
 
     public override void FindFrame(int frameHeight) {
-        int phase1LastFrame = 3;
-        void playPhase1IdleAnimation() {
+        int frameCount = NPC.GetMaxFrames();
+        int lastFrame = IsInSecondPhase ? frameCount : 3;
+
+        void playIdleAnimation() {
             int frame = NPC.GetCurrentFrame(frameHeight);
             ref double frameCounter = ref NPC.frameCounter;
             int frameTime = 6;
+
+            int frameCount = NPC.GetMaxFrames();
+            int phase2FirstFrame = frameCount / 2;
+
+            if (IsInSecondPhase) {
+                if (frame < phase2FirstFrame) {
+                    frame = phase2FirstFrame;
+                }
+            }
+
             if (++frameCounter >= frameTime) {
                 frameCounter = 0;
                 frame++;
-                if (frame >= phase1LastFrame) {
-                    frame = 0;
+                if (frame >= lastFrame) {
+                    frame = IsInSecondPhase ? phase2FirstFrame : 0;
                 }
             }
             NPC.SetCurrentFrame(frame, frameHeight);
         }
 
-        playPhase1IdleAnimation();
+        playIdleAnimation();
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
