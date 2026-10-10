@@ -60,12 +60,17 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     private static int _eyeSpawnCD,
                        _eyeSpawnCycle;
 
-    private static bool _shouldBlink, _shouldBlinkOut;
+    private static bool _shouldBlink;
     private static bool _in;
     private static float _delay,
                          _speedFactor;
 
     private static int _bossSpawnCounter;
+
+    public static bool ShouldBlinkOut;
+    public static byte BlinkedTime;
+
+    public static float BlinkOpacity = 1f;
 
     public static float BlinkProgress { get; private set; } = 1f;
 
@@ -139,6 +144,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         EternalHorrorShouldBeSummoned = false;
 
         _soulWhooshPlayed = false;
+
+        BlinkOpacity = 1f;
     }
 
     public override void PostUpdateNPCs() {
@@ -161,8 +168,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         if (!bossAlive) {
             EternalHorror_SecondPhaseStarted = false;
 
-            if (!_shouldBlinkOut) {
-                _shouldBlinkOut = true;
+            if (!ShouldBlinkOut) {
+                ShouldBlinkOut = true;
             }
         }
 
@@ -242,16 +249,20 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         //}
     }
 
-    public static void Blink(float speedFactor = 3.5f, float delay = 0.5f, bool shouldBlinkOut = true) {
+    public static void Blink(float speedFactor = 3.5f, float delay = 0.5f, bool shouldBlinkOut = true, float blinkOpacity = 1f) {
         if (_shouldBlink) {
             return;
         }
+
+        BlinkedTime++;
 
         _shouldBlink = true;
         _delay = delay;
         _speedFactor = speedFactor;
 
-        _shouldBlinkOut = shouldBlinkOut;
+        ShouldBlinkOut = shouldBlinkOut;
+
+        BlinkOpacity = blinkOpacity;
     }
 
     private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch) {
@@ -757,7 +768,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (_in) {
-                if (_shouldBlinkOut) {
+                if (ShouldBlinkOut) {
                     float to = 1f;
                     BlinkProgress = Helper.Approach(BlinkProgress, to, lerpValue);
                     if (BlinkProgress >= to) {
@@ -786,6 +797,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         float brightness = Lighting.GetColor(Main.LocalPlayer.Center.ToTileCoordinates()).ToVector3().Length() / 3f;
         brightness = Ease.CubeOut(brightness);
         Color color = Color.Lerp(EternalHorror.MainPurpleColor_Dynamic, EternalHorror.MainPurpleColor, brightness);
+
+        color *= BlinkOpacity;
 
         _blinkingVertexes = new VertexPositionColor[192];
         for (int i2 = 0; i2 < _blinkingVertexes.Length; i2++) {

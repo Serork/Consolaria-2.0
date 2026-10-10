@@ -174,6 +174,8 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         if (IsInSecondPhase_Base) {
+            EternalHorrorSummonHandler.BlinkOpacity = 1f - 0.5f * Ease.CubeIn(SecondPhaseOpacity);
+
             if (!EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted) {
                 EternalHorrorSummonHandler.Blink(shouldBlinkOut: false);
 
@@ -186,17 +188,25 @@ sealed partial class EternalHorror : ModNPC {
 
             _secondPhaseOpacity = Helper.Approach(_secondPhaseOpacity, 1f, 0.025f);
 
-            Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * 1f * _secondPhaseOpacity;
-            Lighting.AddLight(NPC.Center, lightColor);
-
-            if (NPC.HasPlayerTarget) {
-                Player target = NPC.GetTargetPlayer();
-                Vector2 targetCenter = target.Center;
-                Lighting.AddLight(targetCenter, lightColor);
-            }
+            //if (_secondPhaseOpacity >= 1f) {
+            //    EternalHorrorSummonHandler.ShouldBlinkOut = false;
+            //}
         }
         else {
+            EternalHorrorSummonHandler.BlinkOpacity = 1f;
+
             _secondPhaseOpacity = 0f;
+        }
+
+        float rayAlpha = IsInSecondPhase ? Ease.CubeOut(GetAllRayProgress()) : GetAllRayProgress();
+
+        Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
+        Lighting.AddLight(NPC.Center, lightColor);
+
+        if (NPC.HasPlayerTarget) {
+            Player target = NPC.GetTargetPlayer();
+            Vector2 targetCenter = target.Center;
+            Lighting.AddLight(targetCenter, lightColor);
         }
     }
 
@@ -282,21 +292,21 @@ sealed partial class EternalHorror : ModNPC {
     public static void MakeMidnight(float speedFactor = 1f, bool secondPhase = false) {
         float expFactor = 0.025f * speedFactor;
 
-        if (secondPhase) {
-            if (!Main.dayTime) {
-                expFactor *= 4;
-                float to = (float)Main.nightLength;
-                float lerpValue = 1f - MathF.Exp(-expFactor);
-                Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
-            }
-            else {
-                float to = (float)Main.dayLength / 2;
-                float lerpValue = 1f - MathF.Exp(-expFactor);
-                Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
-            }
+        //if (secondPhase) {
+        //    if (!Main.dayTime) {
+        //        expFactor *= 4;
+        //        float to = (float)Main.nightLength;
+        //        float lerpValue = 1f - MathF.Exp(-expFactor);
+        //        Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
+        //    }
+        //    else {
+        //        float to = (float)Main.dayLength / 2;
+        //        float lerpValue = 1f - MathF.Exp(-expFactor);
+        //        Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
+        //    }
 
-            return;
-        }
+        //    return;
+        //}
 
         if (Main.dayTime) {
             expFactor *= 4;
