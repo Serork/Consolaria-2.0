@@ -857,7 +857,7 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
         EternalHorror boss_modNPC = boss.As<EternalHorror>();
-        if (!boss_modNPC.IsInSecondPhase) {
+        if (!boss_modNPC.IsInSecondPhase_Base) {
             return;
         }
 
