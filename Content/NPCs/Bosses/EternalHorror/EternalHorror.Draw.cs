@@ -51,7 +51,7 @@ sealed partial class EternalHorror : ModNPC {
     private RayInfo[] _rayData = null;
 
     private void InitializeRays() {
-        _rayData = new RayInfo[RAYCOUNTMAX * 3];
+        _rayData = new RayInfo[RAYCOUNTMAX];
 
         _seed = Main.rand.NextFloat(100f);
     }
