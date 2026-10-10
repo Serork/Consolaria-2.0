@@ -146,6 +146,8 @@ sealed partial class EternalHorror : ModNPC {
         set => Phase1SpawnSummonAttack_DoneValue = value.ToInt();
     }
 
+    public float SecondPhaseOpacity => Helper.Clamp01(_secondPhaseOpacity);
+
     public override bool PreAI() => base.PreAI();
 
     public override void AI() {
@@ -156,7 +158,7 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         OnSpawn();
-        MakeMidnight();
+        MakeMidnight(speedFactor: 1f);
         UpdateStates();
         UpdateClones();
         ForceUpdateRotation();
@@ -180,6 +182,11 @@ sealed partial class EternalHorror : ModNPC {
 
                 EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted = true;
             }
+
+            _secondPhaseOpacity = Helper.Approach(_secondPhaseOpacity, 1f, 0.025f);
+        }
+        else {
+            _secondPhaseOpacity = 0f;
         }
     }
 
@@ -262,8 +269,8 @@ sealed partial class EternalHorror : ModNPC {
 
     private partial void InitializeStates();
 
-    public static void MakeMidnight() {
-        float expFactor = 0.025f;
+    public static void MakeMidnight(float speedFactor = 1f) {
+        float expFactor = 0.025f * speedFactor;
         if (Main.dayTime) {
             expFactor *= 4;
             float to = (float)Main.dayLength;

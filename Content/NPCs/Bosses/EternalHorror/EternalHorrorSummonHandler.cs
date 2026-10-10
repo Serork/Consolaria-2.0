@@ -152,7 +152,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         bool bossAlive = NPC.AnyNPCs(EternalHorror.SelfType);
         if (EternalHorrorSummonEnded && !bossAlive) {
-            EternalHorror.MakeMidnight();
+            EternalHorror.MakeMidnight(speedFactor: 1f);
+        }
+        if (EternalHorrorSummonStarted && !bossAlive && !EternalHorrorSummonEnded) {
+            EternalHorror.MakeMidnight(speedFactor: 0.125f);
         }
 
         if (!bossAlive) {
