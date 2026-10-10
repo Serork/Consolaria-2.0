@@ -3,6 +3,7 @@ using Consolaria.Content.NPCs.Bosses.Ocram;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -23,7 +24,7 @@ sealed partial class EternalHorror : ModNPC {
         public void OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct MoveToPlayer : IAIState {
+    private readonly struct Phase1MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.TargetPlayer();
             npc.FaceTarget_New();
@@ -286,7 +287,7 @@ sealed partial class EternalHorror : ModNPC {
 
             bool shouldResetState() {
                 if (boss.Phase1DashAttackCount >= DASHATTACKCOUNT) {
-                    boss.ActivateState<MoveToPlayer>();
+                    boss.ActivateState<Phase1MoveToPlayer>();
                     boss.DeactivateState<Phase1DashAttack>();
                     if (boss.Phase1DashAttack_ShouldBurstLaserAfter) {
                         boss.Phase1DashAttack_ShouldBurstLaserAfter = false;
@@ -313,7 +314,7 @@ sealed partial class EternalHorror : ModNPC {
                 return false;
             }
             void lookAtTarget() {
-                if (!boss.HasActiveState<MoveToPlayer>()) {
+                if (!boss.HasActiveState<Phase1MoveToPlayer>()) {
                     boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, dashProgress, 0.025f);
                 }
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
@@ -339,7 +340,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.AICounter = -DASHTIME;
 
-                    boss.DeactivateState<MoveToPlayer>();
+                    boss.DeactivateState<Phase1MoveToPlayer>();
 
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     boss._dashVelocity = dashDirection * dashStrength;
@@ -549,7 +550,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.ResetPhase1LaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
 
-                    boss.ActivateState<MoveToPlayer>();
+                    boss.ActivateState<Phase1MoveToPlayer>();
                     boss.DeactivateState<Phase1SummonSpawnAttack>();
                     boss.ActivateState<Phase1BurstLaserAttack>();
                 }
@@ -572,12 +573,12 @@ sealed partial class EternalHorror : ModNPC {
 
                 //boss.ResetSmoothFactor(preparationSlowDown);
 
-                boss.ActivateState<MoveToPlayer>();
+                boss.ActivateState<Phase1MoveToPlayer>();
 
                 return;
             }
 
-            boss.DeactivateState<MoveToPlayer>();
+            boss.DeactivateState<Phase1MoveToPlayer>();
 
             void lookAtTarget() {
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
@@ -697,6 +698,117 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
+    private readonly struct Phase2Transition : IAIState {
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+
+            bool shouldDash = boss.HasActiveState<Phase1DashAttack>(),
+                 shouldSpamLasers = boss.HasActiveState<Phase1LaserSpamAttack>(),
+                 shouldSpawnSummons = boss.HasActiveState<Phase1SummonSpawnAttack>();
+
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center,
+                    baseTargetCenter = targetCenter;
+
+            boss._cloneTargetPosition = targetCenter;
+
+            const int MinDistanceToTargetInPixels = 300;
+
+            void smoothEverything() {
+                if (shouldDash) {
+                    return;
+                }
+                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.025f);
+            }
+            void lookAtTarget() {
+                float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
+                if (shouldDash) {
+                    return;
+                }
+                void setRotation(float smoothFactor = 1f) {
+                    npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor * smoothFactor);
+                }
+                if (shouldSpamLasers) {
+                    float angleFactor = boss.Phase1LaserSpamPreparationSlowDown;
+                    angleFactor = Utils.Remap(angleFactor, Phase1LaserSpamAttack.PPEPARATIONSLOWLASTFACTOR, 1f, 0f, 1f, true);
+                    setRotation(angleFactor);
+
+                    return;
+                }
+                setRotation();
+            }
+            void makeTargetPositionABitHigher() {
+                if (shouldDash) {
+                    return;
+                }
+                targetCenter.Y -= 100f;
+            }
+            void moveToTarget() {
+                const float Speed = 15f,
+                            Inertia = 20f;
+                const float Deceleration = 0.99f;
+                npc.MoveToWithDeceleration(targetCenter, Speed * boss.SmoothFactor, Inertia * boss.SmoothFactor, MinDistanceToTargetInPixels, Deceleration);
+
+                Vector2 targetPosition = Vector2.Zero.MoveTowards(targetCenter - npc.Center, 4f * boss.SmoothFactor);
+                npc.velocity = npc.velocity.MoveTowards(targetPosition, 2f / 15f * boss.SmoothFactor);
+            }
+            void moveFromTargetIfClose() {
+                if (shouldDash) {
+                    return;
+                }
+                float distance = npc.Distance(targetCenter);
+                float minDistance = MinDistanceToTargetInPixels / 2f;
+                if (distance < minDistance) {
+                    npc.velocity += npc.DirectionFrom(targetCenter) * (0.25f + 0.75f * Helper.Clamp01(1f - distance / minDistance)) * boss.SmoothFactor;
+                }
+                else {
+                    if (npc.velocity.Length() < 1f) {
+                        npc.velocity *= 0.95f;
+                    }
+                }
+            }
+            void moveUpwardsIfClose() {
+                if (shouldDash) {
+                    return;
+                }
+                if (npc.Center.Y > targetCenter.Y) {
+                    npc.velocity -= Vector2.UnitY * 0.5f * boss.SmoothFactor;
+                }
+            }
+            void slowDownWhenCloseToTarget() {
+                if (shouldDash) {
+                    return;
+                }
+                npc.velocity *= Helper.Clamp01(npc.Distance(targetCenter) / (MinDistanceToTargetInPixels / 5f));
+            }
+
+            bool noRays = !boss._rayData.Any(rayInfo => rayInfo.Progress > 0f);
+            if (noRays) {
+                boss.SpawnRays(startRaySpeed: 0.5f);
+            }
+
+            smoothEverything();
+            lookAtTarget();
+            makeTargetPositionABitHigher();
+            moveToTarget();
+            moveFromTargetIfClose();
+            moveUpwardsIfClose();
+            slowDownWhenCloseToTarget();
+            //npc.Center = Vector2.Lerp(npc.Center, targetCenter, progress);
+            //npc.rotation = Utils.AngleLerp(npc.rotation, 0f, progress);
+
+            npc.dontTakeDamage = true;
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.SmoothFactor = 0f;
+
+            boss.SpawnRays(startRaySpeed: 0.5f);
+        }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
     private Dictionary<Type, IAIState> _states = null;
     private HashSet<IAIState> _activeStates = null;
 
@@ -740,6 +852,14 @@ sealed partial class EternalHorror : ModNPC {
         }
         stateToDeactivate.OnEnd(npc: NPC, boss: Self);
         _activeStates.Remove(stateToDeactivate);
+    }
+
+    private void DeactivateAllStates() {
+        if (!Init) {
+            return;
+        }
+
+        _activeStates.Clear();
     }
 
     private bool HasActiveState<T>() where T : IAIState {

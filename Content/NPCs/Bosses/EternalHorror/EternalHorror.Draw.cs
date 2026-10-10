@@ -24,10 +24,12 @@ sealed partial class EternalHorror : ModNPC {
 
     public readonly record struct DrawContext(SpriteBatch SpriteBatch, Vector2 Position, Texture2D Texture, Rectangle Clip, Color DrawColor, float Rotation, SpriteEffects Flip, Vector2 ScreenPosition);
 
-    private static Asset<Texture2D> _eyeTexture = null,
+    private static Asset<Texture2D> _eyesTexture = null,
                                     _glowTexture = null,
                                     _shadowTexture = null,
-                                    _backgroundTexture = null;
+                                    _backgroundTexture = null,
+                                    _secondPhaseEyeTexture = null,
+                                    _secondPhaseEyeTexture_Glow = null;
 
     public static Asset<Texture2D> RayTexture { get; private set; }
 
@@ -47,9 +49,17 @@ sealed partial class EternalHorror : ModNPC {
     private RayInfo[] _rayData = null;
 
     private void InitializeRays() {
-        _rayData = new RayInfo[RAYCOUNTMAX];
+        _rayData = new RayInfo[RAYCOUNTMAX * 3];
 
         _seed = Main.rand.NextFloat(100f);
+    }
+
+    private void SpawnRays(float startRaySpeed = 0f) {
+        _raySpeed = startRaySpeed;
+
+        for (int i = 0; i < SPAWNRAYCOUNTONSPAWN; i++) {
+            SpawnRay();
+        }
     }
 
     private void SpawnRay() {
@@ -60,7 +70,7 @@ sealed partial class EternalHorror : ModNPC {
                 break;
             }
         }
-        float angle = index / (float)SPAWNRAYCOUNTONSPAWN * MathHelper.TwoPi;
+        float angle = NPC.rotation + index / (float)SPAWNRAYCOUNTONSPAWN * MathHelper.TwoPi;
         _rayData[index] = new RayInfo(Angle: angle,
                                       Progress: RAYSTARTPROGRESS);
     }
@@ -82,12 +92,14 @@ sealed partial class EternalHorror : ModNPC {
                 continue;
             }
 
+            float angleFactor = 1f;
+
             float rayProgress = rayInfo.Progress;
             rayProgress = Helper.Clamp01(rayProgress);
-            int directon = (i % 2 == 0).ToDirectionInt();
-            rayInfo.Angle += _raySpeed * rayProgress * directon 
+            int direction = (i % 2 == 0).ToDirectionInt();
+            rayInfo.Angle += _raySpeed * rayProgress * direction 
                 * MathHelper.Lerp(0.1f, 0.25f, 0.5f) * 1f * 0.25f
-                * Utils.Remap(getRandomValue(), 0f, 1f, 1f, 0.25f, true);
+                * Utils.Remap(getRandomValue(), 0f, 1f, 1f, 0.25f, true) * angleFactor;
 
             rayInfo.Progress = Helper.Approach(rayInfo.Progress, 0f, 1 / 60f * 1.5f);
         }
@@ -155,11 +167,14 @@ sealed partial class EternalHorror : ModNPC {
     private float WaveOffset => NPC.whoAmI;
 
     private partial void Load_Textures() {
-        _eyeTexture = Helper.RequestTexture(Texture + "_Eyes");
+        _eyesTexture = Helper.RequestTexture(Texture + "_Eyes");
         _glowTexture = Helper.RequestTexture(Texture + "_Glow");
         _shadowTexture = Helper.RequestTexture(Texture + "_Shadow");
         _backgroundTexture = Helper.RequestTexture(Texture + "_Background");
         RayTexture = Helper.RequestTexture(Texture + "_Ray");
+
+        _secondPhaseEyeTexture = Helper.RequestTexture(Texture + "_Eye");
+        _secondPhaseEyeTexture_Glow = Helper.RequestTexture(Texture + "_Eye_Glow");
     }
 
     private partial void Load_ApplyShaderEffects() {
@@ -218,26 +233,39 @@ sealed partial class EternalHorror : ModNPC {
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
         if (Init || NPC.IsABestiaryIconDummy) {
-            Draw(spriteBatch, screenPos, drawColor);
+            drawColor = NPC.GetNPCColorTintedByBuffs(npcColor: drawColor);
+            drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+
+            Draw(spriteBatch, screenPos, drawColor, shouldDrawRays: !IsInSecondPhase);
         }
 
         return false;
     }
 
-    private void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
-        drawColor = NPC.GetNPCColorTintedByBuffs(npcColor: drawColor);
-        drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+    private static DrawContext GetBasicDrawContext(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+        Texture2D texture = npc.GetTexture();
+        SpriteEffects flip = (-npc.spriteDirection).ToSpriteEffects();
+        flip = SpriteEffects.None;
+        Vector2 position = npc.Center;
+        float rotation = npc.rotation;
+        Rectangle clip = npc.frame;
+
+        DrawContext drawContext = new(spriteBatch, position, texture, clip, drawColor, rotation, flip, screenPos);
+
+        return drawContext;
+    }
+
+    private void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor, bool shouldDrawRays = true) {
         Texture2D texture = NPC.GetTexture(),
                   glowTexture = _glowTexture.Value,
                   shadowTexture = _shadowTexture.Value;
-        SpriteEffects flip = (-NPC.spriteDirection).ToSpriteEffects();
-        flip = SpriteEffects.None;
-        Vector2 position = NPC.Center;
-        float rotation = NPC.rotation;
-        Rectangle clip = NPC.frame,
-                  glowClip = glowTexture.Bounds;
+        Rectangle glowClip = glowTexture.Bounds;
 
-        DrawContext drawContext = new(spriteBatch, position, texture, clip, drawColor, rotation, flip, screenPos);
+        DrawContext drawContext = GetBasicDrawContext(NPC, spriteBatch, screenPos, drawColor);
+
+        SpriteEffects flip = drawContext.Flip;
+        Vector2 position = drawContext.Position;
+        float rotation = drawContext.Rotation;
 
         void drawShadows() {
             drawContext = drawContext with { Texture = shadowTexture };
@@ -245,7 +273,7 @@ sealed partial class EternalHorror : ModNPC {
                 ShaderLoader.DistortShader.SetDefault(shadowTexture.Width * 2, shadowTexture.Height * 2);
                 ShaderLoader.DistortShader.Anxiety = 0.5f + 0.5f * _shadowProgress;
                 ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                    Draw_Inner(drawContext with {
+                    Draw_Inner(NPC, drawContext with {
                         Position = newPosition,
                         DrawColor = newColor,
                     });
@@ -283,20 +311,20 @@ sealed partial class EternalHorror : ModNPC {
                 value67 *= 0.375f;
                 Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2() 
                     * num248 * num247;
-                Draw_Inner(drawContext with { 
+                Draw_Inner(NPC, drawContext with { 
                     Position = position23,
                     DrawColor = value67
                 });
                 //mySpriteBatch.Draw(value64, position23, rCurrentNPC.frame, value67, rCurrentNPC.rotation, halfSize, rCurrentNPC.scale, spriteEffects, 0f);
             }
 
-            Draw_Inner(drawContext);
+            Draw_Inner(NPC, drawContext);
         }
         void drawGlowingEyes() {
-            Texture2D eyesTexture = _eyeTexture.Value;
+            Texture2D eyesTexture = _eyesTexture.Value;
             drawContext = drawContext with { Texture = eyesTexture };
             DrawUnderGlowEffect(drawContext, draw: (newPosition, newColor) => {
-                Draw_Inner(drawContext with {
+                Draw_Inner(NPC, drawContext with {
                     Position = newPosition,
                     DrawColor = newColor,
                 });
@@ -362,10 +390,10 @@ sealed partial class EternalHorror : ModNPC {
                 Texture = glowTexture,
                 Clip = glowClip
             };
-            Draw_Inner(drawContext with { DrawColor = getLaserGlowColor(drawColor) });
+            Draw_Inner(NPC, drawContext with { DrawColor = getLaserGlowColor(drawColor) });
             DrawUnderGlowEffect(drawContext, draw: (newPosition, newColor) => {
                 newColor = getLaserGlowColor(newColor);
-                Draw_Inner(drawContext with {
+                Draw_Inner(NPC, drawContext with {
                     Position = newPosition,
                     DrawColor = newColor,
                 });
@@ -440,7 +468,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     ShaderLoader.DistortShader.SetDefault(shadowTexture.Width * 2, shadowTexture.Height * 2);
                     ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                        Draw_Inner(cloneDrawContext with {
+                        Draw_Inner(NPC, cloneDrawContext with {
                             Position = position,
                             DrawColor = color,
                             Rotation = rotation
@@ -574,81 +602,11 @@ sealed partial class EternalHorror : ModNPC {
                 //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
             }
         }
-        void drawRays() {
-            if (!Init) {
-                return;
-            }
-
-            ulong seed = (ulong)_seed;
-
-            for (int i = 0; i < _rayData.Length; i++) {
-                RayInfo rayInfo = _rayData[i];
-                if (!rayInfo.Active) {
-                    continue;
-                }
-
-                float rayWaveOffset = i;
-
-                float rotation = rayInfo.Angle;
-
-                float rayProgress = rayInfo.Progress;
-                float step = 0.125f;
-                rayProgress *= Utils.GetLerpValue(0f, step, rayProgress, true);
-                rayProgress *= Utils.GetLerpValue(RAYSTARTPROGRESS, RAYSTARTPROGRESS - step * 2f, rayProgress, true);
-
-                float getRandomValue() => Utils.RandomFloat(ref seed);
-                float getRemappedRandomValue(float min, float max) => Utils.Remap(getRandomValue(), 0f, 1f, min, max, true);
-
-                Vector2 scale = Vector2.One;
-                scale *= 1f;
-                scale.X *= 2f * getRemappedRandomValue(0.5f, 1f);
-                scale.Y *= 2.5f * getRemappedRandomValue(0.25f, 1f);
-
-                scale.Y *= rayProgress;
-
-                Color color = MainPurpleColor;
-                color *= Helper.Wave(0.75f, 1f, 15f, rayWaveOffset);
-                color *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
-
-                color *= rayProgress;
-
-                Texture2D texture = RayTexture.Value;
-                Rectangle clip = texture.Frame(2, 1, frameX: 0);
-                Vector2 origin = clip.Centered();
-                Helper.DrawInfo drawInfo = new() {
-                    Clip = clip,
-                    Origin = origin,
-                    Rotation = rotation,
-                    Color = color,
-                    Scale = scale
-                };
-
-                Vector2 position = NPC.Center;
-                Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation);
-                angleDirection *= origin.Y / 3f;
-                position += angleDirection;
-
-                ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
-                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                    int drawCount = 3;
-                    for (int k = 0; k < drawCount; k++) {
-                        float progress = k / (float)drawCount;
-                        progress -= 0.5f;
-                        spriteBatch.Draw(texture, position,
-                            drawInfo
-                            .WithRotation(progress * 0.125f * 0.5f)
-                            .WithColorOverride(
-                                Color.Lerp(color,
-                                Main.hslToRgb(getRandomValue(), 1f, 0.5f),
-                                getRemappedRandomValue(0f, 0.125f))
-                                .MultiplyAlpha(0f)));
-                    }
-                });
-            }
-        }
 
         drawTrails();
-        drawRays();
+        if (shouldDrawRays) {
+            drawRays(NPC, spriteBatch, 1f);
+        }
         drawShadows();
         drawClones();
         drawSelf();
@@ -656,6 +614,81 @@ sealed partial class EternalHorror : ModNPC {
         drawLaserGlow();
         drawLaserSpamWarning();
         //drawLaserLine();
+    }
+
+    private static void drawRays(NPC npc, SpriteBatch spriteBatch, float opacity = 1f) {
+        EternalHorror boss = npc.As<EternalHorror>();
+
+        if (!boss.Init) {
+            return;
+        }
+
+        ulong seed = (ulong)boss._seed;
+
+        for (int i = 0; i < boss._rayData.Length; i++) {
+            RayInfo rayInfo = boss._rayData[i];
+            if (!rayInfo.Active) {
+                continue;
+            }
+
+            float rayWaveOffset = i;
+
+            float rotation = rayInfo.Angle;
+
+            float rayProgress = rayInfo.Progress;
+            float step = 0.125f;
+            rayProgress *= Utils.GetLerpValue(0f, step, rayProgress, true);
+            rayProgress *= Utils.GetLerpValue(RAYSTARTPROGRESS, RAYSTARTPROGRESS - step * 2f, rayProgress, true);
+
+            float getRandomValue() => Utils.RandomFloat(ref seed);
+            float getRemappedRandomValue(float min, float max) => Utils.Remap(getRandomValue(), 0f, 1f, min, max, true);
+
+            Vector2 scale = Vector2.One;
+            scale *= 1f;
+            scale.X *= 2f * getRemappedRandomValue(0.5f, 1f);
+            scale.Y *= 2.5f * getRemappedRandomValue(0.25f, 1f);
+
+            scale.Y *= rayProgress;
+
+            Color color = MainPurpleColor;
+            color *= Helper.Wave(0.75f, 1f, 15f, rayWaveOffset);
+            color *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
+
+            color *= rayProgress;
+
+            Texture2D texture = RayTexture.Value;
+            Rectangle clip = texture.Frame(2, 1, frameX: 0);
+            Vector2 origin = clip.Centered();
+            Helper.DrawInfo drawInfo = new() {
+                Clip = clip,
+                Origin = origin,
+                Rotation = rotation,
+                Color = color,
+                Scale = scale
+            };
+
+            Vector2 position = npc.Center;
+            Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation);
+            angleDirection *= origin.Y / 3f;
+            position += angleDirection;
+
+            ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                int drawCount = 3;
+                for (int k = 0; k < drawCount; k++) {
+                    float progress = k / (float)drawCount;
+                    progress -= 0.5f;
+                    spriteBatch.Draw(texture, position,
+                        drawInfo
+                        .WithRotation(progress * 0.125f * 0.5f)
+                        .WithColorOverride(
+                            Color.Lerp(color,
+                            Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+                            getRemappedRandomValue(0f, 0.125f))
+                            .MultiplyAlpha(0f) * opacity));
+                }
+            });
+        }
     }
 
     private void UpdateVisuals() {
@@ -714,8 +747,8 @@ sealed partial class EternalHorror : ModNPC {
 
     public static Color GetLaserGlowColor(Color drawColor) => drawColor.MultiplyRGBA(MainRedColor_Dynamic);
 
-    private void Draw_Inner(DrawContext drawContext) {
-        NPC.QuickDraw(drawContext.SpriteBatch, drawContext.ScreenPosition, drawContext.DrawColor, frameBox: drawContext.Clip, 
+    private static void Draw_Inner(NPC npc, DrawContext drawContext) {
+        npc.QuickDraw(drawContext.SpriteBatch, drawContext.ScreenPosition, drawContext.DrawColor, frameBox: drawContext.Clip, 
                                                                                                   rotation: drawContext.Rotation, 
                                                                                                   position: drawContext.Position, 
                                                                                                   texture: drawContext.Texture, 
@@ -805,4 +838,46 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) { }
+
+    private partial void Load_BlinkingDrawing() {
+        EternalHorrorSummonHandler.OverBlinkingDrawEvent += EternalHorrorSummonHandler_OverBlinkingDrawEvent;
+    }
+
+    private void EternalHorrorSummonHandler_OverBlinkingDrawEvent(SpriteBatch spriteBatch) {
+        NPC boss = null;
+        bool found = false;
+        foreach (NPC npc in Main.ActiveNPCs) {
+            if (npc.type == SelfType) {
+                boss = npc;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return;
+        }
+        EternalHorror boss_modNPC = boss.As<EternalHorror>();
+        if (!boss_modNPC.IsInSecondPhase) {
+            return;
+        }
+
+        Color drawColor = Lighting.GetColor(boss.Center.ToTileCoordinates());
+        drawColor = boss.GetNPCColorTintedByBuffs(npcColor: drawColor);
+        drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+
+        Vector2 screenPos = Main.screenPosition;
+
+        drawRays(boss, spriteBatch, opacity: 0.25f);
+
+        boss_modNPC.Draw(spriteBatch, screenPos, drawColor * MathHelper.Lerp(0.125f, 0.25f, 0.5f), shouldDrawRays: false);
+
+        DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor);
+        Texture2D eyeTexture = _secondPhaseEyeTexture.Value;
+        Rectangle eyeClip = eyeTexture.Bounds;
+        drawContext = drawContext with {
+            Texture = eyeTexture,
+            Clip = eyeClip
+        };
+        Draw_Inner(boss, drawContext);
+    }
 }

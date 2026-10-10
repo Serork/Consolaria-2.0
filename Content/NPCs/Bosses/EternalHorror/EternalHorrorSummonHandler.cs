@@ -60,17 +60,25 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     private static int _eyeSpawnCD,
                        _eyeSpawnCycle;
 
-    private static bool _shouldBlink;
+    private static bool _shouldBlink, _shouldBlinkOut;
     private static bool _in;
-    private static float _progress = 1f,
-                         _delay,
+    private static float _delay,
                          _speedFactor;
 
     private static int _bossSpawnCounter;
 
+    public static float BlinkProgress { get; private set; } = 1f;
+
+    public static float BlinkProgress_Out => BlinkProgress <= 0f ? -BlinkProgress / _delay : 0f;
+
     public static bool EternalHorrorSummonStarted;
     public static bool EternalHorrorSummonEnded { get; private set; }
     public static bool EternalHorrorShouldBeSummoned { get; private set; }
+
+    public static bool EternalHorror_SecondPhaseStarted;
+
+    public delegate void OverBlinkingDrawDelegate(SpriteBatch spriteBatch);
+    public static event OverBlinkingDrawDelegate OverBlinkingDrawEvent = null!;
 
     public static void StartSummoningEternalHorror() {
         if (EternalHorrorSummonStarted) {
@@ -111,6 +119,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         if (!EternalHorrorSummonEnded) {
             return;
         }
+        if (_shouldBlink) {
+            return;
+        }
 
         EternalHorrorSummonEnded = false;
         EternalHorrorSummonStarted = false;
@@ -142,6 +153,14 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         bool bossAlive = NPC.AnyNPCs(EternalHorror.SelfType);
         if (EternalHorrorSummonEnded && !bossAlive) {
             EternalHorror.MakeMidnight();
+        }
+
+        if (!bossAlive) {
+            EternalHorror_SecondPhaseStarted = false;
+
+            if (!_shouldBlinkOut) {
+                _shouldBlinkOut = true;
+            }
         }
 
         if (!bossAlive && EternalHorrorShouldBeSummoned) {
@@ -220,7 +239,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         //}
     }
 
-    public static void Blink(float speedFactor = 3.5f, float delay = 0.5f) {
+    public static void Blink(float speedFactor = 3.5f, float delay = 0.5f, bool shouldBlinkOut = true) {
         if (_shouldBlink) {
             return;
         }
@@ -228,6 +247,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         _shouldBlink = true;
         _delay = delay;
         _speedFactor = speedFactor;
+
+        _shouldBlinkOut = shouldBlinkOut;
     }
 
     private void On_ScreenObstruction_Draw(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch) {
@@ -721,7 +742,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             lerpValue *= _speedFactor;
             float progressOffset = _delay;
 
-            if (EternalHorrorSummonStarted && _progress <= 0f) {
+            if (EternalHorrorSummonStarted && BlinkProgress <= 0f) {
                 for (int i = 0; i < _eyeData.Length; i++) {
                     ref EyeInfo eyeInfo = ref _eyeData[i];
                     if (!eyeInfo.Active) {
@@ -733,20 +754,22 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (_in) {
-                float to = 1f;
-                _progress = Helper.Approach(_progress, to, lerpValue);
-                if (_progress >= to) {
-                    if (_in) {
-                        _shouldBlink = false;
-                    }
+                if (_shouldBlinkOut) {
+                    float to = 1f;
+                    BlinkProgress = Helper.Approach(BlinkProgress, to, lerpValue);
+                    if (BlinkProgress >= to) {
+                        if (_in) {
+                            _shouldBlink = false;
+                        }
 
-                    _in = false;
+                        _in = false;
+                    }
                 }
             }
             else {
                 float to = 0f - progressOffset * 1f;
-                _progress = Helper.Approach(_progress, to, lerpValue);
-                if (_progress <= to) {
+                BlinkProgress = Helper.Approach(BlinkProgress, to, lerpValue);
+                if (BlinkProgress <= to) {
                     _in = true;
                 }
             }
@@ -770,7 +793,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         int screenHeight = desktop.Height;
         int num = screenWidth;
         int num2 = screenHeight;
-        float num3 = _progress;
+        float num3 = BlinkProgress;
         num3 = Helper.Clamp01(num3);
         Vector2 vector = new Vector2(num, num2) / 2f;
         float num4 = num * 0.55f;
@@ -842,5 +865,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         graphicsDevice.RasterizerState = previousState;
 
         spriteBatch.Begin(snapshot);
+
+        OverBlinkingDrawEvent?.Invoke(spriteBatch);
     }
 }

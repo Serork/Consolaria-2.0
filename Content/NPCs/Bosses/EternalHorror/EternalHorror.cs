@@ -20,6 +20,8 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         Load_ApplyShaderEffects();
+
+        Load_BlinkingDrawing();
     }
 
     public override void Unload() {
@@ -33,6 +35,8 @@ sealed partial class EternalHorror : ModNPC {
     private partial void Load_Textures();
 
     private partial void Load_ApplyShaderEffects();
+
+    private partial void Load_BlinkingDrawing();
 
     public override void SetStaticDefaults() {
         NPC.SetMaxFrames(count: 6);

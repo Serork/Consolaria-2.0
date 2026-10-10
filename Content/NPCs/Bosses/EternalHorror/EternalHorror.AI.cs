@@ -129,7 +129,7 @@ sealed partial class EternalHorror : ModNPC {
         set => InitValue = value.ToInt();
     }
 
-    public bool IsInSecondPhase => NPC.life < NPC.lifeMax / 2f;
+    public bool IsInSecondPhase => NPC.life < NPC.lifeMax * 0.95f/* / 2f*/;
 
     public bool Phase1CloneSpawn_ShouldDashAfter {
         get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
@@ -166,6 +166,21 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void PostAI() {
+        if (!Init) {
+            return;
+        }
+
+        if (IsInSecondPhase) {
+            if (!EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted) {
+                EternalHorrorSummonHandler.Blink(shouldBlinkOut: false);
+
+                DeactivateAllStates();
+
+                ActivateState<Phase2Transition>();
+
+                EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted = true;
+            }
+        }
     }
 
     private void OnSpawn() {
@@ -189,13 +204,11 @@ sealed partial class EternalHorror : ModNPC {
 
         InitializeStates();
 
-        ActivateState<MoveToPlayer>();
+        ActivateState<Phase1MoveToPlayer>();
         ActivateState<Phase1BurstLaserAttack>();
 
         InitializeRays();
-        for (int i = 0; i < SPAWNRAYCOUNTONSPAWN; i++) {
-            SpawnRay();
-        }
+        SpawnRays();
     }
 
     private void PlaySpawnRoarSound() {
