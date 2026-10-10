@@ -888,7 +888,13 @@ sealed partial class EternalHorror : ModNPC {
             Draw_Inner(boss, drawContext);
         });
 
+        Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
+
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
         Main.ParticleSystem_World_OverPlayers.Settings.AnchorPosition = -Main.screenPosition;
         Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
+
+        spriteBatch.Begin(in snapshot, end: true);
     }
 }
