@@ -802,7 +802,7 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
-            boss.SpawnRays(startRaySpeed: 0.5f);
+            //boss.SpawnRays(startRaySpeed: 0.5f);
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
