@@ -158,7 +158,7 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         OnSpawn();
-        MakeMidnight(speedFactor: 1f);
+        MakeMidnight(speedFactor: 1f, secondPhase: IsInSecondPhase);
         UpdateStates();
         UpdateClones();
         ForceUpdateRotation();
@@ -184,6 +184,15 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             _secondPhaseOpacity = Helper.Approach(_secondPhaseOpacity, 1f, 0.025f);
+
+            Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * 1f * _secondPhaseOpacity;
+            Lighting.AddLight(NPC.Center, lightColor);
+
+            if (NPC.HasPlayerTarget) {
+                Player target = NPC.GetTargetPlayer();
+                Vector2 targetCenter = target.Center;
+                Lighting.AddLight(targetCenter, lightColor);
+            }
         }
         else {
             _secondPhaseOpacity = 0f;
@@ -269,8 +278,25 @@ sealed partial class EternalHorror : ModNPC {
 
     private partial void InitializeStates();
 
-    public static void MakeMidnight(float speedFactor = 1f) {
+    public static void MakeMidnight(float speedFactor = 1f, bool secondPhase = false) {
         float expFactor = 0.025f * speedFactor;
+
+        if (secondPhase) {
+            if (!Main.dayTime) {
+                expFactor *= 4;
+                float to = (float)Main.nightLength;
+                float lerpValue = 1f - MathF.Exp(-expFactor);
+                Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
+            }
+            else {
+                float to = (float)Main.dayLength / 2;
+                float lerpValue = 1f - MathF.Exp(-expFactor);
+                Main.time = MathHelper.Lerp((float)Main.time, to, lerpValue);
+            }
+
+            return;
+        }
+
         if (Main.dayTime) {
             expFactor *= 4;
             float to = (float)Main.dayLength;

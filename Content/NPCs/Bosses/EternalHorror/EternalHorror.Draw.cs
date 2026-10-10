@@ -887,5 +887,8 @@ sealed partial class EternalHorror : ModNPC {
         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
             Draw_Inner(boss, drawContext);
         });
+
+        Main.ParticleSystem_World_OverPlayers.Settings.AnchorPosition = -Main.screenPosition;
+        Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
     }
 }
