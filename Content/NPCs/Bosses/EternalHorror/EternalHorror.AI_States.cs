@@ -719,7 +719,7 @@ sealed partial class EternalHorror : ModNPC {
                 if (shouldDash) {
                     return;
                 }
-                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1.5f, 0.025f);
+                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.025f);
             }
             void lookAtTarget() {
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
@@ -797,8 +797,6 @@ sealed partial class EternalHorror : ModNPC {
             slowDownWhenCloseToTarget();
             //npc.Center = Vector2.Lerp(npc.Center, targetCenter, progress);
             //npc.rotation = Utils.AngleLerp(npc.rotation, 0f, progress);
-
-            npc.dontTakeDamage = true;
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {

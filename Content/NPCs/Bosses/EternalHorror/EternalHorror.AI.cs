@@ -109,6 +109,9 @@ sealed partial class EternalHorror : ModNPC {
     private Vector2 _tempPosition;
     private Vector2 _cloneTargetPosition;
 
+    private Vector2 _eyeVelocity;
+    private float _eyeDirectionChangeTime, _eyeAngle;
+
     public ref float InitValue => ref NPC.ai[0];
 
     public ref float AICounter => ref NPC.ai[1];
@@ -210,6 +213,17 @@ sealed partial class EternalHorror : ModNPC {
             Player target = NPC.GetTargetPlayer();
             Vector2 targetCenter = target.Center;
             Lighting.AddLight(targetCenter, lightColor);
+        }
+
+        _eyeVelocity = Vector2.Lerp(_eyeVelocity, Vector2.UnitY.RotatedBy(_eyeAngle) * 3.75f * _eyeEffectOpacity, 0.125f * 2f);
+
+        if (_eyeDirectionChangeTime <= 0) {
+            _eyeDirectionChangeTime = 10;
+
+            _eyeAngle = MathHelper.TwoPi * Main.rand.NextFloat();
+        }
+        else {
+            _eyeDirectionChangeTime--;
         }
     }
 
@@ -505,6 +519,9 @@ sealed partial class EternalHorror : ModNPC {
 
             if (!forDrawing) {
                 result -= rotationStep * 45f;
+            }
+            else {
+                result += _eyeVelocity;
             }
         }
 
