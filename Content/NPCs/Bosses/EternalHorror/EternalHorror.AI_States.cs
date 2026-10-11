@@ -152,9 +152,9 @@ sealed partial class EternalHorror : ModNPC {
                     return;
                 }
 
-                boss.ResetPhase1LaserAttack();
+                boss.ResetLaserAttack();
 
-                boss.Phase1BurstLaserAttackCount++;
+                boss.LaserAttackCount++;
 
                 bool shotLasers = ++boss.AttackCount >= LASERATTACKCOUNT;
                 if (!shotLasers) {
@@ -164,9 +164,9 @@ sealed partial class EternalHorror : ModNPC {
                 boss.ResetCounters();
                 boss.DeactivateState<Phase1BurstLaserAttack>();
 
-                bool shouldDash = boss.Phase1BurstLaserAttackCount > Phase1DashAttack.LASERATTACKCOUNTNEEDED;
+                bool shouldDash = boss.LaserAttackCount > Phase1DashAttack.LASERATTACKCOUNTNEEDED;
                 if (shouldDash) {
-                    boss.Phase1BurstLaserAttackCount = 0;
+                    boss.LaserAttackCount = 0;
                     boss.ActivateState<Phase1DashAttack>();
 
                     return;
@@ -548,7 +548,7 @@ sealed partial class EternalHorror : ModNPC {
                     boss.ResetCounters();
                     boss.ResetSmoothFactor();
 
-                    boss.ResetPhase1LaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
+                    boss.ResetLaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
 
                     boss.ActivateState<Phase1MoveToPlayer>();
                     boss.DeactivateState<Phase1SummonSpawnAttack>();
@@ -698,7 +698,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2Transition : IAIState {
+    private readonly struct Phase2MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.TargetPlayer();
             npc.FaceTarget_New();
@@ -719,7 +719,7 @@ sealed partial class EternalHorror : ModNPC {
                 if (shouldDash) {
                     return;
                 }
-                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.025f);
+                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1.5f, 0.025f);
             }
             void lookAtTarget() {
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
@@ -804,6 +804,67 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             //boss.SpawnRays(startRaySpeed: 0.5f);
         }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
+    private readonly struct Phase2BurstLaserAttack : IAIState {
+        public static float LASERATTACKTIME => Helper.SecondsToFrames(1);
+        public static byte LASERATTACKCOUNT => 3;
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center;
+
+            boss._cloneTargetPosition = targetCenter;
+
+            float laserProgress = boss.Phase1BurstLaserAttackProgress;
+            float laserProgress_ForLaserRotation = laserProgress * Utils.GetLerpValue(1f, 0.5f, laserProgress, true);
+
+            void shootLasers() {
+                if ((boss.AICounter < 0f && laserProgress > 0f) || boss.AICounter >= LASERATTACKTIME * 0.5f) {
+                    if (boss.AICounter % 2 == 0) {
+                        boss.ShootLaser(shootBasedOnRotation: true, reflectedFromStart: true);
+                    }
+                }
+            }
+            void prepareLasers() {
+                ref float laserRotation = ref boss.Phase1LaserRotation;
+                float newLaserRotation = npc.AngleTo(targetCenter);
+                laserRotation = Utils.AngleLerp(laserRotation, newLaserRotation, laserProgress_ForLaserRotation);
+
+                bool shotLaser = ++boss.AICounter >= LASERATTACKTIME;
+                if (!shotLaser) {
+                    return;
+                }
+
+                boss.ResetLaserAttack();
+
+                boss.LaserAttackCount++;
+
+                bool shotLasers = ++boss.AttackCount >= LASERATTACKCOUNT;
+                if (!shotLasers) {
+                    return;
+                }
+
+                //boss.ResetCounters();
+                //boss.DeactivateState<Phase1BurstLaserAttack>();
+
+                bool shouldDash = boss.LaserAttackCount > Phase1DashAttack.LASERATTACKCOUNTNEEDED;
+                if (shouldDash) {
+                    boss.LaserAttackCount = 0;
+                    //boss.ActivateState<Phase1DashAttack>();
+
+                    return;
+                }
+
+                //boss.ActivateState<Phase1CloneSpawn>();
+            }
+
+            prepareLasers();
+            shootLasers();
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 

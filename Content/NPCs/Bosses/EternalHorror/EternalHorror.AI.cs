@@ -116,7 +116,7 @@ sealed partial class EternalHorror : ModNPC {
 
     public ref float AttackCount => ref NPC.localAI[3];
     public ref float SmoothFactor => ref NPC.localAI[2];
-    public ref float Phase1BurstLaserAttackCount => ref NPC.localAI[1];
+    public ref float LaserAttackCount => ref NPC.localAI[1];
     public ref float Phase1DashAttackCount => ref NPC.localAI[1];
     public ref float Phase1LaserSpamPreparationSlowDown => ref AICounter3;
 
@@ -179,9 +179,11 @@ sealed partial class EternalHorror : ModNPC {
             if (!EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted) {
                 EternalHorrorSummonHandler.Blink(shouldBlinkOut: false);
 
+                ResetCounters();
                 DeactivateAllStates();
 
-                ActivateState<Phase2Transition>();
+                ActivateState<Phase2MoveToPlayer>();
+                ActivateState<Phase2BurstLaserAttack>();
 
                 EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted = true;
             }
@@ -221,7 +223,7 @@ sealed partial class EternalHorror : ModNPC {
 
         Init = true;
 
-        ResetPhase1LaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay2: true);
+        ResetLaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay2: true);
 
         TargetPlayer();
 
@@ -458,7 +460,7 @@ sealed partial class EternalHorror : ModNPC {
         NPC.Center = NPC.GetTargetPlayer().Center + spawnOffset;
     }
 
-    private void ResetPhase1LaserAttack(bool applyIncreasedDelay = false,
+    private void ResetLaserAttack(bool applyIncreasedDelay = false,
                                         bool applyExtraIncreasedDelay = false,
                                         bool applyExtraIncreasedDelay2 = false) {
         if (applyIncreasedDelay) {
@@ -481,7 +483,7 @@ sealed partial class EternalHorror : ModNPC {
         AICounter3 = 0f;
     }
 
-    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f) {
+    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false) {
         if (!NPC.HasPlayerTarget) {
             return;
         }
@@ -501,11 +503,13 @@ sealed partial class EternalHorror : ModNPC {
         Vector2 center = vector8;
         Vector2 velocity = new(speedX, speedY);
 
+        Color color = !reflectedFromStart ? MainRedColor_Dynamic : MainPurpleColor;
+
         int num5 = Main.rand.Next(20, 40);
         Vector2 positionInWorld = center;
         Vector2 movementVector = velocity * Main.rand.NextFloatDirection();
         PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
-        prettySparkleParticle.ColorTint = EternalHorror.MainRedColor_Dynamic.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+        prettySparkleParticle.ColorTint = color.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
         prettySparkleParticle.LocalPosition = positionInWorld;
         prettySparkleParticle.Rotation = (float)Math.PI / 2f;
         prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
@@ -523,8 +527,8 @@ sealed partial class EternalHorror : ModNPC {
         if (Helper.IsClient()) {
             return;
         }
-        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser1>(),
-            27, 1.5f, Main.myPlayer);
+        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser>(),
+            27, 1.5f, Main.myPlayer, ai2: reflectedFromStart.ToInt());
     }
 
     private void ForceUpdateRotation() {

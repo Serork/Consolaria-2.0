@@ -33,6 +33,8 @@ sealed partial class EternalHorror : ModNPC {
 
     public static Asset<Texture2D> RayTexture { get; private set; }
 
+    public static bool? DrawBlinking { get; private set; } = null;
+
     private static float _shakeIntensity;
 
     public static float ShakeStrength;
@@ -843,7 +845,9 @@ sealed partial class EternalHorror : ModNPC {
         EternalHorrorSummonHandler.OverBlinkingDrawEvent += EternalHorrorSummonHandler_OverBlinkingDrawEvent;
     }
 
-    private void EternalHorrorSummonHandler_OverBlinkingDrawEvent(SpriteBatch spriteBatch) {
+    private static void EternalHorrorSummonHandler_OverBlinkingDrawEvent(SpriteBatch spriteBatch) {
+        DrawBlinking = null;
+
         NPC boss = null;
         bool found = false;
         foreach (NPC npc in Main.ActiveNPCs) {
@@ -860,6 +864,8 @@ sealed partial class EternalHorror : ModNPC {
         if (!boss_modNPC.IsInSecondPhase_Base) {
             return;
         }
+
+        DrawBlinking = true;
 
         Color drawColor = Lighting.GetColor(boss.Center.ToTileCoordinates());
         drawColor = boss.GetNPCColorTintedByBuffs(npcColor: drawColor);
@@ -895,6 +901,14 @@ sealed partial class EternalHorror : ModNPC {
         Main.ParticleSystem_World_OverPlayers.Settings.AnchorPosition = -Main.screenPosition;
         Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
 
+        for (int j = 0; j < 1000; j++) {
+            if (Main.projectile[j].active && Main.projectile[j].type > 0 && !Main.projectile[j].hide && Main.projectile[j].ModProjectile is IEternalHorrorProjectile) {
+                Main.instance.DrawProj(j);
+            }
+        }
+
         spriteBatch.Begin(in snapshot, end: true);
+
+        DrawBlinking = false;
     }
 }

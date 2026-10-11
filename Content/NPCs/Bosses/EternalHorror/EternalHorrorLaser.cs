@@ -12,7 +12,7 @@ using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
-sealed class EternalHorrorLaser1 : ModProjectile {
+sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     public ref float ReflectedValue => ref Projectile.ai[2];
 
     public bool Reflected {
@@ -165,6 +165,13 @@ sealed class EternalHorrorLaser1 : ModProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
+        if (!EternalHorror.DrawBlinking.HasValue) {
+            return false;
+        }
+        else if (!EternalHorror.DrawBlinking.Value) {
+            return false;
+        }
+
         Texture2D texture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/Projectiles/LightTrail_1");
         Vector2 position = Projectile.Center;
         Rectangle clip = texture.Bounds;

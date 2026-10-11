@@ -1683,6 +1683,7 @@ Mods: {
 			AlbinoRunt.DisplayName: Альбинос-недоросток
 			// .DisplayName: ""
 			// EternalHorrorLaser1.DisplayName: Eternal Horror Laser1
+			// EternalHorrorLaser.DisplayName: Eternal Horror Laser
 			// EternalHorrorCloneExplosion.DisplayName: Eternal Horror Clone Explosion
 			// EternalHorrorCloneExplosionSkull.DisplayName: Eternal Horror Clone Explosion Skull
 		}
