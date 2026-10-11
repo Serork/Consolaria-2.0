@@ -1,18 +1,14 @@
 ﻿using Consolaria.Common.Particles;
-using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using ReLogic.Peripherals.RGB;
 using System;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
-using Terraria.Map;
 using Terraria.ModLoader;
-using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -33,7 +29,7 @@ sealed partial class EternalHorror : ModNPC {
 
     public static Asset<Texture2D> RayTexture { get; private set; }
 
-    public static bool? DrawBlinking { get; private set; } = null;
+    public static bool CanDrawOnTopOfBlinking { get; private set; }
 
     private static float _shakeIntensity;
 
@@ -47,6 +43,8 @@ sealed partial class EternalHorror : ModNPC {
                   _shadowTime,
                   _dashOpacity,
                   _copiesIntensity;
+
+    private float _eyeEffectOpacity;
 
     private float _secondPhaseOpacity;
 
@@ -263,7 +261,7 @@ sealed partial class EternalHorror : ModNPC {
         Texture2D texture = NPC.GetTexture(),
                   glowTexture = _glowTexture.Value,
                   shadowTexture = _shadowTexture.Value;
-        Rectangle glowClip = glowTexture.Bounds;
+        Rectangle glowClip = glowTexture.Frame(1, 2, frameY: IsInSecondPhase ? 1 : 0);
 
         DrawContext drawContext = GetBasicDrawContext(NPC, spriteBatch, screenPos, drawColor);
 
@@ -334,7 +332,7 @@ sealed partial class EternalHorror : ModNPC {
                 });
             }, sinWaveOffset: WaveOffset);
         }
-        Color getLaserGlowColor(Color color) => GetLaserGlowColor(color) * _glowOpacity;
+        Color getLaserGlowColor(Color color) => GetLaserGlowColor(color, IsInSecondPhase) * _glowOpacity;
         void drawLaserLine() {
             float rotation = Phase1LaserRotation;
 
@@ -405,7 +403,7 @@ sealed partial class EternalHorror : ModNPC {
                applyInnerOpacity: false,
                forcedOpacity: MathHelper.Lerp(0.125f, 0.25f, 1f),
                sinWaveOffset_BasedOnEffectIndex: MathHelper.TwoPi * 0.25f,
-               sinStep: AICounter);
+               sinStep: AICounter * (IsInSecondPhase ? 5f : 1f));
         }
         void drawClones() {
             if (!Init) {
@@ -706,7 +704,13 @@ sealed partial class EternalHorror : ModNPC {
         if (HasActiveState<Phase1LaserSpamAttack>()) {
             glowOpacity = Phase1LaserSpamAttackProgress;
         }
+        if (HasActiveState<Phase2BurstLaserAttack>()) {
+            glowOpacity = Phase2BurstLaserAttackProgress;
+        }
         _glowOpacity = Helper.Approach(_glowOpacity, glowOpacity, lerpValue);
+
+        _eyeEffectOpacity = Helper.Approach(_eyeEffectOpacity, 0f, lerpValue);
+
         float shadowOpacity = 0f;
         if (HasActiveState<Phase1CloneSpawn>()) {
             shadowOpacity = Phase1ShadowSpawnProgress;
@@ -747,10 +751,11 @@ sealed partial class EternalHorror : ModNPC {
         _shakeIntensity = Helper.Approach(_shakeIntensity, EternalHorrorSummonHandler.EternalHorrorSummonEnded.ToInt(), lerpValue);
     }
 
-    public static Color GetLaserGlowColor(Color drawColor) => drawColor.MultiplyRGBA(MainRedColor_Dynamic);
+    public static Color GetLaserGlowColor(Color drawColor, bool secondPhase) => drawColor.MultiplyRGBA(secondPhase ? MainPurpleColor : MainRedColor_Dynamic);
 
-    private static void Draw_Inner(NPC npc, DrawContext drawContext) {
-        npc.QuickDraw(drawContext.SpriteBatch, drawContext.ScreenPosition, drawContext.DrawColor, frameBox: drawContext.Clip, 
+    private static void Draw_Inner(NPC npc, DrawContext drawContext, float scale = 1f) {
+        npc.QuickDraw(drawContext.SpriteBatch, drawContext.ScreenPosition, drawContext.DrawColor, scale: scale,
+                                                                                                  frameBox: drawContext.Clip, 
                                                                                                   rotation: drawContext.Rotation, 
                                                                                                   position: drawContext.Position, 
                                                                                                   texture: drawContext.Texture, 
@@ -846,7 +851,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private static void EternalHorrorSummonHandler_OverBlinkingDrawEvent(SpriteBatch spriteBatch) {
-        DrawBlinking = null;
+        CanDrawOnTopOfBlinking = false;
 
         NPC boss = null;
         bool found = false;
@@ -862,10 +867,11 @@ sealed partial class EternalHorror : ModNPC {
         }
         EternalHorror boss_modNPC = boss.As<EternalHorror>();
         if (!boss_modNPC.IsInSecondPhase_Base) {
+            CanDrawOnTopOfBlinking = true;
             return;
         }
 
-        DrawBlinking = true;
+        CanDrawOnTopOfBlinking = true;
 
         Color drawColor = Lighting.GetColor(boss.Center.ToTileCoordinates());
         drawColor = boss.GetNPCColorTintedByBuffs(npcColor: drawColor);
@@ -882,9 +888,17 @@ sealed partial class EternalHorror : ModNPC {
         DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor);
         Texture2D eyeTexture = _secondPhaseEyeTexture.Value;
         Rectangle eyeClip = eyeTexture.Bounds;
+        Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true);
+
+        Color eyeEffectColor = drawContext.DrawColor;
+
+        float blink = (float)Math.Sin(boss_modNPC.AICounter / 4) / 2 + 0.5f;
+        eyeEffectColor = new Color(1f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
+
         drawContext = drawContext with {
             Texture = eyeTexture,
-            Clip = eyeClip
+            Clip = eyeClip,
+            Position = eyePosition
         };
 
         ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
@@ -892,23 +906,26 @@ sealed partial class EternalHorror : ModNPC {
         ShaderLoader.DistortShader.Anxiety = anxietyFactor + anxietyFactor * boss_modNPC.SecondPhaseOpacity;
         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
             Draw_Inner(boss, drawContext);
+
+            Draw_Inner(boss, drawContext with {
+                Texture = _secondPhaseEyeTexture_Glow.Value,
+                DrawColor = eyeEffectColor
+            });
         });
 
         Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
+
+        for (int j = 0; j < 1000; j++) {
+            if (Main.projectile[j].active && Main.projectile[j].ModProjectile is IEternalHorrorProjectile) {
+                Main.instance.DrawProj(j);
+            }
+        }
 
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
         Main.ParticleSystem_World_OverPlayers.Settings.AnchorPosition = -Main.screenPosition;
         Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
 
-        for (int j = 0; j < 1000; j++) {
-            if (Main.projectile[j].active && Main.projectile[j].type > 0 && !Main.projectile[j].hide && Main.projectile[j].ModProjectile is IEternalHorrorProjectile) {
-                Main.instance.DrawProj(j);
-            }
-        }
-
         spriteBatch.Begin(in snapshot, end: true);
-
-        DrawBlinking = false;
     }
 }

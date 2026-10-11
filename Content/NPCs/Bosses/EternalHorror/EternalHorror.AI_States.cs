@@ -808,7 +808,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase2BurstLaserAttack : IAIState {
-        public static float LASERATTACKTIME => Helper.SecondsToFrames(1);
+        public static float LASERATTACKTIME => Helper.SecondsToFrames(1.5f);
         public static byte LASERATTACKCOUNT => 3;
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
@@ -823,6 +823,8 @@ sealed partial class EternalHorror : ModNPC {
             void shootLasers() {
                 if ((boss.AICounter < 0f && laserProgress > 0f) || boss.AICounter >= LASERATTACKTIME * 0.5f) {
                     if (boss.AICounter % 2 == 0) {
+                        boss._eyeEffectOpacity = 1f;
+
                         boss.ShootLaser(shootBasedOnRotation: true, reflectedFromStart: true);
                     }
                 }
@@ -832,7 +834,9 @@ sealed partial class EternalHorror : ModNPC {
                 float newLaserRotation = npc.AngleTo(targetCenter);
                 laserRotation = Utils.AngleLerp(laserRotation, newLaserRotation, laserProgress_ForLaserRotation);
 
-                bool shotLaser = ++boss.AICounter >= LASERATTACKTIME;
+                boss.AICounter += boss.AICounter < 0f ? 1f : 0.5f;
+
+                bool shotLaser = boss.AICounter >= LASERATTACKTIME * 1f;
                 if (!shotLaser) {
                     return;
                 }
@@ -878,6 +882,8 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase1LaserSpamAttackProgress => Ease.SineIn(Helper.Clamp01(AICounter / Phase1LaserSpamAttack.BEFORESPAMTIME));
     public bool Phase1LastDash => Phase1DashAttackCount >= Phase1DashAttack.DASHATTACKCOUNT - 1;
     public bool Phase1AtLeast1Dash => Phase1DashAttackCount > 1;
+
+    public float Phase2BurstLaserAttackProgress => Helper.Clamp01(AICounter / Phase2BurstLaserAttack.LASERATTACKTIME);
 
     private partial void InitializeStates() {
         _states = [];

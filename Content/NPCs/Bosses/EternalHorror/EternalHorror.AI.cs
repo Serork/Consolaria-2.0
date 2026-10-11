@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 using static tModPorter.ProgressUpdate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
@@ -461,8 +462,8 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void ResetLaserAttack(bool applyIncreasedDelay = false,
-                                        bool applyExtraIncreasedDelay = false,
-                                        bool applyExtraIncreasedDelay2 = false) {
+                                  bool applyExtraIncreasedDelay = false,
+                                  bool applyExtraIncreasedDelay2 = false) {
         if (applyIncreasedDelay) {
             AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 1f);
             if (applyExtraIncreasedDelay) {
@@ -471,6 +472,10 @@ sealed partial class EternalHorror : ModNPC {
             if (applyExtraIncreasedDelay2) {
                 AICounter *= 1.5f;
             }
+            return;
+        }
+        if (IsInSecondPhase) {
+            AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 4f);
             return;
         }
         AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 2f);
@@ -483,6 +488,29 @@ sealed partial class EternalHorror : ModNPC {
         AICounter3 = 0f;
     }
 
+    private Vector2 GetEyePosition(bool forDrawing = false) {
+        Vector2 result = NPC.Center;
+
+        if (IsInSecondPhase) {
+            float rotation = NPC.rotation;
+            Vector2 rotationStep = Vector2.UnitY.RotatedBy(rotation);
+
+            float eyeScale = NPC.scale;
+            eyeScale *= 1f/*Helper.Wave(0.875f, 1f, 5f, boss.whoAmI)*/;
+
+            result -= rotationStep * 7.5f;
+
+            Vector2 angleToPlayer = Vector2.UnitX.RotatedBy(result.AngleTo(NPC.GetTargetData().Center));
+            result += angleToPlayer * 7.5f;
+
+            if (!forDrawing) {
+                result -= rotationStep * 45f;
+            }
+        }
+
+        return result;
+    }
+
     private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false) {
         if (!NPC.HasPlayerTarget) {
             return;
@@ -490,12 +518,13 @@ sealed partial class EternalHorror : ModNPC {
 
         const float Speed = 12f;
         Player target = NPC.GetTargetPlayer();
-        Vector2 vector8 = NPC.Center;
+        Vector2 vector8 = GetEyePosition();
         SoundEngine.PlaySound(SoundID.Item33, vector8);
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
             rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);
         }
+
         rotation += angleShiftToPlayer;
         float speedX = MathF.Cos(rotation) * Speed;
         float speedY = MathF.Sin(rotation) * Speed;
@@ -511,7 +540,7 @@ sealed partial class EternalHorror : ModNPC {
         PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
         prettySparkleParticle.ColorTint = color.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
         prettySparkleParticle.LocalPosition = positionInWorld;
-        prettySparkleParticle.Rotation = (float)Math.PI / 2f;
+        prettySparkleParticle.Rotation = NPC.rotation + (float)Math.PI / 2f;
         prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
         prettySparkleParticle.FadeInNormalizedTime = 0.1f;
         prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
@@ -521,6 +550,13 @@ sealed partial class EternalHorror : ModNPC {
         prettySparkleParticle.FadeOutStart = num5 / 2;
         prettySparkleParticle.AdditiveAmount = 0.35f;
         prettySparkleParticle.Velocity = movementVector;
+
+        if (IsInSecondPhase) {
+            prettySparkleParticle.Velocity *= 0f;
+
+            prettySparkleParticle.Scale *= Main.rand.NextFloat(1f, 1.5f);
+        }
+
         prettySparkleParticle.Velocity *= 0.3f;
         Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
 
