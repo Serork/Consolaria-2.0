@@ -177,54 +177,7 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
-        if (IsInSecondPhase_Base) {
-            EternalHorrorSummonHandler.BlinkOpacity = 1f - 0.5f * Ease.CubeIn(SecondPhaseOpacity);
-
-            if (!EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted) {
-                EternalHorrorSummonHandler.Blink(shouldBlinkOut: false);
-
-                ResetCounters();
-                DeactivateAllStates();
-
-                ActivateState<Phase2MoveToPlayer>();
-                ActivateState<Phase2BurstLaserAttack>();
-
-                EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted = true;
-            }
-
-            _secondPhaseOpacity = Helper.Approach(_secondPhaseOpacity, 1f, 0.025f);
-
-            //if (_secondPhaseOpacity >= 1f) {
-            //    EternalHorrorSummonHandler.ShouldBlinkOut = false;
-            //}
-        }
-        else {
-            EternalHorrorSummonHandler.BlinkOpacity = 1f;
-
-            _secondPhaseOpacity = 0f;
-        }
-
-        float rayAlpha = IsInSecondPhase ? Ease.CubeOut(GetAllRayProgress()) : GetAllRayProgress();
-
-        Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
-        Lighting.AddLight(NPC.Center, lightColor);
-
-        if (NPC.HasPlayerTarget) {
-            Player target = NPC.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
-            Lighting.AddLight(targetCenter, lightColor);
-        }
-
-        _eyeVelocity = Vector2.Lerp(_eyeVelocity, Vector2.UnitY.RotatedBy(_eyeAngle) * 3.75f * _eyeEffectOpacity, 0.125f * 2f);
-
-        if (_eyeDirectionChangeTime <= 0) {
-            _eyeDirectionChangeTime = 10;
-
-            _eyeAngle = MathHelper.TwoPi * Main.rand.NextFloat();
-        }
-        else {
-            _eyeDirectionChangeTime--;
-        }
+        SomeSecondPhaseShitCode();
     }
 
     private void OnSpawn() {
@@ -660,6 +613,57 @@ sealed partial class EternalHorror : ModNPC {
                 fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
                 Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
             }
+        }
+    }
+
+    private void SomeSecondPhaseShitCode() {
+        if (IsInSecondPhase_Base) {
+            EternalHorrorSummonHandler.BlinkOpacity = 1f - 0.5f * Ease.CubeIn(SecondPhaseOpacity);
+
+            if (!EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted) {
+                EternalHorrorSummonHandler.Blink(shouldBlinkOut: false);
+
+                ResetCounters();
+                DeactivateAllStates();
+
+                ActivateState<Phase2MoveToPlayer>();
+                ActivateState<Phase2BurstLaserAttack>();
+
+                EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted = true;
+            }
+
+            _secondPhaseOpacity = Helper.Approach(_secondPhaseOpacity, 1f, 0.025f);
+
+            //if (_secondPhaseOpacity >= 1f) {
+            //    EternalHorrorSummonHandler.ShouldBlinkOut = false;
+            //}
+        }
+        else {
+            EternalHorrorSummonHandler.BlinkOpacity = 1f;
+
+            _secondPhaseOpacity = 0f;
+        }
+
+        float rayAlpha = IsInSecondPhase ? Ease.CubeOut(GetAllRayProgress()) : GetAllRayProgress();
+
+        Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
+        Lighting.AddLight(NPC.Center, lightColor);
+
+        if (NPC.HasPlayerTarget) {
+            Player target = NPC.GetTargetPlayer();
+            Vector2 targetCenter = target.Center;
+            Lighting.AddLight(targetCenter, lightColor);
+        }
+
+        _eyeVelocity = Vector2.Lerp(_eyeVelocity, Vector2.UnitY.RotatedBy(_eyeAngle) * 3.75f * _eyeEffectOpacity, 0.125f * 2f);
+
+        if (_eyeDirectionChangeTime <= 0) {
+            _eyeDirectionChangeTime = 10;
+
+            _eyeAngle = MathHelper.TwoPi * Main.rand.NextFloat();
+        }
+        else {
+            _eyeDirectionChangeTime--;
         }
     }
 }
