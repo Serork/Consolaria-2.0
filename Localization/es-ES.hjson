@@ -1792,6 +1792,7 @@ Mods: {
 			// EternalHorrorLaser.DisplayName: Eternal Horror Laser
 			// EternalHorrorCloneExplosion.DisplayName: Eternal Horror Clone Explosion
 			// EternalHorrorCloneExplosionSkull.DisplayName: Eternal Horror Clone Explosion Skull
+			// EternalHorrorScythe.DisplayName: Eternal Horror Scythe
 		}
 
 		Tiles: {

@@ -165,7 +165,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
-        if (EternalHorror.CanDrawOnTopOfBlinking) {
+        if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/Projectiles/LightTrail_1");
             Vector2 position = Projectile.Center;
             Rectangle clip = texture.Bounds;
