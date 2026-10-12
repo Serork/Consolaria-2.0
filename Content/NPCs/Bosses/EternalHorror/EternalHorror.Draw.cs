@@ -903,7 +903,7 @@ sealed partial class EternalHorror : ModNPC {
         Color eyeEffectColor = drawContext.DrawColor;
 
         float blink = (float)Math.Sin(boss_modNPC.AICounter / 4) / 2 + 0.5f;
-        eyeEffectColor = new Color(1f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
+        eyeEffectColor = new Color(0.875f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
 
         drawContext = drawContext with {
             Texture = eyeTexture,
