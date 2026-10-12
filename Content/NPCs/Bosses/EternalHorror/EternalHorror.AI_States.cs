@@ -704,11 +704,18 @@ sealed partial class EternalHorror : ModNPC {
 
     private readonly struct Phase2Transition : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            boss.ResetCounters();
             boss.DeactivateAllStates();
 
             boss.ActivateState<Phase2MoveToPlayer>();
             boss.ActivateState<Phase2BurstLaserAttack>();
+
+            boss.ResetCounters();
+
+            boss._dashVelocity *= 0f;
+
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                cloneInfo.ShouldFade = true;
+            });
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
