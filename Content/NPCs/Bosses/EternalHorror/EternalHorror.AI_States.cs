@@ -908,8 +908,6 @@ sealed partial class EternalHorror : ModNPC {
             Player target = npc.GetTargetPlayer();
             Vector2 targetCenter = target.Center;
 
-            boss._cloneTargetPosition = targetCenter;
-
             float smoothFactor = boss.SmoothFactor/*Ease.SineIn(boss.SmoothFactor)*/;
             targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
             targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * smoothFactor);
@@ -951,6 +949,8 @@ sealed partial class EternalHorror : ModNPC {
             //    //    }
             //    //});
             //}
+
+            boss._cloneTargetPosition = Vector2.Lerp(boss._cloneTargetPosition, targetCenter, 0.5f * smoothFactor);
 
             Vector2 baseTargetCenter = targetCenter;
 
