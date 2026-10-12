@@ -940,26 +940,19 @@ sealed partial class EternalHorror : ModNPC {
 
             ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
 
-            bool didAtLeastOneDash = boss.Phase1DashAttackCount > 0;
+            bool didAtLeastOneDash = boss.Phase2DashAttackCount > 0;
 
             float dashPreparationFactor = 0.25f;
 
             bool shouldResetState() {
-                if (boss.Phase1DashAttackCount >= DASHATTACKCOUNT) {
+                if (boss.Phase2DashAttackCount >= DASHATTACKCOUNT) {
                     boss.ActivateState<Phase2MoveToPlayer>();
                     boss.DeactivateState<Phase2DashAttack>();
-                    //if (boss.Phase1DashAttack_ShouldBurstLaserAfter) {
-                    //    boss.Phase1DashAttack_ShouldBurstLaserAfter = false;
-                    //    boss.ActivateState<Phase1SummonSpawnAttack>();
-                    //}
-                    //else {
-                    //    boss.ActivateState<Phase1LaserSpamAttack>();
-                    //}
-                    boss.ActivateState<Phase2BurstLaserAttack>();
+                    boss.ActivateState<Phase2LaserSpamAttack>();
                     boss.ResetCounters();
 
                     boss.ResetSmoothFactor(value: 0.25f);
-                    boss.Phase1DashAttackCount = 0;
+                    boss.Phase2DashAttackCount = 0;
 
                     boss._dashVelocity *= 0f;
 
@@ -1015,7 +1008,7 @@ sealed partial class EternalHorror : ModNPC {
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     boss._dashVelocity = dashDirection * dashStrength;
 
-                    boss.Phase1DashAttackCount++;
+                    boss.Phase2DashAttackCount++;
 
                     //if (!boss.Phase1LastDash)
                     {
@@ -1109,6 +1102,85 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
+    private readonly struct Phase2LaserSpamAttack : IAIState {
+        public static float BEFORESPAMTIME => Helper.SecondsToFrames(1.5f * 1.5f);
+        public static float SPAMATTACKTIME => Helper.SecondsToFrames(2f * 1.5f);
+
+        public static float PPEPARATIONSLOWLASTFACTOR => 0.75f;
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            float preparationProgress = boss.Phase2LaserSpamPreparationSlowDown;
+            bool shouldStartAttack = boss.AICounter >= BEFORESPAMTIME;
+            float attackTime_ForSlowDown = SPAMATTACKTIME,
+                  attackProgress_ForSlowDown = (boss.AICounter - BEFORESPAMTIME) / attackTime_ForSlowDown;
+            attackProgress_ForSlowDown = Helper.Clamp01(attackProgress_ForSlowDown);
+            float preparationSlowDown = Utils.Remap(1f - attackProgress_ForSlowDown, 0f, 1f, PPEPARATIONSLOWLASTFACTOR, 1f, true);
+
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center;
+
+            boss._cloneTargetPosition = targetCenter;
+
+            void prepareLasers() {
+                boss.AICounter += 1f;
+                boss.Phase2LaserSpamPreparationSlowDown = preparationSlowDown;
+            }
+            void spamLasers() {
+                if (shouldStartAttack) {
+                    float laserAttackFireRate = Utils.Remap(attackProgress_ForSlowDown, 0f, 1f, 0.25f, 1f, true);
+                    boss.AICounter2 += laserAttackFireRate;
+                    float rotationOffset = MathHelper.PiOver4 * 0.5f * laserAttackFireRate;
+                    if (boss.AICounter2 >= 1f * 2f) {
+                        boss._eyeEffectOpacity = 1f;
+
+                        float waveStep = attackProgress_ForSlowDown * 10f;
+                        if (npc.IsFacingLeft()) {
+                            waveStep += MathHelper.TwoPi;
+                        }
+                        float max = 2f;
+
+                        float randomAngleShift = max * Main.rand.NextFloatDirection() * attackProgress_ForSlowDown/*Helper.Wave(waveStep, -max, max, 2.5f, boss.WaveOffset)*/ * rotationOffset;
+                        randomAngleShift *= Main.rand.NextFloat(0.75f, 1.25f);
+
+                        float forcedRotationOffset = randomAngleShift * 0.25f;
+                        forcedRotationOffset *= 1f - Utils.GetLerpValue(0.75f, 1f, attackProgress_ForSlowDown, true);
+                        boss._forcedRotationOffset += forcedRotationOffset;
+                        boss.ShootLaser(shootBasedOnRotation: false, angleShiftToPlayer: randomAngleShift, reflectedFromStart: true);
+                        boss.AICounter2 = 0f;
+                    }
+                }
+                else {
+                    boss._eyeEffectOpacity = Ease.CubeIn(boss.Phase2LaserSpamAttackProgress);
+                }
+            }
+            void stopAttacking() {
+                bool shouldStopAttack = boss.AICounter >= SPAMATTACKTIME + BEFORESPAMTIME;
+                if (shouldStopAttack) {
+                    boss.ResetCounters();
+                    boss.ResetSmoothFactor();
+                    boss.DeactivateState<Phase2LaserSpamAttack>();
+                    boss.ActivateState<Phase2BurstLaserAttack>();
+
+                    boss.ResetLaserAttack(applyIncreasedDelay: true);
+                    //boss.ActivateState<Phase1CloneSpawn>();
+
+                    //boss.Phase1CloneSpawn_ShouldDashAfter = true;
+                }
+            }
+            void slowDownWhenShooting() {
+                npc.velocity *= preparationSlowDown;
+            }
+
+            prepareLasers();
+            spamLasers();
+            stopAttacking();
+            slowDownWhenShooting();
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
     private Dictionary<Type, IAIState> _states = null;
     private HashSet<IAIState> _activeStates = null;
 
@@ -1121,6 +1193,7 @@ sealed partial class EternalHorror : ModNPC {
     public bool Phase1AtLeast1Dash => Phase1DashAttackCount > 1;
 
     public float Phase2BurstLaserAttackProgress => Helper.Clamp01(AICounter / Phase2BurstLaserAttack.LASERATTACKTIME);
+    public float Phase2LaserSpamAttackProgress => Ease.SineIn(Helper.Clamp01(AICounter / Phase2LaserSpamAttack.BEFORESPAMTIME));
 
     private partial void InitializeStates() {
         _states = [];

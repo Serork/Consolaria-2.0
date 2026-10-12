@@ -552,58 +552,6 @@ sealed partial class EternalHorror : ModNPC {
                 });
             }
         }
-        void drawLaserSpamWarning() {
-            if (!HasActiveState<Phase1LaserSpamAttack>()) {
-                return;
-            }
-
-            NPC rCurrentNPC = NPC;
-
-            //Vector2 vector43 = Utils.Vector2FromElipse(rCurrentNPC.localAI[0].ToRotationVector2(), vector38 * rCurrentNPC.localAI[1]);
-            float num149 = Phase1LaserSpamAttack.BEFORESPAMTIME;
-            float num153 = AICounter;
-
-            float framesBeforeSmolBeam = num149 / 2;
-            float framesBeforeSmolBeam2 = num149 / 10;
-
-            Vector2 rotationVector2 = Vector2.UnitY.RotatedBy(NPC.rotation);
-            int starCount = 3;
-            for (int i = 0; i < starCount; i++) {
-                Vector2 starPosition = NPC.Center.DirectionTo(NPC.GetTargetPlayer().Center);
-                float starMaxRotation = (float)num153 * ((float)Math.PI * 2f / num149) * 1.5f;
-
-                starMaxRotation *= ((i + 1) % 2 == 0).ToDirectionInt();
-
-                float starScale = Utils.Remap(num153, num149 - (float)framesBeforeSmolBeam2 - (float)framesBeforeSmolBeam, num149 - (float)framesBeforeSmolBeam2, 1f, 0f);
-                float starRotation = Utils.Remap(num153, num149 - (float)framesBeforeSmolBeam2 - (float)framesBeforeSmolBeam, num149 - (float)framesBeforeSmolBeam2, 0f, 1f);
-
-                starScale *= 1.5f;
-
-                float starProgress = (float)i / starCount;
-                float offset = 13f;
-                if (i == 1) {
-                    offset = 42f;
-
-                    starScale *= 0.875f;
-                    starRotation *= 0.875f;
-                }
-                else if (i == 2) {
-                    offset = 62f;
-
-                    starScale *= 0.75f;
-                    starRotation *= 0.75f;
-                }
-                Vector2 starOffset = rotationVector2 * -offset;
-
-                Helper.DrawPrettyStarSparkle(1f, SpriteEffects.None, rCurrentNPC.Center - screenPos + starPosition + starOffset,
-                    Color.Lerp(Color.White, MainRedColor_Dynamic, 
-                    Utils.Remap(Ease.SineIn(Phase1LaserSpamAttackProgress), 0f, 1f, 0.25f, 1f, true)),
-                    MainRedColor_Dynamic, starRotation, 0f, 0.5f, 0.9f, 1f,
-                    starMaxRotation * starRotation * starRotation,
-                    new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
-                //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
-            }
-        }
 
         drawTrails();
         drawRays(NPC, spriteBatch, rayOpacity);
@@ -612,8 +560,67 @@ sealed partial class EternalHorror : ModNPC {
         drawSelf();
         drawGlowingEyes();
         drawLaserGlow();
-        drawLaserSpamWarning();
+        if (!IsInSecondPhase) {
+            drawLaserSpamWarning(screenPos);
+        }
         //drawLaserLine();
+    }
+
+    private void drawLaserSpamWarning(Vector2 screenPos) {
+        if (!HasActiveState<Phase1LaserSpamAttack>() && !HasActiveState<Phase2LaserSpamAttack>()) {
+            return;
+        }
+
+        NPC rCurrentNPC = NPC;
+
+        //Vector2 vector43 = Utils.Vector2FromElipse(rCurrentNPC.localAI[0].ToRotationVector2(), vector38 * rCurrentNPC.localAI[1]);
+        float num149 = !IsInSecondPhase ? Phase1LaserSpamAttack.BEFORESPAMTIME : Phase2LaserSpamAttack.BEFORESPAMTIME;
+        float num153 = AICounter;
+
+        float framesBeforeSmolBeam = num149 / 2;
+        float framesBeforeSmolBeam2 = num149 / 10;
+
+        Vector2 rotationVector2 = Vector2.UnitY.RotatedBy(NPC.rotation);
+        int starCount = IsInSecondPhase ? 2 : 3;
+        for (int i = 0; i < starCount; i++) {
+            Vector2 starPosition = NPC.Center.DirectionTo(NPC.GetTargetPlayer().Center);
+            float starMaxRotation = (float)num153 * ((float)Math.PI * 2f / num149) * 1.5f;
+
+            starMaxRotation *= ((i + 1) % 2 == 0).ToDirectionInt();
+
+            float starScale = Utils.Remap(num153, num149 - (float)framesBeforeSmolBeam2 - (float)framesBeforeSmolBeam, num149 - (float)framesBeforeSmolBeam2, 1f, 0f);
+            float starRotation = Utils.Remap(num153, num149 - (float)framesBeforeSmolBeam2 - (float)framesBeforeSmolBeam, num149 - (float)framesBeforeSmolBeam2, 0f, 1f);
+
+            starScale *= 1.5f;
+
+            float starProgress = (float)i / starCount;
+            float offset = 13f;
+            if (i == 1) {
+                offset = 42f;
+
+                if (IsInSecondPhase) {
+                    offset *= 1.125f;
+                }
+
+                starScale *= 0.875f;
+                starRotation *= 0.875f;
+            }
+            else if (i == 2) {
+                offset = 62f;
+
+                starScale *= 0.75f;
+                starRotation *= 0.75f;
+            }
+            Vector2 starOffset = rotationVector2 * -offset;
+
+            Helper.DrawPrettyStarSparkle(1f, SpriteEffects.None, rCurrentNPC.Center - screenPos + starPosition + starOffset,
+                Color.Lerp(Color.White, IsInSecondPhase ? MainPurpleColor : MainRedColor_Dynamic,
+                Utils.Remap(Ease.SineIn(IsInSecondPhase ? Phase2LaserSpamAttackProgress : Phase1LaserSpamAttackProgress), 0f, 1f, 0.25f, 1f, true)),
+                IsInSecondPhase ? MainPurpleColor : MainRedColor_Dynamic, starRotation, 0f, 0.5f, 0.9f, 1f,
+                starMaxRotation * starRotation * starRotation,
+                new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
+            //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
+        }
     }
 
     private static void drawRays(NPC npc, SpriteBatch spriteBatch, float opacity = 1f) {
@@ -912,6 +919,8 @@ sealed partial class EternalHorror : ModNPC {
                 DrawColor = eyeEffectColor
             });
         });
+
+        boss_modNPC.drawLaserSpamWarning(Main.screenPosition);
 
         Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
 

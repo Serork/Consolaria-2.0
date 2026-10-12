@@ -123,7 +123,9 @@ sealed partial class EternalHorror : ModNPC {
     public ref float SmoothFactor => ref NPC.localAI[2];
     public ref float LaserAttackCount => ref NPC.localAI[1];
     public ref float Phase1DashAttackCount => ref NPC.localAI[1];
+    public ref float Phase2DashAttackCount => ref NPC.localAI[1];
     public ref float Phase1LaserSpamPreparationSlowDown => ref AICounter3;
+    public ref float Phase2LaserSpamPreparationSlowDown => ref AICounter3;
 
     public ref float Phase1CloneSpawn_ShouldDashAfterValue => ref NPC.localAI[0];
     public ref float Phase1DashAttack_ShouldBurstLaserAfterValue => ref NPC.localAI[0];

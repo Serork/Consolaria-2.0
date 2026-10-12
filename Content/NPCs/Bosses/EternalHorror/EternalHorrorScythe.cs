@@ -13,6 +13,8 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
+    private static ushort TIMELEFT => 150;
+
     private static Asset<Texture2D> _glowTexture = null!;
 
     private float rotationTimer = (float)Math.PI;
@@ -37,6 +39,8 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
         Projectile.penetrate = 1;
         Projectile.tileCollide = false;
 
+        Projectile.timeLeft = TIMELEFT;
+
         //Projectile.light = 0.25f;
         //Projectile.scale = 0.6f;
     }
@@ -51,9 +55,18 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
             //Projectile.velocity = angle * 5f;
         }
 
-        Projectile.scale = Helper.Approach(Projectile.scale, 1f, 0.1f);
+        if (Projectile.timeLeft < 30) {
+            Projectile.scale = Helper.Approach(Projectile.scale, 0f, 0.1f);
+            if (Projectile.scale <= 0f) {
+                Projectile.Kill();
+                return;
+            }
+        }
+        else {
+            Projectile.scale = Helper.Approach(Projectile.scale, 1f, 0.1f);
+        }
 
-        if (Projectile.timeLeft > 200)
+        if (Projectile.timeLeft > TIMELEFT * 0.75f)
             Projectile.velocity *= 1.05f;
 
         //int dust2 = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, Projectile.velocity.X * 0.2f, Projectile.velocity.Y * 0.2f, 100, default, 1.2f);
@@ -62,7 +75,7 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
         Projectile.rotation += 2 / rotationTimer;
         rotationTimer += 0.05f;
 
-        Lighting.AddLight(Projectile.Center, 0.4f, 0.1f, 0.5f);
+        Lighting.AddLight(Projectile.Center, new Color(0.4f, 0.1f, 0.5f).ToVector3() * Projectile.scale);
 
         if (Main.rand.NextBool(2)) {
             void makeSpawnDust() {

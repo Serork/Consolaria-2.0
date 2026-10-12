@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.GameContent.UI.Elements;
+using Terraria.Graphics;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,6 +15,8 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
+    private static ushort TIMELEFT => 240;
+
     public ref float ReflectedValue => ref Projectile.ai[2];
 
     public bool Reflected {
@@ -32,12 +36,13 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
         Projectile.hostile = true;
         Projectile.tileCollide = false;
 
-        Projectile.scale = 1f;
         Projectile.alpha = 255;
 
         Projectile.width = 6;
 
-        Projectile.timeLeft = 900;
+        Projectile.scale = 1f;
+
+        Projectile.timeLeft = TIMELEFT;
         Projectile.penetrate = -1;
 
         Projectile.light = 0.1f;
@@ -53,15 +58,25 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
         if (Projectile.localAI[2] == 0f) {
             Projectile.localAI[2] = 1f;
 
+            Projectile.scale = 1f;
+
             SoundEngine.PlaySound(SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, Projectile.Center);
         }
 
-        if (Projectile.timeLeft <= 895) Projectile.alpha = 50;
+        if (Projectile.timeLeft <= TIMELEFT - 5) Projectile.alpha = 50;
         if (Reflected) {
-            Lighting.AddLight(Projectile.Center, 0.4f, 0.1f, 0.5f);
+            Lighting.AddLight(Projectile.Center, new Color(0.4f, 0.1f, 0.5f).ToVector3() * Projectile.scale);
         }
         else {
-            Lighting.AddLight(Projectile.Center, 0.6f, 0.1f, 0.1f);
+            Lighting.AddLight(Projectile.Center, new Color(0.6f, 0.1f, 0.1f).ToVector3() * Projectile.scale);
+        }
+
+        if (Projectile.timeLeft < 30) {
+            Projectile.scale = Helper.Approach(Projectile.scale, 0f, 0.1f);
+            if (Projectile.scale <= 0f) {
+                Projectile.Kill();
+                return;
+            }
         }
 
         ReflectFromEternalHorrorClones();
@@ -178,7 +193,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
             Vector2 drawOrigin = clip.Centered();
 
-            for (int k = 0; k < Projectile.oldPos.Length - 1; k++) {
+            for (int k = 0; k < Projectile.oldPos.Length - 1 - 5; k++) {
                 Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
                 position = drawPos;
                 rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
