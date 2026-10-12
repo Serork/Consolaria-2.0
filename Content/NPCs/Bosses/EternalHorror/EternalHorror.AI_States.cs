@@ -710,6 +710,11 @@ sealed partial class EternalHorror : ModNPC {
             boss.ActivateState<Phase2BurstLaserAttack>();
 
             boss.ResetCounters();
+
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                //cloneInfo.ShouldUpdateVisualPosition = true;
+                cloneInfo.ShouldFade = true;
+            });
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
