@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -441,10 +442,6 @@ sealed partial class EternalHorror : ModNPC {
             }
             return;
         }
-        if (IsInSecondPhase) {
-            AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 4f);
-            return;
-        }
         AICounter = -(int)(Phase1BurstLaserAttack.LASERATTACKTIME / 2f);
     }
 
@@ -479,6 +476,64 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         return result;
+    }
+
+    private void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f) {
+        if (!NPC.HasPlayerTarget) {
+            return;
+        }
+
+        const float Speed = 12f;
+        Player target = NPC.GetTargetPlayer();
+        Vector2 vector8 = GetEyePosition();
+        vector8 += spawnOffset.RotatedBy(NPC.rotation);
+
+        //SoundEngine.PlaySound(SoundID.Item33, vector8);
+        float rotation = NPC.rotation + MathHelper.PiOver2;
+        if (shootBasedOnRotation) {
+            rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);
+        }
+
+        rotation += angleShiftToPlayer;
+        float speedX = MathF.Cos(rotation) * Speed;
+        float speedY = MathF.Sin(rotation) * Speed;
+
+        Vector2 center = vector8;
+        Vector2 velocity = new(speedX, speedY);
+
+        Color color = MainPurpleColor;
+
+        int num5 = Main.rand.Next(20, 40);
+        Vector2 positionInWorld = center;
+        Vector2 movementVector = velocity * Main.rand.NextFloatDirection();
+        PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+        prettySparkleParticle.ColorTint = color.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+        prettySparkleParticle.LocalPosition = positionInWorld;
+        prettySparkleParticle.Rotation = NPC.rotation + (float)Math.PI / 2f;
+        prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+        prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+        prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+        prettySparkleParticle.TimeToLive = num5;
+        prettySparkleParticle.FadeOutEnd = num5;
+        prettySparkleParticle.FadeInEnd = num5 / 2;
+        prettySparkleParticle.FadeOutStart = num5 / 2;
+        prettySparkleParticle.AdditiveAmount = 0.35f;
+        prettySparkleParticle.Velocity = movementVector;
+
+        if (IsInSecondPhase) {
+            prettySparkleParticle.Velocity *= 0f;
+
+            prettySparkleParticle.Scale *= Main.rand.NextFloat(1f, 1.5f);
+        }
+
+        prettySparkleParticle.Velocity *= 0.3f;
+        Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+
+        if (Helper.IsClient()) {
+            return;
+        }
+        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorScythe>(),
+            27, 1.5f, Main.myPlayer);
     }
 
     private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false) {
@@ -637,6 +692,11 @@ sealed partial class EternalHorror : ModNPC {
             //if (_secondPhaseOpacity >= 1f) {
             //    EternalHorrorSummonHandler.ShouldBlinkOut = false;
             //}
+
+            bool noRays = !_rayData.Any(rayInfo => rayInfo.Progress > 0f);
+            if (noRays) {
+                SpawnRays(startRaySpeed: 0.5f);
+            }
         }
         else {
             EternalHorrorSummonHandler.BlinkOpacity = 1f;

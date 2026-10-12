@@ -47,8 +47,8 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
 
             Projectile.scale = 0f;
 
-            Vector2 angle = Projectile.Center.DirectionTo(Main.LocalPlayer.Center);
-            Projectile.velocity = angle * 5f;
+            //Vector2 angle = Projectile.Center.DirectionTo(Main.LocalPlayer.Center);
+            //Projectile.velocity = angle * 5f;
         }
 
         Projectile.scale = Helper.Approach(Projectile.scale, 1f, 0.1f);
@@ -165,7 +165,7 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
                 rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
                 EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, clip, drawColor, rotation, flip, screenPos);
                 EternalHorror.DrawUnderGlowEffect(drawContext, (newPosition, newColor) => {
-                    Color color = new Color(60 - k * 5, 10, 60 + k * 4, 40 + k * 4) * 1.5f;
+                    Color color = new Color(60 - k * 5, 10, 60 + k * 4, 40 + k * 4) * 1.25f;
                     color = color.MultiplyRGBA(newColor);
 
                     spriteBatch.Draw(texture, newPosition, drawContext.Clip, color, Projectile.oldRot[k], drawOrigin, Projectile.scale - k / (float)Projectile.oldPos.Length, drawContext.Flip, 0f);

@@ -12,7 +12,8 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalServant : ModNPC {
-    private static Asset<Texture2D> _eyeTexture = null;
+    private static Asset<Texture2D> _eyeTexture = null,
+                                    _glowTexture = null;
 
     private Vector2 _speed;
     private float _appearanceFactor;
@@ -30,6 +31,7 @@ sealed class EternalServant : ModNPC {
 
         if (!Main.dedServ) {
             _eyeTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Eye");
+            _glowTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Glow");
         }
     }
 
@@ -333,12 +335,12 @@ sealed class EternalServant : ModNPC {
         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
             float scale2 = MathHelper.Lerp(3.5f, 1f, appearanceFactor);
             Color color2 = drawColor;
-            color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor);
-            //color2 = color2.MultiplyRGBA(EternalHorror.MainPurpleColor_Dynamic);
+            color2 = color2.MultiplyRGBA(Color.Lerp(EternalHorror.MainPurpleColor, Color.White, 0f));
+            color2 = color2.MultiplyRGBA(Color.Lerp(EternalHorror.MainPurpleColor, Color.White, 0.5f));
             color2 = color2.MultiplyAlpha(0.5f);
             color2 *= 1f - appearanceFactor;
             color2 *= Utils.GetLerpValue(0f, 0.125f, appearanceFactor, true);
-            NPC.QuickDraw(spriteBatch, screenPos, color2, texture: texture, effect: flip, scale: scale2);
+            NPC.QuickDraw(spriteBatch, screenPos, color2, texture: _glowTexture.Value, effect: flip, scale: scale2);
             NPC.QuickDraw(spriteBatch, screenPos, color2, rotation: 0f, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale2,
                 position: NPC.Center + NPC.DirectionTo(NPC.GetTargetPlayer().Center) * 5f);
         });

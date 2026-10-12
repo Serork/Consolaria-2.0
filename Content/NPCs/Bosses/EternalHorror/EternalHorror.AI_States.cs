@@ -169,6 +169,8 @@ sealed partial class EternalHorror : ModNPC {
                     boss.LaserAttackCount = 0;
                     boss.ActivateState<Phase1DashAttack>();
 
+                    boss.ResetSmoothFactor();
+
                     return;
                 }
 
@@ -206,6 +208,8 @@ sealed partial class EternalHorror : ModNPC {
                         boss.Phase1CloneSpawn_ShouldDashAfter = false;
                         boss.ActivateState<Phase1DashAttack>();
                         boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
+
+                        boss.ResetSmoothFactor();
                     }
                     else {
                         boss.ActivateState<Phase1BurstLaserAttack>();
@@ -783,11 +787,6 @@ sealed partial class EternalHorror : ModNPC {
                 npc.velocity *= Helper.Clamp01(npc.Distance(targetCenter) / (MinDistanceToTargetInPixels / 5f));
             }
 
-            bool noRays = !boss._rayData.Any(rayInfo => rayInfo.Progress > 0f);
-            if (noRays) {
-                boss.SpawnRays(startRaySpeed: 0.5f);
-            }
-
             smoothEverything();
             lookAtTarget();
             makeTargetPositionABitHigher();
@@ -807,7 +806,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private readonly struct Phase2BurstLaserAttack : IAIState {
         public static float LASERATTACKTIME => Helper.SecondsToFrames(1.5f);
-        public static byte LASERATTACKCOUNT => 3;
+        public static byte LASERATTACKCOUNT => (byte)(Phase2DashAttack.LASERATTACKCOUNTNEEDED + 1);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             Player target = npc.GetTargetPlayer();
@@ -832,7 +831,7 @@ sealed partial class EternalHorror : ModNPC {
                 float newLaserRotation = npc.AngleTo(targetCenter);
                 laserRotation = Utils.AngleLerp(laserRotation, newLaserRotation, laserProgress_ForLaserRotation);
 
-                boss.AICounter += boss.AICounter < 0f ? 1f : 0.5f;
+                boss.AICounter += boss.AICounter < LASERATTACKTIME * 0.5f ? 1f : 0.5f;
 
                 bool shotLaser = boss.AICounter >= LASERATTACKTIME * 1f;
                 if (!shotLaser) {
@@ -848,13 +847,17 @@ sealed partial class EternalHorror : ModNPC {
                     return;
                 }
 
-                //boss.ResetCounters();
-                //boss.DeactivateState<Phase1BurstLaserAttack>();
-
-                bool shouldDash = boss.LaserAttackCount > Phase1DashAttack.LASERATTACKCOUNTNEEDED;
+                bool shouldDash = boss.LaserAttackCount > Phase2DashAttack.LASERATTACKCOUNTNEEDED;
                 if (shouldDash) {
+                    boss.ResetLaserAttack();
+
+                    boss.ResetCounters();
+                    boss.DeactivateState<Phase2BurstLaserAttack>();
+
                     boss.LaserAttackCount = 0;
-                    //boss.ActivateState<Phase1DashAttack>();
+                    boss.ActivateState<Phase2DashAttack>();
+
+                    boss.ResetSmoothFactor();
 
                     return;
                 }
@@ -864,6 +867,242 @@ sealed partial class EternalHorror : ModNPC {
 
             prepareLasers();
             shootLasers();
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.ResetLaserAttack();
+
+            boss.AICounter = LASERATTACKTIME * 0.5f * 0.5f;
+        }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
+    private readonly struct Phase2DashAttack : IAIState {
+        public static float DASHTIME => Helper.SecondsToFrames(0.75f * 0.75f * 0.75f);
+        public static float LASERATTACKCOUNTNEEDED => 1;
+        public static float DASHATTACKCOUNT => 5;
+        public static float DASHSTRENGTH => 40f;
+
+        public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center;
+
+            targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * boss.SmoothFactor);
+            targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * boss.SmoothFactor);
+
+            float dashProgress = boss.AICounter / DASHTIME;
+
+            float dustProgress = dashProgress;
+            dustProgress = Helper.YoYo(dustProgress);
+            boss.SpawnPreparationDust_Shadow(dustProgress);
+
+            //if (boss.Phase1LastDash) {
+            //    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+            //        //if (cloneInfo.LerpVelocityValue == 0f) {
+            //        //    Player target = npc.GetTargetPlayer();
+            //        //    Vector2 targetCenter = target.Center;
+            //        //    Vector2 clonePosition = boss.GetCloneSpawnPosition();
+            //        //    cloneInfo.TargetPosition = Vector2.Lerp(cloneInfo.TargetPosition, targetCenter, 0.1f);
+            //        //    cloneInfo.Position = Vector2.Lerp(cloneInfo.Position, clonePosition, 0.1f);
+            //        //}
+
+            //        //cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.05f);
+
+            //        //cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 0.1f);
+            //    });
+            //    foreach (CloneInfo cloneInfo in boss._cloneData) {
+            //        if (cloneInfo.Active) {
+            //            Vector2 targetCenter2 = targetCenter;
+            //            targetCenter = Vector2.Lerp(npc.Center, cloneInfo.VisualPosition, 0.875f);
+            //            targetCenter = Vector2.Lerp(targetCenter, targetCenter2, 0.875f);
+            //            break;
+            //        }
+            //    }
+            //}
+            //else {
+            //    //boss.OnIterateActiveCloneData((ref cloneInfo) => {
+            //    //    cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 0f, 0.05f);
+            //    //    if (cloneInfo.LerpVelocityValue <= 0f) {
+            //    //        cloneInfo.ShouldUpdateVisualPosition = false;
+            //    //    }
+            //    //});
+            //}
+
+            boss._cloneTargetPosition = targetCenter;
+
+            Vector2 baseTargetCenter = targetCenter;
+
+            targetCenter += targetCenter.DirectionTo(npc.Center) * 10f;
+
+            float dashStrength = DASHSTRENGTH;
+
+            ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
+
+            bool didAtLeastOneDash = boss.Phase1DashAttackCount > 0;
+
+            float dashPreparationFactor = 0.25f;
+
+            bool shouldResetState() {
+                if (boss.Phase1DashAttackCount >= DASHATTACKCOUNT) {
+                    boss.ActivateState<Phase2MoveToPlayer>();
+                    boss.DeactivateState<Phase2DashAttack>();
+                    //if (boss.Phase1DashAttack_ShouldBurstLaserAfter) {
+                    //    boss.Phase1DashAttack_ShouldBurstLaserAfter = false;
+                    //    boss.ActivateState<Phase1SummonSpawnAttack>();
+                    //}
+                    //else {
+                    //    boss.ActivateState<Phase1LaserSpamAttack>();
+                    //}
+                    boss.ActivateState<Phase2BurstLaserAttack>();
+                    boss.ResetCounters();
+
+                    boss.ResetSmoothFactor(value: 0.25f);
+                    boss.Phase1DashAttackCount = 0;
+
+                    boss._dashVelocity *= 0f;
+
+                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                        //cloneInfo.ShouldUpdateVisualPosition = true;
+                        cloneInfo.ShouldFade = true;
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
+            void lookAtTarget() {
+                if (!boss.HasActiveState<Phase2MoveToPlayer>()) {
+                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, dashProgress, 0.025f);
+                }
+                float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
+                npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
+            }
+            void prepareDash() {
+                boss.AICounter += 1f;
+
+                if (!didAtLeastOneDash) {
+                    boss.AICounter -= 0.25f;
+                }
+                bool shouldDash = boss.AICounter >= DASHTIME;
+
+                boss._copiesIntensity = dashProgress;
+
+                if (shouldDash) {
+                    if (shouldResetState()) {
+                        return;
+                    }
+
+                    npc.ResetTrails();
+
+                    SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+
+                    {
+                        boss._eyeEffectOpacity = 1f;
+
+                        Vector2[] scytheSpawnOffsets = [new Vector2(120, 50), new Vector2(160, 50), new Vector2(-120, -50), new Vector2(-160, -50), new Vector2(50, 120), new Vector2(50, 160), new Vector2(-50, -120), new Vector2(-50, -160)];
+                        foreach (Vector2 spawnOffset in scytheSpawnOffsets) {
+                            boss.SpawnScythe(spawnOffset * 1f, shootBasedOnRotation: true);
+                        }
+                    }
+
+                    boss.AICounter = -DASHTIME;
+
+                    boss.DeactivateState<Phase2MoveToPlayer>();
+
+                    Vector2 dashDirection = npc.DirectionTo(targetCenter);
+                    boss._dashVelocity = dashDirection * dashStrength;
+
+                    boss.Phase1DashAttackCount++;
+
+                    //if (!boss.Phase1LastDash)
+                    {
+                        boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                            Vector2 clonePosition = cloneInfo.VisualPosition;
+                            dashDirection = clonePosition.DirectionTo(targetCenter);
+                            cloneInfo.Velocity = dashDirection * dashStrength;
+                            cloneInfo.ShouldUpdateVisualPosition = true;
+                        });
+                    }
+
+                    boss.ResetSmoothFactor();
+                }
+                else if (!didAtLeastOneDash) {
+                    float smoothFactor = dashProgress;
+                    dashProgress *= 1f - Utils.GetLerpValue(1f - dashPreparationFactor, 1f, smoothFactor, true);
+                    npc.velocity -= npc.DirectionTo(targetCenter) * 1f * dashProgress;
+                }
+            }
+            void slowDown() {
+                float velocityDeceleration = 0.98f;
+                boss._dashVelocity *= velocityDeceleration;
+                float dashOpacity = boss._dashVelocity.Length() / dashStrength;
+                //if (!boss.Phase1LastDash) 
+                {
+                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                        cloneInfo.Velocity *= velocityDeceleration;
+                        cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, dashOpacity, 1f);
+                    });
+                }
+                boss._dashOpacity = Helper.Approach(boss._dashOpacity, dashOpacity, 1f);
+
+            }
+            bool shouldSlowDownAfterDash() {
+                bool preparingDash = boss.AICounter < 0f;
+                if (preparingDash) {
+                    return true;
+                }
+
+                return false;
+            }
+            void extraSlowDownAfterDash() {
+                slowDown();
+
+                if (didAtLeastOneDash) {
+                    float smoothFactor = boss.SmoothFactor;
+                    smoothFactor *= 1f - Utils.GetLerpValue(1f - dashPreparationFactor, 1f, smoothFactor, true);
+                    npc.velocity += npc.DirectionTo(targetCenter) * 1f * smoothFactor;
+                }
+            }
+            void prepareSelfAfterDash() {
+                boss._copiesIntensity = 0f;
+                if (didAtLeastOneDash) {
+                    float lerpValue = 0.25f;
+                    npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
+                    float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f);
+                }
+            }
+            void destroyClones() {
+                bool shouldDestroyClones = npc.velocity.Length() > dashStrength * MathHelper.Lerp(0.5f, 0.875f, 0.5f);
+                if (boss.Phase1AtLeast1Dash && shouldDestroyClones) {
+                    boss.DestroyClonesOnContact();
+                }
+            }
+
+            destroyClones();
+
+            prepareDash();
+
+            if (shouldSlowDownAfterDash()) {
+                prepareSelfAfterDash();
+                slowDown();
+                return;
+            }
+
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                Vector2 position = cloneInfo.VisualPosition;
+                float maxDistance = 600f;
+                float distanceFactor = npc.Distance(position) / maxDistance;
+                distanceFactor = Helper.Clamp01(distanceFactor);
+                distanceFactor = 1f - distanceFactor;
+                npc.Center += npc.DirectionFrom(position) * distanceFactor * 2.5f;
+            });
+
+            lookAtTarget();
+            extraSlowDownAfterDash();
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) { }
