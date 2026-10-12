@@ -20,7 +20,7 @@ using ThoriumMod.Projectiles;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
-sealed class EternalHorrorCloneExplosion : ModProjectile {
+sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjectile {
     private static float EXPLOSIONSCALEMODIFIER => 1.5f;
 
     public override string Texture => "Consolaria/Assets/Textures/Empty";
@@ -171,31 +171,33 @@ sealed class EternalHorrorCloneExplosion : ModProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
-        SpriteBatch mySpriteBatch = Main.spriteBatch;
-        Matrix Transform = Main.Transform;
-        SamplerState DefaultSamplerState = Main.DefaultSamplerState;
-        RasterizerState Rasterizer = Main.Rasterizer;
+        if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
+            SpriteBatch mySpriteBatch = Main.spriteBatch;
+            Matrix Transform = Main.Transform;
+            SamplerState DefaultSamplerState = Main.DefaultSamplerState;
+            RasterizerState Rasterizer = Main.Rasterizer;
 
-        SpriteEffects spriteEffects = SpriteEffects.None;
+            SpriteEffects spriteEffects = SpriteEffects.None;
 
-        Vector2 vector65 = Projectile.Center - Main.screenPosition;
-        Vector2 vector66 = vector65 - new Vector2(300f, 310f);
+            Vector2 vector65 = Projectile.Center - Main.screenPosition;
+            Vector2 vector66 = vector65 - new Vector2(300f, 310f);
 
-        mySpriteBatch.End();
-        mySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Transform);
-        float num234 = Projectile.scale;
-        DrawData value62 = new DrawData(Main.Assets.Request<Texture2D>("Images/Misc/Perlin").Value, 
-            vector66 + new Vector2(300f, 300f), 
-            new Microsoft.Xna.Framework.Rectangle(0, 0, 600, 600),
-            new Microsoft.Xna.Framework.Color(new Vector4(1f - (float)Math.Sqrt(num234)) * 0.75f), 
-            Projectile.rotation, 
-            new Vector2(300f, 300f),
-            Projectile.scale * (1f + num234) * new Vector2(1.5f, 1f) * 0.9375f * EXPLOSIONSCALEMODIFIER, spriteEffects);
-        GameShaders.Misc["ForceField"].UseColor(EternalHorror.MainPurpleColor);
-        GameShaders.Misc["ForceField"].Apply(value62);
-        value62.Draw(mySpriteBatch);
-        mySpriteBatch.End();
-        mySpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, DefaultSamplerState, DepthStencilState.None, Rasterizer, null, Transform);
+            mySpriteBatch.End();
+            mySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Transform);
+            float num234 = Projectile.scale;
+            DrawData value62 = new DrawData(Main.Assets.Request<Texture2D>("Images/Misc/Perlin").Value,
+                vector66 + new Vector2(300f, 300f),
+                new Microsoft.Xna.Framework.Rectangle(0, 0, 600, 600),
+                new Microsoft.Xna.Framework.Color(new Vector4(1f - (float)Math.Sqrt(num234)) * 0.75f),
+                Projectile.rotation,
+                new Vector2(300f, 300f),
+                Projectile.scale * (1f + num234) * new Vector2(1.5f, 1f) * 0.9375f * EXPLOSIONSCALEMODIFIER, spriteEffects);
+            GameShaders.Misc["ForceField"].UseColor(EternalHorror.MainPurpleColor);
+            GameShaders.Misc["ForceField"].Apply(value62);
+            value62.Draw(mySpriteBatch);
+            mySpriteBatch.End();
+            mySpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, DefaultSamplerState, DepthStencilState.None, Rasterizer, null, Transform);
+        }
 
         return base.PreDraw(ref lightColor);
     }

@@ -867,8 +867,6 @@ sealed partial class EternalHorror : ModNPC {
                     return;
                 }
 
-                boss.ResetCounters();
-
                 boss.DeactivateState<Phase2BurstLaserAttack>();
 
                 //bool shouldDash = boss.LaserAttackCount > Phase2DashAttack.LASERATTACKCOUNTNEEDED;
@@ -877,6 +875,8 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.LaserAttackCount = 0;
                     boss.ActivateState<Phase2DashAttack>();
+
+                    boss.ResetCounters();
 
                     //return;
                 }
@@ -907,6 +907,8 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             Player target = npc.GetTargetPlayer();
             Vector2 targetCenter = target.Center;
+
+            boss._cloneTargetPosition = targetCenter;
 
             float smoothFactor = boss.SmoothFactor/*Ease.SineIn(boss.SmoothFactor)*/;
             targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
@@ -949,8 +951,6 @@ sealed partial class EternalHorror : ModNPC {
             //    //    }
             //    //});
             //}
-
-            boss._cloneTargetPosition = targetCenter;
 
             Vector2 baseTargetCenter = targetCenter;
 

@@ -17,6 +17,8 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     private static ushort TIMELEFT => 240;
 
+    private bool _spawnedScythe;
+
     public ref float ReflectedValue => ref Projectile.ai[2];
 
     public bool Reflected {
@@ -117,16 +119,26 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     private void ReflectFromEternalHorrorClones() {
-        if (Reflected) {
-            return;
-        }
-
         foreach (NPC npc in Main.ActiveNPCs) {
             if (npc.type != EternalHorror.SelfType) {
                 continue;
             }
 
             EternalHorror boss = npc.As<EternalHorror>();
+
+            bool secondPhase = false;
+            if (boss.IsInSecondPhase) {
+                secondPhase = true;
+                if (_spawnedScythe) {
+                    return;
+                }
+            }
+            else {
+                if (Reflected) {
+                    return;
+                }
+            }
+
             HashSet<EternalHorror.CloneInfo> cloneData = boss.GetActiveCloneData();
             float bossRotation = npc.rotation;
             Player bossTarget = npc.GetTargetPlayer();
@@ -146,11 +158,18 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
                         clonePosition_End = clonePosition + -cloneDirection * npc.height / 2f * fluffFactor;
                 float collisionPoint = 0f;
                 if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, width, ref collisionPoint)) {
-                    Projectile.velocity = Projectile.Center.DirectionTo(bossTargetCenter) * Projectile.velocity.Length();
+                    if (!secondPhase) {
+                        Projectile.velocity = Projectile.Center.DirectionTo(bossTargetCenter) * Projectile.velocity.Length();
+                    }
+                    else {
+                        boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: Projectile.Center);
+                    }
 
                     cloneInfo.AddStar(Projectile.Center);
 
                     Reflected = true;
+
+                    _spawnedScythe = true;
 
                     SoundEngine.PlaySound(SoundID.Item150 with { Pitch = -1f, Volume = 0.5f }, Projectile.Center);
 

@@ -392,8 +392,10 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (IsInSecondPhase) {
-                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 1f && cloneInfo.TimeLeft % 50 == 0) {
-                    SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneInfo.VisualPosition);
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 25 == 0) {
+                    Vector2 cloneEyePosition = cloneInfo.VisualPosition;
+                    cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
+                    SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneEyePosition);
                 }
             }
         }
@@ -486,7 +488,7 @@ sealed partial class EternalHorror : ModNPC {
         return result;
     }
 
-    private void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, Vector2? clonePosition = null) {
+    public void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, Vector2? clonePosition = null) {
         if (!NPC.HasPlayerTarget) {
             return;
         }

@@ -11,7 +11,7 @@ using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
-sealed class EternalHorrorCloneExplosionSkull : ModProjectile {
+sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorProjectile {
     public ref float ReflectedValue => ref Projectile.ai[2];
 
     public bool Reflected {
@@ -197,47 +197,49 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
-        Texture2D texture = Projectile.GetTexture();
-        Vector2 position = Projectile.Center;
-        Rectangle clip = texture.Bounds;
-        Color drawColor = Color.Lerp(lightColor, Color.White, 0.5f);
-        float rotation = Projectile.rotation;
-        SpriteEffects flip = (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        Vector2 screenPos = Main.screenPosition;
+        if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
+            Texture2D texture = Projectile.GetTexture();
+            Vector2 position = Projectile.Center;
+            Rectangle clip = texture.Bounds;
+            Color drawColor = Color.Lerp(lightColor, Color.White, 0.5f);
+            float rotation = Projectile.rotation;
+            SpriteEffects flip = (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            Vector2 screenPos = Main.screenPosition;
 
-        SpriteBatch spriteBatch = Main.spriteBatch;
+            SpriteBatch spriteBatch = Main.spriteBatch;
 
-        Vector2 drawOrigin = clip.Centered();
+            Vector2 drawOrigin = clip.Centered();
 
-        for (int k = 0; k < Projectile.oldPos.Length - 1; k += 1) {
-            Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
-            position = drawPos;
+            for (int k = 0; k < Projectile.oldPos.Length - 1; k += 1) {
+                Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
+                position = drawPos;
 
-            float scaleFactor = Helper.Wave(0.75f, 1.5f, 20f, k * 10);
+                float scaleFactor = Helper.Wave(0.75f, 1.5f, 20f, k * 10);
 
-            position = drawPos;
-            rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
-            EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, clip, drawColor, rotation, flip, screenPos);
-            EternalHorror.DrawUnderGlowEffect(drawContext, (newPosition, newColor) => {
-                Color color = true ? new Color(60 - k * 5, 10, 60 + k * 4, 40 + k * 4) : new Color(60 + k * 4, 20 - k, 10 + k * 4, 60 + k * 4);
-                color = Color.White;
-                color = color.MultiplyRGBA(newColor);
-                color = color.MultiplyRGBA(EternalHorror.MainPurpleColor);
-                drawColor = color;
-
-                newPosition = Vector2.Lerp(newPosition, position, 0.875f);
-
-                newPosition += Vector2.UnitY.RotatedBy(Projectile.identity + k + Projectile.oldRot[k] + Main.GlobalTimeWrappedHourly * -15f) * 10f * Projectile.spriteDirection;
-
-                drawColor *= 0.2f;
-
+                position = drawPos;
                 rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
-                spriteBatch.Draw(texture, newPosition, null, drawColor, Projectile.oldRot[k], drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * scaleFactor, Projectile.spriteDirection.ToSpriteEffects(), 0f);
-                spriteBatch.Draw(texture, newPosition - Projectile.oldPos[k] * 0.5f + Projectile.oldPos[k + 1] * 0.5f, null, drawColor, Projectile.oldRot[k], drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * scaleFactor, Projectile.spriteDirection.ToSpriteEffects(), 0f);
-            }, sinWaveOffset: Projectile.identity + MathHelper.Pi,
-               applyInnerOpacity: false,
-               forcedOpacity: MathHelper.Lerp(0.125f, 0.25f, 0f),
-               sinWaveOffset_BasedOnEffectIndex: MathHelper.TwoPi * 0.25f);
+                EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, clip, drawColor, rotation, flip, screenPos);
+                EternalHorror.DrawUnderGlowEffect(drawContext, (newPosition, newColor) => {
+                    Color color = true ? new Color(60 - k * 5, 10, 60 + k * 4, 40 + k * 4) : new Color(60 + k * 4, 20 - k, 10 + k * 4, 60 + k * 4);
+                    color = Color.White;
+                    color = color.MultiplyRGBA(newColor);
+                    color = color.MultiplyRGBA(EternalHorror.MainPurpleColor);
+                    drawColor = color;
+
+                    newPosition = Vector2.Lerp(newPosition, position, 0.875f);
+
+                    newPosition += Vector2.UnitY.RotatedBy(Projectile.identity + k + Projectile.oldRot[k] + Main.GlobalTimeWrappedHourly * -15f) * 10f * Projectile.spriteDirection;
+
+                    drawColor *= 0.2f;
+
+                    rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
+                    spriteBatch.Draw(texture, newPosition, null, drawColor, Projectile.oldRot[k], drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * scaleFactor, Projectile.spriteDirection.ToSpriteEffects(), 0f);
+                    spriteBatch.Draw(texture, newPosition - Projectile.oldPos[k] * 0.5f + Projectile.oldPos[k + 1] * 0.5f, null, drawColor, Projectile.oldRot[k], drawOrigin, (Projectile.scale - k / (float)Projectile.oldPos.Length) * scaleFactor, Projectile.spriteDirection.ToSpriteEffects(), 0f);
+                }, sinWaveOffset: Projectile.identity + MathHelper.Pi,
+                   applyInnerOpacity: false,
+                   forcedOpacity: MathHelper.Lerp(0.125f, 0.25f, 0f),
+                   sinWaveOffset_BasedOnEffectIndex: MathHelper.TwoPi * 0.25f);
+            }
         }
 
         return false;
