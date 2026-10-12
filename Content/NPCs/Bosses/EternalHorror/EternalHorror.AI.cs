@@ -488,7 +488,7 @@ sealed partial class EternalHorror : ModNPC {
         const float Speed = 12f;
         Player target = NPC.GetTargetPlayer();
         Vector2 vector8 = GetEyePosition();
-        vector8 += spawnOffset.RotatedBy(NPC.rotation);
+        vector8 += spawnOffset.RotatedBy(NPC.rotation - MathHelper.PiOver4);
 
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
         float rotation = NPC.rotation + MathHelper.PiOver2;
