@@ -488,7 +488,7 @@ sealed partial class EternalHorror : ModNPC {
         return result;
     }
 
-    public void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, Vector2? clonePosition = null) {
+    public void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, Vector2? clonePosition = null, Vector2? speed = null) {
         if (!NPC.HasPlayerTarget) {
             return;
         }
@@ -510,6 +510,11 @@ sealed partial class EternalHorror : ModNPC {
         rotation += angleShiftToPlayer;
         float speedX = MathF.Cos(rotation) * Speed;
         float speedY = MathF.Sin(rotation) * Speed;
+
+        if (speed != null) {
+            speedX = speed.Value.X;
+            speedY = speed.Value.Y;
+        }
 
         Vector2 center = vector8;
         Vector2 velocity = new(speedX, speedY);

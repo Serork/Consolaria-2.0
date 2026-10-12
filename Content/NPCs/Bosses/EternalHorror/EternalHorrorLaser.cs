@@ -158,11 +158,13 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
                         clonePosition_End = clonePosition + -cloneDirection * npc.height / 2f * fluffFactor;
                 float collisionPoint = 0f;
                 if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, width, ref collisionPoint)) {
+                    Vector2 speedToTarget = Projectile.Center.DirectionTo(bossTargetCenter) * Projectile.velocity.Length();
+
                     if (!secondPhase) {
-                        Projectile.velocity = Projectile.Center.DirectionTo(bossTargetCenter) * Projectile.velocity.Length();
+                        Projectile.velocity = speedToTarget;
                     }
                     else {
-                        boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: Projectile.Center);
+                        boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: Projectile.Center, speed: speedToTarget);
 
                         if (Projectile.timeLeft > 30) {
                             Projectile.timeLeft = 30;
