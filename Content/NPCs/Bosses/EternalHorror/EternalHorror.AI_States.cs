@@ -702,6 +702,21 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
+    private readonly struct Phase2Transition : IAIState {
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.ResetCounters();
+            boss.DeactivateAllStates();
+
+            boss.ActivateState<Phase2MoveToPlayer>();
+            boss.ActivateState<Phase2BurstLaserAttack>();
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            //boss.SpawnRays(startRaySpeed: 0.5f);
+        }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
     private readonly struct Phase2MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.TargetPlayer();
@@ -1104,7 +1119,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private readonly struct Phase2LaserSpamAttack : IAIState {
         public static float BEFORESPAMTIME => Helper.SecondsToFrames(1.5f * 1.5f);
-        public static float SPAMATTACKTIME => Helper.SecondsToFrames(2f * 1.5f);
+        public static float SPAMATTACKTIME => Helper.SecondsToFrames(2f * 2f);
 
         public static float PPEPARATIONSLOWLASTFACTOR => 0.75f;
 

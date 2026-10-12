@@ -680,11 +680,7 @@ sealed partial class EternalHorror : ModNPC {
             if (!EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted) {
                 EternalHorrorSummonHandler.Blink(shouldBlinkOut: false);
 
-                ResetCounters();
-                DeactivateAllStates();
-
-                ActivateState<Phase2MoveToPlayer>();
-                ActivateState<Phase2BurstLaserAttack>();
+                ActivateState<Phase2Transition>();
 
                 EternalHorrorSummonHandler.EternalHorror_SecondPhaseStarted = true;
             }
