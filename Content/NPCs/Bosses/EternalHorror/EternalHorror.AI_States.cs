@@ -1,16 +1,13 @@
 ﻿using Consolaria.Common.Particles;
-using Consolaria.Content.NPCs.Bosses.Ocram;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static tModPorter.ProgressUpdate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -870,17 +867,18 @@ sealed partial class EternalHorror : ModNPC {
                     return;
                 }
 
-                bool shouldDash = boss.LaserAttackCount > Phase2DashAttack.LASERATTACKCOUNTNEEDED;
-                if (shouldDash) {
-                    boss.ResetLaserAttack();
+                boss.ResetCounters();
 
-                    boss.ResetCounters();
-                    boss.DeactivateState<Phase2BurstLaserAttack>();
+                boss.DeactivateState<Phase2BurstLaserAttack>();
+
+                //bool shouldDash = boss.LaserAttackCount > Phase2DashAttack.LASERATTACKCOUNTNEEDED;
+                //if (shouldDash)
+                {
 
                     boss.LaserAttackCount = 0;
                     boss.ActivateState<Phase2DashAttack>();
 
-                    return;
+                    //return;
                 }
 
                 //boss.ActivateState<Phase1CloneSpawn>();
@@ -963,6 +961,7 @@ sealed partial class EternalHorror : ModNPC {
             ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
 
             bool didAtLeastOneDash = boss.Phase2DashAttackCount > 0;
+            didAtLeastOneDash = true;
 
             float dashPreparationFactor = 0.25f;
 
@@ -1181,10 +1180,12 @@ sealed partial class EternalHorror : ModNPC {
                     boss.ResetCounters();
                     boss.ResetSmoothFactor();
                     boss.DeactivateState<Phase2LaserSpamAttack>();
-                    boss.ActivateState<Phase2BurstLaserAttack>();
 
                     boss.ResetLaserAttack(applyIncreasedDelay: true);
-                    //boss.ActivateState<Phase1CloneSpawn>();
+
+                    boss.ActivateState<Phase2MoveToPlayer>();
+
+                    boss.ActivateState<Phase2CloneSpawn>();
 
                     //boss.Phase1CloneSpawn_ShouldDashAfter = true;
                 }
@@ -1197,6 +1198,46 @@ sealed partial class EternalHorror : ModNPC {
             spamLasers();
             stopAttacking();
             slowDownWhenShooting();
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
+    private readonly struct Phase2CloneSpawn : IAIState {
+        public static float SHADOWSPAWNTIME => Helper.SecondsToFrames(1);
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            void prepareAndSpawnClone() {
+                bool justStarted = boss.AICounter == 0f;
+                if (justStarted) {
+                    boss.SpawnClone();
+                }
+
+                bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
+
+                float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
+                dustProgress = Helper.YoYo(dustProgress);
+                boss.SpawnPreparationDust_Shadow(dustProgress);
+
+                if (shadowSpawnProgress) {
+                    boss.ResetCounters();
+
+                    if (boss.Phase1CloneSpawn_ShouldDashAfter) {
+                        boss.Phase1CloneSpawn_ShouldDashAfter = false;
+                        boss.ActivateState<Phase2DashAttack>();
+                        boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
+
+                        //boss.ResetSmoothFactor();
+                    }
+                    else {
+                        boss.ActivateState<Phase2BurstLaserAttack>();
+                    }
+                    boss.DeactivateState<Phase2CloneSpawn>();
+                }
+            }
+
+            prepareAndSpawnClone();
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) { }

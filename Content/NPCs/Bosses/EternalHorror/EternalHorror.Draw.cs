@@ -722,7 +722,7 @@ sealed partial class EternalHorror : ModNPC {
         _eyeEffectOpacity = Helper.Approach(_eyeEffectOpacity, 0f, lerpValue);
 
         float shadowOpacity = 0f;
-        if (HasActiveState<Phase1CloneSpawn>()) {
+        if (HasActiveState<Phase1CloneSpawn>() || HasActiveState<Phase2CloneSpawn>()) {
             shadowOpacity = Phase1ShadowSpawnProgress;
         }
         else {

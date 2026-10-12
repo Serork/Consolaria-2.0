@@ -390,6 +390,12 @@ sealed partial class EternalHorror : ModNPC {
                 float angleToTarget = clonePosition.AngleTo(targetCenter) - MathHelper.PiOver2;
                 cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f);
             }
+
+            if (IsInSecondPhase) {
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 1f && cloneInfo.TimeLeft % 50 == 0) {
+                    SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneInfo.VisualPosition);
+                }
+            }
         }
     }
 
@@ -480,14 +486,17 @@ sealed partial class EternalHorror : ModNPC {
         return result;
     }
 
-    private void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f) {
+    private void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, Vector2? clonePosition = null) {
         if (!NPC.HasPlayerTarget) {
             return;
         }
 
         const float Speed = 12f;
         Player target = NPC.GetTargetPlayer();
-        Vector2 vector8 = GetEyePosition();
+
+        clonePosition ??= GetEyePosition();
+
+        Vector2 vector8 = clonePosition.Value;
         vector8 += spawnOffset.RotatedBy(NPC.rotation - MathHelper.PiOver4);
 
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
