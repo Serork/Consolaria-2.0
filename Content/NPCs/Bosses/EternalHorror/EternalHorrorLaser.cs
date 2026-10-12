@@ -163,6 +163,10 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
                     }
                     else {
                         boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: Projectile.Center);
+
+                        if (Projectile.timeLeft > 30) {
+                            Projectile.timeLeft = 30;
+                        }
                     }
 
                     cloneInfo.AddStar(Projectile.Center);
