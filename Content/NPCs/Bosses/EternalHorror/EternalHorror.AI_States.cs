@@ -710,12 +710,6 @@ sealed partial class EternalHorror : ModNPC {
             boss.ActivateState<Phase2BurstLaserAttack>();
 
             boss.ResetCounters();
-
-            boss._dashVelocity *= 0f;
-
-            boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                cloneInfo.ShouldFade = true;
-            });
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
@@ -729,9 +723,11 @@ sealed partial class EternalHorror : ModNPC {
             boss.TargetPlayer();
             npc.FaceTarget_New();
 
-            bool shouldDash = boss.HasActiveState<Phase1DashAttack>(),
-                 shouldSpamLasers = boss.HasActiveState<Phase1LaserSpamAttack>(),
+            bool shouldDash = boss.HasActiveState<Phase2DashAttack>(),
+                 shouldSpamLasers = boss.HasActiveState<Phase2LaserSpamAttack>(),
                  shouldSpawnSummons = boss.HasActiveState<Phase1SummonSpawnAttack>();
+
+            shouldSpawnSummons = false;
 
             Player target = npc.GetTargetPlayer();
             Vector2 targetCenter = target.Center,
@@ -757,7 +753,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
                 if (shouldSpamLasers) {
                     float angleFactor = boss.Phase1LaserSpamPreparationSlowDown;
-                    angleFactor = Utils.Remap(angleFactor, Phase1LaserSpamAttack.PPEPARATIONSLOWLASTFACTOR, 1f, 0f, 1f, true);
+                    angleFactor = Utils.Remap(angleFactor, Phase2LaserSpamAttack.PPEPARATIONSLOWLASTFACTOR, 1f, 0f, 1f, true);
                     setRotation(angleFactor);
 
                     return;
@@ -879,8 +875,6 @@ sealed partial class EternalHorror : ModNPC {
                     boss.LaserAttackCount = 0;
                     boss.ActivateState<Phase2DashAttack>();
 
-                    boss.ResetSmoothFactor();
-
                     return;
                 }
 
@@ -911,8 +905,9 @@ sealed partial class EternalHorror : ModNPC {
             Player target = npc.GetTargetPlayer();
             Vector2 targetCenter = target.Center;
 
-            targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * boss.SmoothFactor);
-            targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * boss.SmoothFactor);
+            float smoothFactor = boss.SmoothFactor/*Ease.SineIn(boss.SmoothFactor)*/;
+            targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
+            targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * smoothFactor);
 
             float dashProgress = boss.AICounter / DASHTIME;
 
