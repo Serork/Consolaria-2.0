@@ -936,5 +936,7 @@ sealed partial class EternalHorror : ModNPC {
         Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
 
         spriteBatch.Begin(in snapshot, end: true);
+
+        CanDrawOnTopOfBlinking = false;
     }
 }

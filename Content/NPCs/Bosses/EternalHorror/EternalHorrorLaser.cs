@@ -193,7 +193,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
             Vector2 drawOrigin = clip.Centered();
 
-            for (int k = 0; k < Projectile.oldPos.Length - 1 - (Reflected ? 5 : 0); k++) {
+            for (int k = 0; k < Projectile.oldPos.Length - 1; k++) {
                 Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
                 position = drawPos;
                 rotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);

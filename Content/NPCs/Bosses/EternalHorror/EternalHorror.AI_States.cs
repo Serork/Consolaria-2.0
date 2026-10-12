@@ -169,7 +169,7 @@ sealed partial class EternalHorror : ModNPC {
                     boss.LaserAttackCount = 0;
                     boss.ActivateState<Phase1DashAttack>();
 
-                    boss.ResetSmoothFactor();
+                    //boss.ResetSmoothFactor();
 
                     return;
                 }
