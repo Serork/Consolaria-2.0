@@ -714,6 +714,9 @@ sealed partial class EternalHorror : ModNPC {
         if (HasActiveState<Phase2BurstLaserAttack>()) {
             glowOpacity = Phase2BurstLaserAttackProgress;
         }
+        if (HasActiveState<Phase2LaserSpamAttack>()) {
+            glowOpacity = Phase2LaserSpamAttackProgress;
+        }
         _glowOpacity = Helper.Approach(_glowOpacity, glowOpacity, lerpValue);
 
         _eyeEffectOpacity = Helper.Approach(_eyeEffectOpacity, 0f, lerpValue);
