@@ -909,8 +909,9 @@ sealed partial class EternalHorror : ModNPC {
             Vector2 targetCenter = target.Center;
 
             float smoothFactor = boss.SmoothFactor/*Ease.SineIn(boss.SmoothFactor)*/;
-            targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
-            targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * smoothFactor);
+            smoothFactor = 1f;
+            //targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
+            //targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * smoothFactor);
 
             float dashProgress = boss.AICounter / DASHTIME;
 
@@ -950,7 +951,7 @@ sealed partial class EternalHorror : ModNPC {
             //    //});
             //}
 
-            boss._cloneTargetPosition = Vector2.Lerp(boss._cloneTargetPosition, targetCenter, 0.5f * smoothFactor);
+            boss._cloneTargetPosition = targetCenter;
 
             Vector2 baseTargetCenter = targetCenter;
 
