@@ -425,9 +425,6 @@ sealed partial class EternalHorror : ModNPC {
 
                 float explosionProgress2 = cloneInfo.ExplosionProgress2;
 
-                DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
-                    true, cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.5f) * explosionProgress2, explosionProgress2, cloneInfo.VisualPosition);
-
                 if (IsInSecondPhase) {
                     ShaderLoader.WavyCircleShader.Time = _seed + Main.GlobalTimeWrappedHourly * 5;
                     ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
@@ -538,6 +535,9 @@ sealed partial class EternalHorror : ModNPC {
                    progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
                    opacity: 0.375f + starOpacityExtra + cloneInfo.DashOpacity / 4f,
                    sinStep: _shadowTime);
+
+                DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
+                    true, cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.5f) * explosionProgress2, explosionProgress2, cloneInfo.VisualPosition);
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
                     if (!cloneStarInfo.Active) {
