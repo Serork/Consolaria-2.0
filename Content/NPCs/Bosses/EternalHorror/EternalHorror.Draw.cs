@@ -425,6 +425,11 @@ sealed partial class EternalHorror : ModNPC {
 
                 float explosionProgress2 = cloneInfo.ExplosionProgress2;
 
+                float explosionOpacity = cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.625f) * explosionProgress2;
+
+                DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
+                    true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, secondHalf: false);
+
                 if (IsInSecondPhase) {
                     ShaderLoader.WavyCircleShader.Time = _seed + Main.GlobalTimeWrappedHourly * 5;
                     ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
@@ -537,7 +542,7 @@ sealed partial class EternalHorror : ModNPC {
                    sinStep: _shadowTime);
 
                 DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
-                    true, cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.75f) * explosionProgress2, explosionProgress2, cloneInfo.VisualPosition);
+                    true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, firstHalf: false);
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
                     if (!cloneStarInfo.Active) {
@@ -834,6 +839,12 @@ sealed partial class EternalHorror : ModNPC {
 
         _eyeEffectOpacity = Helper.Approach(_eyeEffectOpacity, 0f, lerpValue);
 
+        //float shadowOpacity_FromClones = 0f;
+        //OnIterateActiveCloneData((ref cloneInfo) => {
+        //    shadowOpacity_FromClones += cloneInfo.ExplosionProgress2;
+        //});
+
+        float previousLerpValue = lerpValue;
         float shadowOpacity = 0f;
         if (HasActiveState<Phase1CloneSpawn>() || HasActiveState<Phase2CloneSpawn>()) {
             shadowOpacity = Phase1ShadowSpawnProgress;
@@ -841,6 +852,10 @@ sealed partial class EternalHorror : ModNPC {
         else {
             lerpValue = 1f;
         }
+        //shadowOpacity = MathF.Max(shadowOpacity, shadowOpacity_FromClones);
+        //if (shadowOpacity == shadowOpacity_FromClones) {
+        //    lerpValue = previousLerpValue;
+        //}
         _shadowProgress = Helper.Approach(_shadowProgress, shadowOpacity, lerpValue);
         _shadowTime += 1 / 60f;
         //if (_shadowProgress <= 0f) {

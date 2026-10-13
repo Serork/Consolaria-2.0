@@ -51,6 +51,7 @@ sealed partial class EternalHorror : ModNPC {
                                                                              float AllStarOpacityFactor = 0f,
                                                                              float LerpVelocityValue = 1f,
                                                                              int ExplosionTime = -1) {
+        public static float OPACITYMAXTIMELEFTFACTOR => 0.75f;
         public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(2f);
 
         public readonly float TimeLeftProgress => Helper.Clamp01((float)TimeLeft / MaxTimeLeft);
@@ -59,7 +60,7 @@ sealed partial class EternalHorror : ModNPC {
             get {
                 float timeLeftProgress = TimeLeftProgress;
                 float opacity = 1f;
-                opacity *= 1f - Utils.GetLerpValue(0.75f, 1f, timeLeftProgress, true);
+                opacity *= 1f - Utils.GetLerpValue(OPACITYMAXTIMELEFTFACTOR, 1f, timeLeftProgress, true);
                 if (ShouldFade) {
                     opacity *= Utils.GetLerpValue(0f, 0.25f, timeLeftProgress, true);
                 }
@@ -142,6 +143,7 @@ sealed partial class EternalHorror : ModNPC {
     public ref float Phase1CloneSpawn_ShouldDashAfterValue => ref NPC.localAI[0];
     public ref float Phase1DashAttack_ShouldBurstLaserAfterValue => ref NPC.localAI[0];
     public ref float Phase1SpawnSummonAttack_DoneValue => ref NPC.localAI[0];
+    public ref float Phase2_WasDoingCloneAattackValue => ref NPC.localAI[0];
 
     public bool Init {
         get => InitValue != 0f;
@@ -164,6 +166,11 @@ sealed partial class EternalHorror : ModNPC {
     public bool Phase1SpawnSummonAttack_Done {
         get => Phase1SpawnSummonAttack_DoneValue != 0f;
         set => Phase1SpawnSummonAttack_DoneValue = value.ToInt();
+    }
+
+    public bool Phase2_WasDoingCloneAttack {
+        get => Phase2_WasDoingCloneAattackValue != 0f;
+        set => Phase2_WasDoingCloneAattackValue = value.ToInt();
     }
 
     public float SecondPhaseOpacity => Helper.Clamp01(_secondPhaseOpacity);
@@ -245,7 +252,7 @@ sealed partial class EternalHorror : ModNPC {
         return result;
     }
 
-    private void SpawnClone() {
+    private void SpawnClone(bool insta = false) {
         int nextCloneAddedIndex = 0;
         OnIterateActiveCloneData((ref cloneInfo) => nextCloneAddedIndex++);
         if (nextCloneAddedIndex >= CLONECOUNTAVAILABLE) {
@@ -270,6 +277,9 @@ sealed partial class EternalHorror : ModNPC {
                                                         OldRotations: new float[NPC.oldRot.Length],
                                                         DashOpacity: 0f,
                                                         CloneStarData: new CloneStarInfo[100]);
+        if (insta) {
+            _cloneData[nextCloneAddedIndex].TimeLeft = (ushort)(_cloneData[nextCloneAddedIndex].MaxTimeLeft * MathHelper.Lerp(CloneInfo.OPACITYMAXTIMELEFTFACTOR, 1f, 0.75f));
+        }
     }
 
     private partial void InitializeStates();
@@ -429,7 +439,7 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (IsInSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
-                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 50 == 0) {
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 37 == 0) {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
                     SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneEyePosition);
@@ -647,6 +657,38 @@ sealed partial class EternalHorror : ModNPC {
         }
         Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser>(),
             27, 1.5f, Main.myPlayer, ai2: reflectedFromStart.ToInt());
+    }
+
+    private void MakeTrailDust() {
+        Color colorTint = MainPurpleColor * 0.25f;
+
+        Vector2 position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) * 0.25f;
+        Vector2 velocity = Vector2.UnitY.RotatedBy(MathHelper.TwoPi * Main.rand.NextFloat()) * 2.5f * Main.rand.NextFloat();
+        FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+        var texture = _shadowTexture;
+        Rectangle? frame = texture.Frame(1, 6, 0, Main.rand.Next(6));
+        fadingParticle.SetBasicInfo(texture, frame, velocity, position);
+        float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+        fadingParticle.SetTypeInfo(num);
+        fadingParticle.AccelerationPerFrame = velocity / num;
+        fadingParticle.ColorTint = colorTint;
+        fadingParticle.FadeInNormalizedTime = 0.5f;
+        fadingParticle.FadeOutNormalizedTime = 0.5f;
+        fadingParticle.Rotation = NPC.rotation;
+        fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+        Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+        //FadingParticle fadingParticle2 = fadingParticle;
+        //fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+        //fadingParticle.SetBasicInfo(texture, frame, velocity, position);
+        //fadingParticle.SetTypeInfo(num);
+        //fadingParticle.AccelerationPerFrame = velocity / num;
+        //fadingParticle.ColorTint = colorTint;
+        //fadingParticle.ColorTint.A = 30;
+        //fadingParticle.FadeInNormalizedTime = 0.5f;
+        //fadingParticle.FadeOutNormalizedTime = 0.5f;
+        //fadingParticle.Rotation = fadingParticle2.Rotation;
+        //fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+        //Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
     }
 
     private void ForceUpdateRotation() {

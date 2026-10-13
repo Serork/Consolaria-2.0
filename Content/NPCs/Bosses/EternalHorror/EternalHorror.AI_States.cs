@@ -857,6 +857,12 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss.AICounter += boss.AICounter < LASERATTACKTIME * 0.5f ? 1f : 0.5f;
 
+                if (boss.AICounter >= -LASERATTACKTIME * 1.125f) {
+                    if (boss.Phase2_WasDoingCloneAttack) {
+                        boss.Phase2_WasDoingCloneAttack = false;
+                    }
+                }
+
                 bool shotLaser = boss.AICounter >= LASERATTACKTIME * 1f;
                 if (!shotLaser) {
                     return;
@@ -886,6 +892,10 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 //boss.ActivateState<Phase1CloneSpawn>();
+            }
+
+            if (boss.Phase2_WasDoingCloneAttack && boss.AICounter % 1 == 0) {
+                boss.MakeTrailDust();
             }
 
             prepareLasers();
@@ -1038,7 +1048,9 @@ sealed partial class EternalHorror : ModNPC {
                         return;
                     }
 
-                    npc.ResetTrails();
+                    if (boss.Phase2_WasDoingCloneAttack) {
+                        boss.Phase2_WasDoingCloneAttack = false;
+                    }
 
                     SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
@@ -1055,6 +1067,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 
+                    npc.ResetTrails();
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     boss._dashVelocity = dashDirection * dashStrength;
 
@@ -1130,6 +1143,10 @@ sealed partial class EternalHorror : ModNPC {
                 //}
             }
 
+            //if (boss.Phase2_WasDoingCloneAttack && boss.AICounter % 2 == 0) {
+            //    boss.MakeTrailDust();
+            //}
+
             destroyClones();
 
             prepareDash();
@@ -1154,6 +1171,8 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss._dashVelocity *= 0f;
+            boss._dashOpacity = 0f;
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
@@ -1245,21 +1264,44 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             void prepareAndSpawnClone() {
                 bool justStarted = boss.AICounter == 0f;
-                if (justStarted) {
-                    boss.SpawnClone();
-                }
 
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
 
                 float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
 
+                float preparationSlowDown = Utils.Remap(1f - dustProgress, 0f, 1f, 0.75f, 1f, true);
+
+                npc.velocity *= preparationSlowDown;
+
                 ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
 
                 dustProgress = Helper.YoYo(dustProgress);
-                boss.SpawnPreparationDust_Shadow(dustProgress);
+                for (int i = 0; i < 2; i++) {
+                    boss.SpawnPreparationDust_Shadow(dustProgress);
+                }
 
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
+
+                    boss.SpawnClone(insta: true);
+
+                    npc.ResetTrails();
+
+                    Player target = npc.GetTargetPlayer();
+                    Vector2 targetCenter = target.Center;
+                    Vector2 dashDirection = npc.DirectionTo(targetCenter);
+                    dashDirection *= -1;
+                    boss._dashVelocity = dashDirection * Phase2DashAttack.DASHSTRENGTH;
+
+                    boss._dashOpacity = 1f;
+
+                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                        cloneInfo.DashOpacity = 1f;
+                    });
+
+                    SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+
+                    npc.velocity = boss._dashVelocity;
 
                     if (boss.Phase1CloneSpawn_ShouldDashAfter) {
                         boss.Phase1CloneSpawn_ShouldDashAfter = false;
@@ -1270,15 +1312,20 @@ sealed partial class EternalHorror : ModNPC {
                     }
                     else {
                         boss.ActivateState<Phase2BurstLaserAttack>();
+
+                        boss.ResetLaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
                     }
                     boss.DeactivateState<Phase2CloneSpawn>();
+
+                    boss.Phase2_WasDoingCloneAttack = true;
                 }
             }
 
             prepareAndSpawnClone();
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
