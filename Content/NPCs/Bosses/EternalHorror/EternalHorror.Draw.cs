@@ -537,7 +537,7 @@ sealed partial class EternalHorror : ModNPC {
                    sinStep: _shadowTime);
 
                 DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
-                    true, cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.5f) * explosionProgress2, explosionProgress2, cloneInfo.VisualPosition);
+                    true, cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.75f) * explosionProgress2, explosionProgress2, cloneInfo.VisualPosition);
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
                     if (!cloneStarInfo.Active) {
