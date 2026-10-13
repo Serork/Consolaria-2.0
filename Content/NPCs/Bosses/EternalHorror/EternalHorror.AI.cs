@@ -397,7 +397,7 @@ sealed partial class EternalHorror : ModNPC {
             //Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
             //Lighting.AddLight(cloneInfo.VisualPosition, lightColor);
 
-            if (Main.rand.NextChance(cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH) && Main.rand.NextBool(1)) {
+            if (Main.rand.NextChance(MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH)) && Main.rand.NextBool(1)) {
                 Color colorTint = MainPurpleColor * 0.375f;
 
                 Vector2 position = cloneInfo.VisualPosition 
