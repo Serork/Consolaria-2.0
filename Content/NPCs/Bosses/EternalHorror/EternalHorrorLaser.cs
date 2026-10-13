@@ -121,6 +121,8 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     private void ReflectFromEternalHorrorClones() {
+        _spawnedScythe = true;
+
         foreach (NPC npc in Main.ActiveNPCs) {
             if (npc.type != EternalHorror.SelfType) {
                 continue;

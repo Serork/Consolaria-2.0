@@ -21,6 +21,45 @@ using static Terraria.ModLoader.Core.TmodFile;
 namespace Consolaria;
 
 sealed class ShaderLoader : ModSystem {
+    public static class WavyCircleShader {
+        public static Effect Effect => WavyCircle.Value;
+
+        private static float _uTime = 0f;
+        private static float _waveCount1 = 6f, _waveCount2 = 6f;
+        private static float _waveSize1 = 0.08f, _waveSize2 = 0.01f;
+        private static float _waveRadius = 0.5f;
+
+        public static float Time {
+            get => _uTime;
+            set => Effect?.Parameters["uTime"].SetValue(_uTime = value);
+        }
+
+        public static float WaveCount1 {
+            get => _waveCount1;
+            set => Effect?.Parameters["waveCount1"].SetValue(_waveCount1 = value);
+        }
+
+        public static float WaveCount2 {
+            get => _waveCount2;
+            set => Effect?.Parameters["waveCount2"].SetValue(_waveCount2 = value);
+        }
+
+        public static float WaveSize1 {
+            get => _waveSize1;
+            set => Effect?.Parameters["waveSize1"].SetValue(_waveSize1 = value);
+        }
+
+        public static float WaveSize2 {
+            get => _waveSize2;
+            set => Effect?.Parameters["waveSize2"].SetValue(_waveSize2 = value);
+        }
+
+        public static float WaveRadius {
+            get => _waveRadius;
+            set => Effect?.Parameters["waveRadius"].SetValue(_waveRadius = value);
+        }
+    }
+
     public static class BlurShader {
         public static Effect Effect => Blur.Value;
 
@@ -150,6 +189,7 @@ sealed class ShaderLoader : ModSystem {
     public static Asset<Effect> Distort => _loadedShaders["Distort"];
     public static Asset<Effect> Primitive => _loadedShaders["Primitive"];
     public static Asset<Effect> Blur => _loadedShaders["Blur"];
+    public static Asset<Effect> WavyCircle => _loadedShaders["WavyCircle"];
 
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];

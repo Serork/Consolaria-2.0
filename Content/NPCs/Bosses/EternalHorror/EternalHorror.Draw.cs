@@ -9,6 +9,8 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Consolaria.Helper;
+using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -25,7 +27,8 @@ sealed partial class EternalHorror : ModNPC {
                                     _shadowTexture = null,
                                     _backgroundTexture = null,
                                     _secondPhaseEyeTexture = null,
-                                    _secondPhaseEyeTexture_Glow = null;
+                                    _secondPhaseEyeTexture_Glow = null,
+                                    _pulseTexture = null;
 
     public static Asset<Texture2D> RayTexture { get; private set; }
 
@@ -177,6 +180,8 @@ sealed partial class EternalHorror : ModNPC {
 
         _secondPhaseEyeTexture = Helper.RequestTexture(Texture + "_Eye");
         _secondPhaseEyeTexture_Glow = Helper.RequestTexture(Texture + "_Eye_Glow");
+
+        _pulseTexture = Helper.RequestTexture(Texture + "_ClonePulse");
     }
 
     private partial void Load_ApplyShaderEffects() {
@@ -514,6 +519,44 @@ sealed partial class EternalHorror : ModNPC {
                                 starMaxRotation * starRotation * starRotation + cloneStarInfo.Rotation,
                                 new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
                             //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
+                        }
+                    });
+                }
+
+                if (IsInSecondPhase)
+                {
+                    ShaderLoader.WavyCircleShader.Time = Main.GlobalTimeWrappedHourly * 10;
+                    ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
+                    ShaderLoader.WavyCircleShader.WaveCount2 = 12f;
+                    ShaderLoader.WavyCircleShader.WaveSize1 = 0.04f;
+                    ShaderLoader.WavyCircleShader.WaveSize2 = 0.04f;
+                    ShaderLoader.WavyCircleShader.WaveRadius = 0.5f;
+                    ShaderLoader.ApplyEffect(ShaderLoader.WavyCircleShader.Effect, spriteBatch, () => {
+                        float _knockProgress2 = 120f;
+
+                        var circleTexture = _pulseTexture.Value;
+                        var circlePosition = cloneInfo.VisualPosition - screenPos;
+                        var circleClip = Utils.Frame(circleTexture, 1, 1, frameY: 0);
+                        var circleOrigin = circleClip.Centered();
+                        var circleColor = MainPurpleColor;
+                        float circleScale = Utils.GetLerpValue(74f, 120f, _knockProgress2, true);
+                    
+                        //circleColor *= 1f - circleScale;
+
+                        circleColor.A = 0;
+
+                        float scaleFinal = 1.5f * Ease.CircOut(circleScale);
+                        Main.NewText(scaleFinal);
+
+                        var circleDrawInfo = new DrawInfo() {
+                            Clip = circleClip,
+                            Origin = circleOrigin,
+                            Color = circleColor
+                        };
+                        for (int num185 = 0; num185 < 4; num185++) {
+                            spriteBatch.Draw(circleTexture, circlePosition + Vector2.UnitX.RotatedBy((float)num185 * ((float)Math.PI / 4f) - Math.PI) * 1f,
+                                circleDrawInfo.WithColorModifier(0.75f).WithScale(scaleFinal),
+                                false);
                         }
                     });
                 }

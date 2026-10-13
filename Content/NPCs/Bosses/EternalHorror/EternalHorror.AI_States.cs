@@ -1037,7 +1037,9 @@ sealed partial class EternalHorror : ModNPC {
                         boss.OnIterateActiveCloneData((ref cloneInfo) => {
                             Vector2 clonePosition = cloneInfo.VisualPosition;
                             dashDirection = clonePosition.DirectionTo(targetCenter);
-                            cloneInfo.Velocity = dashDirection * dashStrength;
+                            //cloneInfo.Velocity = dashDirection * dashStrength;
+
+                            cloneInfo.ShouldFade = true;
                             cloneInfo.ShouldUpdateVisualPosition = true;
                         });
                     }
@@ -1058,7 +1060,7 @@ sealed partial class EternalHorror : ModNPC {
                 {
                     boss.OnIterateActiveCloneData((ref cloneInfo) => {
                         cloneInfo.Velocity *= velocityDeceleration;
-                        cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, dashOpacity, 1f);
+                        //cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, dashOpacity, 1f);
                     });
                 }
                 boss._dashOpacity = Helper.Approach(boss._dashOpacity, dashOpacity, 1f);
@@ -1091,10 +1093,10 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
             void destroyClones() {
-                bool shouldDestroyClones = npc.velocity.Length() > dashStrength * MathHelper.Lerp(0.5f, 0.875f, 0.5f);
-                if (boss.Phase1AtLeast1Dash && shouldDestroyClones) {
-                    boss.DestroyClonesOnContact();
-                }
+                //bool shouldDestroyClones = npc.velocity.Length() > dashStrength * MathHelper.Lerp(0.5f, 0.875f, 0.5f);
+                //if (boss.Phase1AtLeast1Dash && shouldDestroyClones) {
+                //    boss.DestroyClonesOnContact();
+                //}
             }
 
             destroyClones();

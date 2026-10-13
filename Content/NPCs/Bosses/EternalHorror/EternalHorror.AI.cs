@@ -137,7 +137,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public bool IsInSecondPhase => EternalHorrorSummonHandler.BlinkProgress_Out >= 1f && IsInSecondPhase_Base;
-    public bool IsInSecondPhase_Base => NPC.life < NPC.lifeMax / 2f;
+    public bool IsInSecondPhase_Base => NPC.life < NPC.lifeMax * 0.9f/*/ 2f*/;
 
     public bool Phase1CloneSpawn_ShouldDashAfter {
         get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
@@ -344,11 +344,21 @@ sealed partial class EternalHorror : ModNPC {
                     0.125f * lerpValueFactor);
             }
             else {
+                if (IsInSecondPhase) {
+                    //Main.NewText(cloneInfo.TimeLeftProgress);
+                }
                 //cloneInfo.Velocity *= 0.98f;
             }
             cloneInfo.VisualPosition += cloneInfo.Velocity;
 
             cloneInfo.UpdateStars();
+
+            if (cloneInfo.Opacity < 1f) {
+                Vector2 targetCenter = target.Center;
+
+                cloneInfo.Position = GetCloneSpawnPosition();
+                cloneInfo.TargetPosition = targetCenter;
+            }
 
             if (Main.rand.NextChance(cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH) && Main.rand.NextBool(1)) {
                 Color colorTint = MainPurpleColor * 0.375f;
@@ -391,7 +401,7 @@ sealed partial class EternalHorror : ModNPC {
                 cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f);
             }
 
-            if (IsInSecondPhase) {
+            if (IsInSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
                 if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 25 == 0) {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
