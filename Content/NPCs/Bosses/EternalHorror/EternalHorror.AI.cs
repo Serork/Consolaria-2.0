@@ -400,19 +400,21 @@ sealed partial class EternalHorror : ModNPC {
             int dustCount = 1;
             dustCount += (int)MathF.Floor(cloneInfo.ExplosionProgress2 * 2);
             for (int k = 0; k < dustCount; k++) {
-                float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity);
-                if (Main.rand.NextChance(IsInSecondPhase ? opacityChance : MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH)) && Main.rand.NextBool(1)) {
+                float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity * 0.875f);
+                if (Main.rand.NextChance(IsInSecondPhase ? opacityChance : MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH)) 
+                    && Main.rand.NextBool(1)) {
                     Color colorTint = MainPurpleColor * 0.375f;
                     colorTint *= opacityChance;
 
                     Vector2 offset = new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
+                    offset *= Utils.Remap(1f - cloneInfo.ExplosionProgress2, 0f, 1f, 0.5f, 1f, true);
                     offset = offset.RotatedBy(cloneInfo.Rotation);
                     Vector2 position = cloneInfo.VisualPosition + offset;
                     Vector2 velocity = cloneInfo.Velocity;
                     position += velocity;
                     velocity *= 0.2f;
 
-                    velocity += position.DirectionFrom(cloneInfo.VisualPosition) * 7.5f * MathF.Max(0.125f * 0.875f, cloneInfo.ExplosionProgress2);
+                    velocity += position.DirectionFrom(cloneInfo.VisualPosition) * MathHelper.Lerp(7.5f, 10f, cloneInfo.ExplosionProgress2) * MathF.Max(0.125f * 0.875f, cloneInfo.ExplosionProgress2);
 
                     FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
                     fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
@@ -423,7 +425,7 @@ sealed partial class EternalHorror : ModNPC {
                     fadingParticle.FadeInNormalizedTime = 0.5f;
                     fadingParticle.FadeOutNormalizedTime = 0.5f;
                     fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
-                    fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat() + cloneInfo.ExplosionProgress2 * 0.25f) * 1.25f;
+                    fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat() + cloneInfo.ExplosionProgress2 * 0.375f) * 1.25f;
                     Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
                     FadingParticle fadingParticle2 = fadingParticle;
                     fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
