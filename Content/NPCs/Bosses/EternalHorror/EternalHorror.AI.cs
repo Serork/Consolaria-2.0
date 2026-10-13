@@ -51,7 +51,7 @@ sealed partial class EternalHorror : ModNPC {
                                                                              float AllStarOpacityFactor = 0f,
                                                                              float LerpVelocityValue = 1f,
                                                                              int ExplosionTime = -1) {
-        public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(1.5f);
+        public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(2f);
 
         public readonly float TimeLeftProgress => Helper.Clamp01((float)TimeLeft / MaxTimeLeft);
         public readonly bool Active => TimeLeftProgress > 0f;
@@ -66,6 +66,9 @@ sealed partial class EternalHorror : ModNPC {
                 return opacity;
             }
         }
+
+        public readonly float ExplosionProgress => 1f - Utils.GetLerpValue(0f, EXPLOSIONTIME, ExplosionTime, true);
+        public readonly float ExplosionProgress2 => Utils.GetLerpValue(0.25f, 1f, ExplosionProgress == 1f ? 0f : ExplosionProgress, true);
 
         public void ForceFade() {
             if (TimeLeft > CLONEACTIVETIME * 0.25f) {
@@ -372,12 +375,17 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
 
-            if (IsInSecondPhase && cloneInfo.Opacity < 1f) {
+            if (IsInSecondPhase && cloneInfo.Opacity < 1f && cloneInfo.ExplosionTime == -1) {
                 Vector2 targetCenter = target.Center;
 
                 cloneInfo.Position = GetCloneSpawnPosition();
                 cloneInfo.TargetPosition = targetCenter;
             }
+
+            //float rayAlpha = cloneInfo.ExplosionProgress2;
+
+            //Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
+            //Lighting.AddLight(cloneInfo.VisualPosition, lightColor);
 
             if (Main.rand.NextChance(cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH) && Main.rand.NextBool(1)) {
                 Color colorTint = MainPurpleColor * 0.375f;
@@ -421,7 +429,7 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (IsInSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
-                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 25 == 0) {
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 50 == 0) {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
                     SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneEyePosition);
@@ -531,6 +539,8 @@ sealed partial class EternalHorror : ModNPC {
         vector8 += spawnOffset.RotatedBy(NPC.rotation - MathHelper.PiOver4);
 
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
+        SoundEngine.PlaySound(SoundID.Item8 with { Pitch = -0.1f, MaxInstances = 5 }, vector8);
+
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
             rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);

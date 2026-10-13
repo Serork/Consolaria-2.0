@@ -1,26 +1,22 @@
 ﻿using Consolaria.Common.Particles;
-using Humanizer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Mono.Cecil;
 using System;
-using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.GameContent.Drawing;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
-using ThoriumMod.Empowerments;
-using ThoriumMod.Projectiles;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjectile {
+    public static byte SKULLCOUNT => 15;
+
     private static float EXPLOSIONSCALEMODIFIER => 1.5f;
 
     public override string Texture => "Consolaria/Assets/Textures/Empty";
@@ -57,7 +53,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
             SoundEngine.PlaySound(SoundID.Item14 with { Pitch = -Main.rand.NextFloat(0.75f, 1f) }, Projectile.Center);
 
             if (!Helper.IsClient()) {
-                int skullCount = 15;
+                int skullCount = SKULLCOUNT;
                 const float SkullSpeed = 12f;
                 for (int i = 0; i < skullCount; i++) {
                     Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center,

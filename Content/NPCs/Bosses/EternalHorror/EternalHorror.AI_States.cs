@@ -902,6 +902,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private readonly struct Phase2DashAttack : IAIState {
         public static float DASHTIME => Helper.SecondsToFrames(0.75f * 0.75f * 0.75f);
+        public static float DASHTIME_FIRSTDASH => Helper.SecondsToFrames(0.75f);
         public static float LASERATTACKCOUNTNEEDED => 1;
         public static float DASHATTACKCOUNT => 5;
         public static float DASHSTRENGTH => 40f;
@@ -917,7 +918,33 @@ sealed partial class EternalHorror : ModNPC {
             //targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
             //targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * smoothFactor);
 
-            float dashProgress = boss.AICounter / DASHTIME;
+            float dashTime = DASHTIME;
+
+            bool didAtLeastOneDash = boss.Phase2DashAttackCount > 0;
+
+            if (!didAtLeastOneDash) {
+                dashTime = DASHTIME_FIRSTDASH;
+            }
+
+            float dashProgress = boss.AICounter / dashTime;
+
+            if (!didAtLeastOneDash) {
+                if (dashProgress >= 0.5f) {
+                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                        Vector2 clonePosition = cloneInfo.VisualPosition;
+                        //dashDirection = clonePosition.DirectionTo(targetCenter);
+                        //cloneInfo.Velocity = dashDirection * dashStrength;
+
+                        if (!cloneInfo.ShouldFade) {
+                            cloneInfo.ShouldFade = true;
+
+                            cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
+                        }
+                    });
+                }
+            }
+
+            didAtLeastOneDash = true;
 
             float dustProgress = dashProgress;
             dustProgress = Helper.YoYo(dustProgress);
@@ -965,9 +992,6 @@ sealed partial class EternalHorror : ModNPC {
 
             ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
 
-            bool didAtLeastOneDash = boss.Phase2DashAttackCount > 0;
-            didAtLeastOneDash = true;
-
             float dashPreparationFactor = 0.25f;
 
             bool shouldResetState() {
@@ -982,10 +1006,10 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss._dashVelocity *= 0f;
 
-                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                        //cloneInfo.ShouldUpdateVisualPosition = true;
-                        cloneInfo.ShouldFade = true;
-                    });
+                    //boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                    //    //cloneInfo.ShouldUpdateVisualPosition = true;
+                    //    cloneInfo.ShouldFade = true;
+                    //});
 
                     return true;
                 }
@@ -1005,7 +1029,7 @@ sealed partial class EternalHorror : ModNPC {
                 if (!didAtLeastOneDash) {
                     boss.AICounter -= 0.25f;
                 }
-                bool shouldDash = boss.AICounter >= DASHTIME;
+                bool shouldDash = boss.AICounter >= dashTime;
 
                 boss._copiesIntensity = dashProgress;
 
@@ -1027,7 +1051,7 @@ sealed partial class EternalHorror : ModNPC {
                         }
                     }
 
-                    boss.AICounter = -DASHTIME;
+                    boss.AICounter = -dashTime;
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 
@@ -1038,17 +1062,17 @@ sealed partial class EternalHorror : ModNPC {
 
                     //if (!boss.Phase1LastDash)
                     {
-                        boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                            Vector2 clonePosition = cloneInfo.VisualPosition;
-                            dashDirection = clonePosition.DirectionTo(targetCenter);
-                            //cloneInfo.Velocity = dashDirection * dashStrength;
+                        //boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                        //    Vector2 clonePosition = cloneInfo.VisualPosition;
+                        //    dashDirection = clonePosition.DirectionTo(targetCenter);
+                        //    //cloneInfo.Velocity = dashDirection * dashStrength;
 
-                            //if (!cloneInfo.ShouldUpdateVisualPosition) {
-                            //    cloneInfo.ShouldFade = true;
-                            //    cloneInfo.ShouldUpdateVisualPosition = true;
-                            //    cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
-                            //}
-                        });
+                        //    if (!cloneInfo.ShouldUpdateVisualPosition) {
+                        //        //cloneInfo.ShouldFade = true;
+                        //        cloneInfo.ShouldUpdateVisualPosition = true;
+                        //        //cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
+                        //    }
+                        //});
                     }
 
                     boss.ResetSmoothFactor();
@@ -1130,17 +1154,6 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
-            boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                Vector2 clonePosition = cloneInfo.VisualPosition;
-                //dashDirection = clonePosition.DirectionTo(targetCenter);
-                //cloneInfo.Velocity = dashDirection * dashStrength;
-
-                if (!cloneInfo.ShouldUpdateVisualPosition) {
-                    cloneInfo.ShouldFade = true;
-                    cloneInfo.ShouldUpdateVisualPosition = true;
-                    cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
-                }
-            });
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
