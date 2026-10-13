@@ -242,8 +242,8 @@ sealed partial class EternalHorror : ModNPC {
         Player target = NPC.GetTargetPlayer();
         Vector2 npcCenter = NPC.Center,
                 targetCenter = target.Center;
-        Vector2 clonePosition = targetCenter + npcCenter.DirectionTo(targetCenter) * (npcCenter - targetCenter).Length();
         float offsetFromBoss = 650f;
+        Vector2 clonePosition = targetCenter + npcCenter.DirectionTo(targetCenter) * MathF.Min(offsetFromBoss, (npcCenter - targetCenter).Length());
         Vector2 result = clonePosition;
         int attempts = 30;
         while (attempts-- > 0 && result.Distance(targetCenter) < offsetFromBoss / 2f) {
@@ -397,37 +397,47 @@ sealed partial class EternalHorror : ModNPC {
             //Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
             //Lighting.AddLight(cloneInfo.VisualPosition, lightColor);
 
-            if (Main.rand.NextChance(MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH)) && Main.rand.NextBool(1)) {
-                Color colorTint = MainPurpleColor * 0.375f;
+            int dustCount = 1;
+            dustCount += (int)MathF.Floor(cloneInfo.ExplosionProgress2 * 2);
+            for (int k = 0; k < dustCount; k++) {
+                float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity);
+                if (Main.rand.NextChance(IsInSecondPhase ? opacityChance : MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH)) && Main.rand.NextBool(1)) {
+                    Color colorTint = MainPurpleColor * 0.375f;
+                    colorTint *= opacityChance;
 
-                Vector2 position = cloneInfo.VisualPosition 
-                    + Vector2.One.RotatedBy(cloneInfo.Rotation) * new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
-                Vector2 velocity = cloneInfo.Velocity;
-                position += velocity;
-                velocity *= 0.2f;
-                FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
-                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
-                float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
-                fadingParticle.SetTypeInfo(num);
-                fadingParticle.AccelerationPerFrame = velocity / num;
-                fadingParticle.ColorTint = colorTint;
-                fadingParticle.FadeInNormalizedTime = 0.5f;
-                fadingParticle.FadeOutNormalizedTime = 0.5f;
-                fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
-                fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat()) * 1.25f;
-                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
-                FadingParticle fadingParticle2 = fadingParticle;
-                fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
-                fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
-                fadingParticle.SetTypeInfo(num);
-                fadingParticle.AccelerationPerFrame = velocity / num;
-                fadingParticle.ColorTint = colorTint;
-                fadingParticle.ColorTint.A = 30;
-                fadingParticle.FadeInNormalizedTime = 0.5f;
-                fadingParticle.FadeOutNormalizedTime = 0.5f;
-                fadingParticle.Rotation = fadingParticle2.Rotation;
-                fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
-                Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                    Vector2 offset = new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
+                    offset = offset.RotatedBy(cloneInfo.Rotation);
+                    Vector2 position = cloneInfo.VisualPosition + offset;
+                    Vector2 velocity = cloneInfo.Velocity;
+                    position += velocity;
+                    velocity *= 0.2f;
+
+                    velocity += position.DirectionFrom(cloneInfo.VisualPosition) * 7.5f * MathF.Max(0.125f * 0.875f, cloneInfo.ExplosionProgress2);
+
+                    FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                    fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                    float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                    fadingParticle.SetTypeInfo(num);
+                    fadingParticle.AccelerationPerFrame = velocity / num;
+                    fadingParticle.ColorTint = colorTint;
+                    fadingParticle.FadeInNormalizedTime = 0.5f;
+                    fadingParticle.FadeOutNormalizedTime = 0.5f;
+                    fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                    fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat() + cloneInfo.ExplosionProgress2 * 0.25f) * 1.25f;
+                    Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                    FadingParticle fadingParticle2 = fadingParticle;
+                    fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                    fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                    fadingParticle.SetTypeInfo(num);
+                    fadingParticle.AccelerationPerFrame = velocity / num;
+                    fadingParticle.ColorTint = colorTint;
+                    fadingParticle.ColorTint.A = 30;
+                    fadingParticle.FadeInNormalizedTime = 0.5f;
+                    fadingParticle.FadeOutNormalizedTime = 0.5f;
+                    fadingParticle.Rotation = fadingParticle2.Rotation;
+                    fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                    Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                }
             }
 
             //if (!cloneInfo.ShouldUpdateVisualPosition)
