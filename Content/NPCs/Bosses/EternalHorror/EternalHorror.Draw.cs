@@ -746,7 +746,7 @@ sealed partial class EternalHorror : ModNPC {
             Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation);
             angleDirection *= origin.Y / 3f;
             if (explosion) {
-                angleDirection *= getRemappedRandomValue(1.25f, 2f);
+                angleDirection *= getRemappedRandomValue(1.25f, 1.75f);
             }
             position2 += angleDirection;
 
