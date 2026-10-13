@@ -49,7 +49,10 @@ sealed partial class EternalHorror : ModNPC {
                                                                              bool ShouldFade = false,
                                                                              CloneStarInfo[] CloneStarData = null,
                                                                              float AllStarOpacityFactor = 0f,
-                                                                             float LerpVelocityValue = 1f) {
+                                                                             float LerpVelocityValue = 1f,
+                                                                             int ExplosionTime = -1) {
+        public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(1.5f);
+
         public readonly float TimeLeftProgress => Helper.Clamp01((float)TimeLeft / MaxTimeLeft);
         public readonly bool Active => TimeLeftProgress > 0f;
         public readonly float Opacity {
@@ -61,6 +64,12 @@ sealed partial class EternalHorror : ModNPC {
                     opacity *= Utils.GetLerpValue(0f, 0.25f, timeLeftProgress, true);
                 }
                 return opacity;
+            }
+        }
+
+        public void ForceFade() {
+            if (TimeLeft > CLONEACTIVETIME * 0.25f) {
+                TimeLeft = (ushort)(CLONEACTIVETIME * 0.25f);
             }
         }
 
@@ -353,7 +362,17 @@ sealed partial class EternalHorror : ModNPC {
 
             cloneInfo.UpdateStars();
 
-            if (cloneInfo.Opacity < 1f) {
+            if (cloneInfo.ExplosionTime > 0) {
+                cloneInfo.ExplosionTime--;
+                if (cloneInfo.ExplosionTime == 0) {
+                    cloneInfo.TimeLeft = 0;
+
+                    Vector2 position = cloneInfo.VisualPosition;
+                    SpawnCloneExplosion(position);
+                }
+            }
+
+            if (IsInSecondPhase && cloneInfo.Opacity < 1f) {
                 Vector2 targetCenter = target.Center;
 
                 cloneInfo.Position = GetCloneSpawnPosition();

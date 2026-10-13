@@ -9,8 +9,6 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Consolaria.Helper;
-using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -28,7 +26,9 @@ sealed partial class EternalHorror : ModNPC {
                                     _backgroundTexture = null,
                                     _secondPhaseEyeTexture = null,
                                     _secondPhaseEyeTexture_Glow = null,
-                                    _pulseTexture = null;
+                                    _pulseTexture = null,
+                                    _pulseTexture2 = null,
+                                    _pulseTexture3 = null;
 
     public static Asset<Texture2D> RayTexture { get; private set; }
 
@@ -182,6 +182,8 @@ sealed partial class EternalHorror : ModNPC {
         _secondPhaseEyeTexture_Glow = Helper.RequestTexture(Texture + "_Eye_Glow");
 
         _pulseTexture = Helper.RequestTexture(Texture + "_ClonePulse");
+        _pulseTexture2 = Helper.RequestTexture(Texture + "_ClonePulse2");
+        _pulseTexture3 = Helper.RequestTexture(Texture + "_ClonePulse3");
     }
 
     private partial void Load_ApplyShaderEffects() {
@@ -419,6 +421,55 @@ sealed partial class EternalHorror : ModNPC {
                     continue;
                 }
 
+                float explosionProgress = 1f - Utils.GetLerpValue(0f, CloneInfo.EXPLOSIONTIME, cloneInfo.ExplosionTime, true);
+                if (explosionProgress >= 1f) {
+                    explosionProgress = 0f;
+                }
+
+                if (IsInSecondPhase) {
+                    ShaderLoader.WavyCircleShader.Time = _seed + Main.GlobalTimeWrappedHourly * 5;
+                    ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
+                    ShaderLoader.WavyCircleShader.WaveCount2 = 12f;
+                    ShaderLoader.WavyCircleShader.WaveSize1 = 0.04f;
+                    ShaderLoader.WavyCircleShader.WaveSize2 = 0.04f;
+                    ShaderLoader.WavyCircleShader.WaveRadius = 1f - explosionProgress * 0.5f;
+                    ShaderLoader.ApplyEffect(ShaderLoader.WavyCircleShader.Effect, spriteBatch, () => {
+                        float _knockProgress2 = 120f * explosionProgress;
+
+                        var circleTexture = _pulseTexture3.Value;
+                        var circlePosition = cloneInfo.VisualPosition - screenPos;
+                        var circleClip = Utils.Frame(circleTexture, 1, 1, frameY: 0);
+                        var circleOrigin = circleClip.Centered();
+                        var circleColor = Color.Lerp(MainPurpleColor_Dynamic, MainPurpleColor, explosionProgress);
+                        float circleScale = Utils.GetLerpValue(74f, 120f, _knockProgress2, true);
+
+                        circleColor.A = 0;
+
+                        circleColor *= 1f - circleScale;
+
+                        float progress2 = Ease.SineOut(explosionProgress);
+                        circleColor *= progress2;
+
+                        Vector2 baseScale = Vector2.One;
+                        baseScale *= 2f * 1.5f; 
+                        //baseScale.Y *= 0.875f;
+
+                        Vector2 scaleFinal = baseScale * Ease.CircOut(circleScale);
+
+                        var circleDrawInfo = new Helper.DrawInfo() {
+                            Clip = circleClip,
+                            Origin = circleOrigin,
+                            Color = circleColor,
+                            //Rotation = cloneInfo.Rotation
+                        };
+                        for (int num185 = 0; num185 < 4; num185++) {
+                            spriteBatch.Draw(circleTexture, circlePosition + Vector2.UnitX.RotatedBy((float)num185 * ((float)Math.PI / 4f) - Math.PI) * 1f,
+                                circleDrawInfo.WithColorModifier(MathHelper.Lerp(0.125f, 0.25f, 0f) * 0.75f).WithScaleOverride(scaleFinal),
+                                false);
+                        }
+                    });
+                }
+
                 float rotation = cloneInfo.Rotation;
 
                 Player target = NPC.GetTargetPlayer();
@@ -478,8 +529,8 @@ sealed partial class EternalHorror : ModNPC {
                         Draw_Inner(NPC, cloneDrawContext with {
                             Position = position,
                             DrawColor = color,
-                            Rotation = rotation
-                        });
+                            Rotation = rotation,
+                        }, scale: NPC.scale + Ease.CubeIn(explosionProgress) * 0.25f);
                     });
                 }, sinWaveOffset: WaveOffset,
                    progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
@@ -519,44 +570,6 @@ sealed partial class EternalHorror : ModNPC {
                                 starMaxRotation * starRotation * starRotation + cloneStarInfo.Rotation,
                                 new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
                             //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
-                        }
-                    });
-                }
-
-                if (IsInSecondPhase)
-                {
-                    ShaderLoader.WavyCircleShader.Time = Main.GlobalTimeWrappedHourly * 10;
-                    ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
-                    ShaderLoader.WavyCircleShader.WaveCount2 = 12f;
-                    ShaderLoader.WavyCircleShader.WaveSize1 = 0.04f;
-                    ShaderLoader.WavyCircleShader.WaveSize2 = 0.04f;
-                    ShaderLoader.WavyCircleShader.WaveRadius = 0.5f;
-                    ShaderLoader.ApplyEffect(ShaderLoader.WavyCircleShader.Effect, spriteBatch, () => {
-                        float _knockProgress2 = 120f;
-
-                        var circleTexture = _pulseTexture.Value;
-                        var circlePosition = cloneInfo.VisualPosition - screenPos;
-                        var circleClip = Utils.Frame(circleTexture, 1, 1, frameY: 0);
-                        var circleOrigin = circleClip.Centered();
-                        var circleColor = MainPurpleColor;
-                        float circleScale = Utils.GetLerpValue(74f, 120f, _knockProgress2, true);
-                    
-                        //circleColor *= 1f - circleScale;
-
-                        circleColor.A = 0;
-
-                        float scaleFinal = 1.5f * Ease.CircOut(circleScale);
-                        Main.NewText(scaleFinal);
-
-                        var circleDrawInfo = new DrawInfo() {
-                            Clip = circleClip,
-                            Origin = circleOrigin,
-                            Color = circleColor
-                        };
-                        for (int num185 = 0; num185 < 4; num185++) {
-                            spriteBatch.Draw(circleTexture, circlePosition + Vector2.UnitX.RotatedBy((float)num185 * ((float)Math.PI / 4f) - Math.PI) * 1f,
-                                circleDrawInfo.WithColorModifier(0.75f).WithScale(scaleFinal),
-                                false);
                         }
                     });
                 }

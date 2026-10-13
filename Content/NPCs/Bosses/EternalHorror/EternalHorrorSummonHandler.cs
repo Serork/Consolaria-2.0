@@ -736,7 +736,13 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     private static void HandleBlinking() {
         if (_shouldBlink) {
-            EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, 1f, 0.125f);
+            float outLerpValueFactor = 0.5f;
+
+            float shakeLerpValue = 0.125f;
+            if (!ShouldBlinkOut) {
+                shakeLerpValue *= outLerpValueFactor;
+            }
+            EternalHorror.ShakeStrength = Helper.Approach(EternalHorror.ShakeStrength, 1f, shakeLerpValue);
 
             if (!EternalHorrorSummonEnded) {
                 for (int i = 0; i < _eyeData.Length; i++) {
@@ -782,6 +788,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
             else {
                 float to = 0f - progressOffset * 1f;
+                if (!ShouldBlinkOut) {
+                    lerpValue *= outLerpValueFactor;
+                }
                 BlinkProgress = Helper.Approach(BlinkProgress, to, lerpValue);
                 if (BlinkProgress <= to) {
                     _in = true;

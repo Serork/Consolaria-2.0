@@ -195,6 +195,9 @@ sealed partial class EternalHorror : ModNPC {
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
 
                 float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
+
+                ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
+
                 dustProgress = Helper.YoYo(dustProgress);
                 boss.SpawnPreparationDust_Shadow(dustProgress);
 
@@ -710,7 +713,8 @@ sealed partial class EternalHorror : ModNPC {
 
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 //cloneInfo.ShouldUpdateVisualPosition = true;
-                cloneInfo.ShouldFade = true;
+                //cloneInfo.ShouldFade = true;
+                cloneInfo.ForceFade();
             });
         }
 
@@ -1039,8 +1043,11 @@ sealed partial class EternalHorror : ModNPC {
                             dashDirection = clonePosition.DirectionTo(targetCenter);
                             //cloneInfo.Velocity = dashDirection * dashStrength;
 
-                            cloneInfo.ShouldFade = true;
-                            cloneInfo.ShouldUpdateVisualPosition = true;
+                            //if (!cloneInfo.ShouldUpdateVisualPosition) {
+                            //    cloneInfo.ShouldFade = true;
+                            //    cloneInfo.ShouldUpdateVisualPosition = true;
+                            //    cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
+                            //}
                         });
                     }
 
@@ -1122,7 +1129,19 @@ sealed partial class EternalHorror : ModNPC {
             extraSlowDownAfterDash();
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                Vector2 clonePosition = cloneInfo.VisualPosition;
+                //dashDirection = clonePosition.DirectionTo(targetCenter);
+                //cloneInfo.Velocity = dashDirection * dashStrength;
+
+                if (!cloneInfo.ShouldUpdateVisualPosition) {
+                    cloneInfo.ShouldFade = true;
+                    cloneInfo.ShouldUpdateVisualPosition = true;
+                    cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
+                }
+            });
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
@@ -1220,6 +1239,9 @@ sealed partial class EternalHorror : ModNPC {
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
 
                 float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
+
+                ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
+
                 dustProgress = Helper.YoYo(dustProgress);
                 boss.SpawnPreparationDust_Shadow(dustProgress);
 
