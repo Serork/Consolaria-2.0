@@ -713,7 +713,7 @@ sealed partial class EternalHorror : ModNPC {
 
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 //cloneInfo.ShouldUpdateVisualPosition = true;
-                //cloneInfo.ShouldFade = true;
+                cloneInfo.ShouldFade = true;
                 cloneInfo.ForceFade();
             });
         }

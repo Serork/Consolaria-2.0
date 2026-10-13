@@ -234,10 +234,10 @@ sealed partial class EternalHorror : ModNPC {
     private Vector2 GetCloneSpawnPosition() {
         Player target = NPC.GetTargetPlayer();
         Vector2 npcCenter = NPC.Center,
-        targetCenter = target.Center;
-        Vector2 clonePosition = targetCenter + (targetCenter - npcCenter);
+                targetCenter = target.Center;
+        Vector2 clonePosition = targetCenter + npcCenter.DirectionTo(targetCenter) * (npcCenter - targetCenter).Length();
         float offsetFromBoss = 650f;
-        Vector2 result = npcCenter + npcCenter.DirectionTo(clonePosition) * offsetFromBoss;
+        Vector2 result = clonePosition;
         int attempts = 30;
         while (attempts-- > 0 && result.Distance(targetCenter) < offsetFromBoss / 2f) {
             result += result.DirectionFrom(targetCenter) * 10f;
