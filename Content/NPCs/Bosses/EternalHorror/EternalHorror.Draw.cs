@@ -466,7 +466,7 @@ sealed partial class EternalHorror : ModNPC {
                         };
                         for (int num185 = 0; num185 < 4; num185++) {
                             spriteBatch.Draw(circleTexture, circlePosition + Vector2.UnitX.RotatedBy((float)num185 * ((float)Math.PI / 4f) - Math.PI) * 1f,
-                                circleDrawInfo.WithColorModifier(MathHelper.Lerp(0.125f, 0.25f, 0.125f) * 0.75f).WithScaleOverride(scaleFinal),
+                                circleDrawInfo.WithColorModifier(MathHelper.Lerp(0.125f, 0.25f, 0f) * 0.75f).WithScaleOverride(scaleFinal),
                                 false);
                         }
                     });
@@ -536,7 +536,7 @@ sealed partial class EternalHorror : ModNPC {
                     });
                 }, sinWaveOffset: WaveOffset,
                    progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
-                   opacity: 0.375f + starOpacityExtra + cloneInfo.DashOpacity / 4f + explosionProgress2 / 4f,
+                   opacity: 0.375f + starOpacityExtra + cloneInfo.DashOpacity / 4f + explosionProgress2 / 10f,
                    sinStep: _shadowTime);
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
