@@ -588,7 +588,7 @@ sealed partial class EternalHorror : ModNPC {
         PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
         prettySparkleParticle.ColorTint = color.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
         prettySparkleParticle.LocalPosition = positionInWorld;
-        prettySparkleParticle.Rotation = NPC.rotation + (float)Math.PI / 2f;
+        prettySparkleParticle.Rotation = MathHelper.TwoPi * Main.rand.NextFloat();
         prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
         prettySparkleParticle.FadeInNormalizedTime = 0.1f;
         prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
