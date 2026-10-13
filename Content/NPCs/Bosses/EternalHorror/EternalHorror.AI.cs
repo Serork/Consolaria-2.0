@@ -439,7 +439,7 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (IsInSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
-                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 37 == 0) {
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 25 == 0) {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
                     SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneEyePosition);
