@@ -10,8 +10,6 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
-using static tModPorter.ProgressUpdate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -126,6 +124,8 @@ sealed partial class EternalHorror : ModNPC {
     private Vector2 _eyeVelocity;
     private float _eyeDirectionChangeTime, _eyeAngle;
 
+    private float _ai4, _ai5;
+
     public ref float InitValue => ref NPC.ai[0];
 
     public ref float AICounter => ref NPC.ai[1];
@@ -151,7 +151,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public bool IsInSecondPhase => EternalHorrorSummonHandler.BlinkProgress_Out >= 1f && IsInSecondPhase_Base;
-    public bool IsInSecondPhase_Base => NPC.life < NPC.lifeMax * 0.9f/*/ 2f*/;
+    public bool IsInSecondPhase_Base => NPC.life < NPC.lifeMax / 2f;
 
     public bool Phase1CloneSpawn_ShouldDashAfter {
         get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
@@ -385,11 +385,15 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
 
-            if (IsInSecondPhase && cloneInfo.Opacity < 1f && cloneInfo.ExplosionTime == -1) {
-                Vector2 targetCenter = target.Center;
+            if (!cloneInfo.ShouldFade) {
+                if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f) {
+                    if (IsInSecondPhase && cloneInfo.Opacity < 1f && cloneInfo.ExplosionTime == -1) {
+                        Vector2 targetCenter = target.Center;
 
-                cloneInfo.Position = GetCloneSpawnPosition();
-                cloneInfo.TargetPosition = targetCenter;
+                        cloneInfo.Position = GetCloneSpawnPosition();
+                        cloneInfo.TargetPosition = targetCenter;
+                    }
+                }
             }
 
             //float rayAlpha = cloneInfo.ExplosionProgress2;
@@ -400,8 +404,8 @@ sealed partial class EternalHorror : ModNPC {
             int dustCount = 1;
             dustCount += (int)MathF.Floor(cloneInfo.ExplosionProgress2 * 2);
             for (int k = 0; k < dustCount; k++) {
-                float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity * 0.875f);
-                if (Main.rand.NextChance(IsInSecondPhase ? opacityChance : MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH)) 
+                float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity * 1f) * (cloneInfo.ExplosionProgress2 > 0f ? 1f : 0.875f);
+                if (Main.rand.NextChance(IsInSecondPhase ? opacityChance : MathF.Max(0.5f, MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH))) 
                     && Main.rand.NextBool(1)) {
                     Color colorTint = MainPurpleColor * 0.375f;
                     colorTint *= opacityChance;
@@ -519,6 +523,8 @@ sealed partial class EternalHorror : ModNPC {
         AICounter = 0f;
         AICounter2 = 0f;
         AICounter3 = 0f;
+        _ai4 = 0f;
+        _ai5 = 0;
     }
 
     private Vector2 GetEyePosition(bool forDrawing = false) {
@@ -671,7 +677,7 @@ sealed partial class EternalHorror : ModNPC {
             27, 1.5f, Main.myPlayer, ai2: reflectedFromStart.ToInt());
     }
 
-    private void MakeTrailDust() {
+    private void MakeTrailDust(float velocityFactor = 1f, float rotation = float.MaxValue) {
         Color colorTint = MainPurpleColor * 0.25f;
 
         Vector2 position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) * 0.25f;
@@ -686,8 +692,9 @@ sealed partial class EternalHorror : ModNPC {
         fadingParticle.ColorTint = colorTint;
         fadingParticle.FadeInNormalizedTime = 0.5f;
         fadingParticle.FadeOutNormalizedTime = 0.5f;
-        fadingParticle.Rotation = NPC.rotation;
+        fadingParticle.Rotation = rotation == float.MaxValue ? NPC.rotation : rotation;
         fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat());
+        fadingParticle.Velocity *= velocityFactor;
         Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
         //FadingParticle fadingParticle2 = fadingParticle;
         //fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();

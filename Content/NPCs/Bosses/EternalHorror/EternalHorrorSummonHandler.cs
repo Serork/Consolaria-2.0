@@ -447,19 +447,21 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                 //color *= colorFactor;
 
-                Vector2 eyePupilPosition = position2 + eyeInfo.PupilVelocity;
-                int pupilMaxFrames = 2;
-                int pupilFrameY = (int)(waveOffset * 7.5f % pupilMaxFrames);
-                Rectangle pupilClip = eyeTexture2.Frame(1, pupilMaxFrames/*, frameY: pupilFrameY*/);
-                Vector2 pupilOrigin = pupilClip.Centered();
-                batch.Draw(eyeTexture2, eyePupilPosition, (drawInfo with { Clip = pupilClip, Origin = pupilOrigin })
-                    .WithRotation(0f)
-                    .WithColorOverride(Color.Lerp(color,
-                                       Color.Lerp(color,
-                                       Main.hslToRgb(getRandomValue(), 1f, 0.5f),
-                                       getRemappedRandomValue(0f, 0.125f)),
-                                       (eyeInfo.RunAwayProgress <= 0f).ToInt()))
-                    .WithScaleOverride(eyePupilScale * Helper.Wave(minScale - eyeScaleFactor, maxScale + eyeScaleFactor / 2f, eyeScaleWaveSpeedFactor, i)));
+                if (eyeInfo.Scale > 0f && color != Color.Transparent) {
+                    Vector2 eyePupilPosition = position2 + eyeInfo.PupilVelocity;
+                    int pupilMaxFrames = 2;
+                    int pupilFrameY = (int)(waveOffset * 7.5f % pupilMaxFrames);
+                    Rectangle pupilClip = eyeTexture2.Frame(1, pupilMaxFrames/*, frameY: pupilFrameY*/);
+                    Vector2 pupilOrigin = pupilClip.Centered();
+                    batch.Draw(eyeTexture2, eyePupilPosition, (drawInfo with { Clip = pupilClip, Origin = pupilOrigin })
+                        .WithRotation(0f)
+                        .WithColorOverride(Color.Lerp(color,
+                                           Color.Lerp(color,
+                                           Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+                                           getRemappedRandomValue(0f, 0.125f)),
+                                           (eyeInfo.RunAwayProgress <= 0f).ToInt()))
+                        .WithScaleOverride(eyePupilScale * Helper.Wave(minScale - eyeScaleFactor, maxScale + eyeScaleFactor / 2f, eyeScaleWaveSpeedFactor, i)));
+                }
             }
 
             if (!eyeInfo.SpawnedSoul) {
@@ -564,22 +566,24 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 Scale = scale
             };
 
-            ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
-            ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                int drawCount = 3;
-                for (int k = 0; k < drawCount; k++) {
-                    float progress = k / (float)drawCount;
-                    progress -= 0.5f;
+            if (progress > 0f && progressStep1 > 0f) {
+                ShaderLoader.DistortShader.SetDefault(texture.Width * 2, texture.Height * 2);
+                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                    int drawCount = 3;
+                    for (int k = 0; k < drawCount; k++) {
+                        float progress2 = k / (float)drawCount;
+                        progress2 -= 0.5f;
 
-                    spriteBatch.Draw(texture, position, drawInfo
-                            .WithRotation(progress * 0.125f * 0.5f)
-                            .WithColorOverride(
-                                Color.Lerp(color,
-                                Main.hslToRgb(getRandomValue(), 1f, 0.5f),
-                                getRemappedRandomValue(0f, 0.125f))
-                                .MultiplyAlpha(0f) * 0.125f * 0.5f));
-                }
-            });
+                        spriteBatch.Draw(texture, position, drawInfo
+                                .WithRotation(progress2 * 0.125f * 0.5f)
+                                .WithColorOverride(
+                                    Color.Lerp(color,
+                                    Main.hslToRgb(getRandomValue(), 1f, 0.5f),
+                                    getRemappedRandomValue(0f, 0.125f))
+                                    .MultiplyAlpha(0f) * 0.125f * 0.5f));
+                    }
+                });
+            }
         }
     }
 

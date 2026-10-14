@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -713,22 +714,203 @@ sealed partial class EternalHorror : ModNPC {
             float preparationSlowDown = Utils.Remap(1f - attackProgress_ForSlowDown, 0f, 1f, 0.75f, 1f, true);
 
             npc.velocity *= preparationSlowDown;
-            npc.rotation *= preparationSlowDown;
+            //npc.rotation *= preparationSlowDown;
 
             npc.dontTakeDamage = true;
+
+            npc.reflectsProjectiles = true;
+
+            float transitionTime = 100f;
+
+            transitionTime *= 0.375f;
+
+            float progress = boss._ai5 / transitionTime;
+            for (int i = 0; i < 2; i++) {
+                boss.SpawnPreparationDust_Shadow(Helper.YoYo(progress));
+            }
+
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center,
+                    baseTargetCenter = targetCenter;
+            float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
+
+            boss._cloneTargetPosition = targetCenter;
+
+            ShakeStrength = Helper.Approach(ShakeStrength, progress, 0.125f);
+
+            boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.025f * 0.025f * 1f);
+
+            Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) / 2f;
+
+            if (boss.AICounter2 == 1f || boss.AICounter2 == 2f) {
+                boss._ai5 += 1f;
+
+                if (boss.AICounter2 == 1f || boss._ai4 == 1f) {
+
+                    boss.AICounter3 += 0.01f;
+                    if ((double)boss.AICounter3 > 0.5)
+                        boss.AICounter3 = 0.5f;
+                }
+                else {
+                    boss._ai5 -= 0.5f;
+
+                    boss.AICounter3 -= 0.005f;
+                    if (boss.AICounter3 < 0f)
+                        boss.AICounter3 = 0f;
+                }
+
+                npc.rotation += boss.AICounter3;
+
+                if (boss._ai5 % 4 == 0 && progress <= 0.875f) {
+                    boss.MakeTrailDust(velocityFactor: 1f);
+                }
+
+                npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
+
+                if (boss._ai5 % 20 == 0 && (boss.AICounter2 == 1f || boss._ai4 == 1f)) {
+                    //AddGlow(20f, 0.5f, Color.BlueViolet);
+                    SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+
+                    if (!Main.dedServ) {
+                        for (int i = 0; i < 2; i++) {
+                            if (i > 0 || Main.rand.NextBool()) {
+                                Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                                Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                                Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                            }
+                        }
+
+                        //for (int index1 = 0; index1 < 14; ++index1) {
+                        //    int index2 = Dust.NewDust(new Vector2(NPC.Center.X, NPC.Center.Y), 0, 0, DustID.Shadowflame, 0f, 0f, 100, default, Main.rand.NextFloat(1f, 2.5f));
+                        //    Main.dust[index2].noGravity = true;
+                        //    Main.dust[index2].noLight = false;
+                        //    Main.dust[index2].fadeIn = Main.rand.NextFloat(0, 1f);
+                        //    Main.dust[index2].position += new Vector2(Main.rand.Next(40, 120), 0).RotatedByRandom(rad);
+                        //    Main.dust[index2].velocity = Vector2.Normalize(NPC.Center - Main.dust[index2].position) * Main.rand.NextFloat(-10f, -1f);
+                        //}
+                    }
+                }
+
+                //if (Main.getGoodWorld)
+                //    reflectsProjectiles = true;
+
+                if (Main.netMode != 1) {
+                    int num29 = 20;
+                    //if (Main.getGoodWorld && life < lifeMax / 3)
+                    num29 = 6;
+
+                    if (boss._ai5 % (float)num29 == 0f) {
+                        float num30 = 5f;
+                        Vector2 vector5 = boss.GetEyePosition();
+                        float num31 = Main.rand.Next(-200, 200);
+                        float num32 = Main.rand.Next(-200, 200);
+                        //if (Main.getGoodWorld) {
+                        //    num31 *= 3f;
+                        //    num32 *= 3f;
+                        //}
+
+                        num31 *= 3f;
+                        num32 *= 3f;
+
+                        float num33 = (float)Math.Sqrt(num31 * num31 + num32 * num32);
+                        num33 = num30 / num33;
+                        Vector2 vector6 = vector5;
+                        Vector2 vector7 = default(Vector2);
+                        vector7.X = num31 * num33;
+                        vector7.Y = num32 * num33;
+                        vector6.X += vector7.X * 10f;
+                        vector6.Y += vector7.Y * 10f;
+
+                        vector7 *= 5f;
+
+                        int num34 = NPC.NewNPC(npc.GetSource_FromAI(), (int)vector6.X, (int)vector6.Y, ModContent.NPCType<EternalServant>(), ai2: 1f);
+                        Main.npc[num34].velocity.X = vector7.X;
+                        Main.npc[num34].velocity.Y = vector7.Y;
+                        if (Main.netMode == 2 && num34 < 200)
+                            NetMessage.SendData(23, -1, -1, null, num34);
+                    }
+
+                    //for (int n = 0; n < 10; n++) {
+                    //    Dust.NewDust(vector6, 20, 20, 5, vector7.X * 0.4f, vector7.Y * 0.4f);
+                    //}
+                }
+
+                if (boss._ai5 >= transitionTime) {
+                    if (boss._ai4 == 1f) {
+                        boss._ai4 = 0f;
+                        boss._ai5 = 0f;
+                    }
+                    else {
+                        boss.AICounter2 += 1f;
+                        boss._ai5 = 0f;
+                        if (boss.AICounter2 == 3f) {
+                            boss.AICounter3 = 0f;
+                        }
+                        else {
+                            SoundEngine.PlaySound(SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+
+                            //SoundEngine.PlaySound(3, (int)position.X, (int)position.Y);
+                            if (!Main.dedServ) {
+                                IEntitySource goreSource = npc.GetSource_FromAI();
+                                for (int i = 0; i < 2; i++) {
+                                    if (i > 0 || Main.rand.NextBool()) {
+                                        for (int num35 = 0; num35 < 2; num35++) {
+                                            Gore.NewGore(goreSource, getPosition(), new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type);
+                                            Gore.NewGore(goreSource, getPosition(), new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type);
+                                            Gore.NewGore(goreSource, getPosition(), new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type);
+                                        }
+                                    }
+                                }
+                            }
+
+                            //for (int num36 = 0; num36 < 20; num36++) {
+                            //    Dust.NewDust(position, width, height, 5, (float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f);
+                            //}
+
+                            //SoundEngine.PlaySound(15, (int)position.X, (int)position.Y, 0);
+                            SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.position);
+                        }
+                    }
+                }
+
+                //Dust.NewDust(position, width, height, 5, (float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f);
+
+                return;
+            }
+
+            boss.DeactivateAllStates();
+
+            boss.ResetCounters();
+
+            boss.ResetLaserAttack(applyExtraIncreasedDelay: true);
+
+            boss.ActivateState<Phase2MoveToPlayer>();
+            boss.ActivateState<Phase2BurstLaserAttack>();
+
+            npc.dontTakeDamage = false;
+
+            npc.reflectsProjectiles = false;
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             boss.DeactivateAllStates();
             boss.ResetCounters();
 
+            boss.AICounter2 = 1f;
+
+            boss.ResetSmoothFactor();
+
             //boss.ActivateState<Phase2MoveToPlayer>();
             //boss.ActivateState<Phase2BurstLaserAttack>();
 
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 //cloneInfo.ShouldUpdateVisualPosition = true;
+                //cloneInfo.ShouldUpdateVisualPosition = true;
+                //cloneInfo.Velocity *= 0f;
+                //cloneInfo.DashOpacity *= 0f;
                 cloneInfo.ShouldFade = true;
-                cloneInfo.ForceFade();
+                //cloneInfo.ForceFade();
             });
 
             //boss.SpawnRays(startRaySpeed: 0.5f);
@@ -1295,7 +1477,7 @@ sealed partial class EternalHorror : ModNPC {
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
-                    boss.SpawnClone(insta: true);
+                    boss.SpawnClone(/*insta: true*/);
 
                     npc.ResetTrails();
 

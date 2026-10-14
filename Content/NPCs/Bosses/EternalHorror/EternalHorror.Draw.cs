@@ -1,4 +1,5 @@
 ﻿using Consolaria.Common.Particles;
+using Consolaria.Content.Gores;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -427,10 +428,12 @@ sealed partial class EternalHorror : ModNPC {
 
                 float explosionOpacity = cloneInfo.Opacity * MathHelper.Lerp(0.25f, 0.375f, 0.625f) * explosionProgress2;
 
-                DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
-                    true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, secondHalf: false);
+                if (explosionOpacity > 0f) {
+                    DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
+                        true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, secondHalf: false);
+                }
 
-                if (IsInSecondPhase) {
+                if (IsInSecondPhase && explosionProgress > 0f) {
                     ShaderLoader.WavyCircleShader.Time = _seed + Main.GlobalTimeWrappedHourly * 5;
                     ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
                     ShaderLoader.WavyCircleShader.WaveCount2 = 12f;
@@ -482,44 +485,47 @@ sealed partial class EternalHorror : ModNPC {
                 float timeLeftProgress = cloneInfo.TimeLeftProgress;
 
                 cloneColor *= cloneInfo.Opacity;
+
                 DrawContext cloneDrawContext = drawContext with {
                     Texture = shadowTexture,
                     Position = clonePosition,
                     DrawColor = cloneColor
                 };
 
-                int length = cloneInfo.OldVisualPositions.Length - 1;
-                for (int num173 = 1; num173 < length; num173 += 1) {
-                    _ = ref cloneInfo.OldVisualPositions[num173];
-                    Color color39 = cloneDrawContext.DrawColor;
-                    color39 = color39.MultiplyRGBA(MainPurpleColor);
-                    color39.R = (byte)(1f * (double)(int)color39.R * (double)(length - num173) / length);
-                    color39.G = (byte)(1f * (double)(int)color39.G * (double)(length - num173) / length);
-                    color39.B = (byte)(1f * (double)(int)color39.B * (double)(length - num173) / length);
-                    color39.A = (byte)(1f * (double)(int)color39.A * (double)(length - num173) / length);
-                    //color39 *= MathHelper.Clamp(NPC.velocity.Length(), 0f, 9f) / 9f;
-                    color39 *= 1f - num173 / length;
-                    //color39 *= _trailOpacity;
-                    //color39 *= 0.8f;
-                    color39 *= 1f;
-                    color39 *= cloneInfo.DashOpacity;
-                    Rectangle frame7 = NPC.frame;
-                    Vector2 origin = NPC.frame.Centered();
-                    Vector2 pos = cloneInfo.OldVisualPositions[num173];
-                    //pos += NPC.Size / 2f;
+                if (cloneInfo.DashOpacity > 0f) {
+                    int length = cloneInfo.OldVisualPositions.Length - 1;
+                    for (int num173 = 1; num173 < length; num173 += 1) {
+                        _ = ref cloneInfo.OldVisualPositions[num173];
+                        Color color39 = cloneDrawContext.DrawColor;
+                        color39 = color39.MultiplyRGBA(MainPurpleColor);
+                        color39.R = (byte)(1f * (double)(int)color39.R * (double)(length - num173) / length);
+                        color39.G = (byte)(1f * (double)(int)color39.G * (double)(length - num173) / length);
+                        color39.B = (byte)(1f * (double)(int)color39.B * (double)(length - num173) / length);
+                        color39.A = (byte)(1f * (double)(int)color39.A * (double)(length - num173) / length);
+                        //color39 *= MathHelper.Clamp(NPC.velocity.Length(), 0f, 9f) / 9f;
+                        color39 *= 1f - num173 / length;
+                        //color39 *= _trailOpacity;
+                        //color39 *= 0.8f;
+                        color39 *= 1f;
+                        color39 *= cloneInfo.DashOpacity;
+                        Rectangle frame7 = NPC.frame;
+                        Vector2 origin = NPC.frame.Centered();
+                        Vector2 pos = cloneInfo.OldVisualPositions[num173];
+                        //pos += NPC.Size / 2f;
 
-                    color39 *= 0.5f;
+                        color39 *= 0.5f;
 
-                    pos = Vector2.Lerp(pos, cloneInfo.VisualPosition, Ease.SineIn(1f - cloneInfo.DashOpacity));
+                        pos = Vector2.Lerp(pos, cloneInfo.VisualPosition, Ease.SineIn(1f - cloneInfo.DashOpacity));
 
-                    pos -= screenPos;
+                        pos -= screenPos;
 
-                    ShaderLoader.DistortShader.SetDefault(shadowTexture.Width * 2, shadowTexture.Height * 2);
-                    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                        spriteBatch.Draw(shadowTexture,
-                        pos,
-                        frame7, color39 * NPC.Opacity, rotation, origin, NPC.scale, flip, 0f);
-                    });
+                        ShaderLoader.DistortShader.SetDefault(shadowTexture.Width * 2, shadowTexture.Height * 2);
+                        ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                            spriteBatch.Draw(shadowTexture,
+                            pos,
+                            frame7, color39 * NPC.Opacity, rotation, origin, NPC.scale, flip, 0f);
+                        });
+                    }
                 }
 
                 float starOpacityExtra = cloneInfo.AllStarOpacityFactor;
@@ -541,8 +547,10 @@ sealed partial class EternalHorror : ModNPC {
                    opacity: 0.375f + starOpacityExtra + cloneInfo.DashOpacity / 4f,
                    sinStep: _shadowTime);
 
-                DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
-                    true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, firstHalf: false);
+                if (explosionOpacity > 0f) {
+                    DrawRays_Inner(spriteBatch, NPC.As<EternalHorror>(),
+                        true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, firstHalf: false);
+                }
 
                 foreach (CloneStarInfo cloneStarInfo in cloneInfo.CloneStarData) {
                     if (!cloneStarInfo.Active) {
@@ -568,51 +576,55 @@ sealed partial class EternalHorror : ModNPC {
 
                     starScale *= 1f;
 
-                    ShaderLoader.DistortShader.SetDefault(100, 100);
-                    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                        for (int i = 0; i < 1; i++) {
-                            Helper.DrawPrettyStarSparkle(1f, SpriteEffects.None, baseStarPosition - screenPos + starPosition,
-                                Color.Lerp(Color.White, new Color(175, 31, 178), 0.25f) * 1f,
-                                Color.Lerp(MainPurpleColor, Color.BlueViolet, 0.75f) * 1f, starRotation, 0f, 0.5f, 0.9f, 1f,
-                                starMaxRotation * starRotation * starRotation + cloneStarInfo.Rotation,
-                                new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
-                            //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
-                        }
-                    });
+                    if (starScale > 0f) {
+                        ShaderLoader.DistortShader.SetDefault(100, 100);
+                        ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                            for (int i = 0; i < 1; i++) {
+                                Helper.DrawPrettyStarSparkle(1f, SpriteEffects.None, baseStarPosition - screenPos + starPosition,
+                                    Color.Lerp(Color.White, new Color(175, 31, 178), 0.25f) * 1f,
+                                    Color.Lerp(MainPurpleColor, Color.BlueViolet, 0.75f) * 1f, starRotation, 0f, 0.5f, 0.9f, 1f,
+                                    starMaxRotation * starRotation * starRotation + cloneStarInfo.Rotation,
+                                    new Vector2(10f, 6f) * starScale * starScale, new Vector2(3f, 3f));
+                                //Utils.DrawLine(spriteBatch, rCurrentNPC.Center + starPosition + starOffset, rCurrentNPC.Center + starPosition * 30f + starOffset, Microsoft.Xna.Framework.Color.Cyan * starRotation, Microsoft.Xna.Framework.Color.Transparent, 16f * starScale);
+                            }
+                        });
+                    }
                 }
             }
         }
         void drawTrails() {
-            int length = NPC.oldPos.Length - 1;
-            for (int num173 = 1; num173 < length; num173 += 1) {
-                _ = ref NPC.oldPos[num173];
-                Color color39 = drawColor;
-                color39 = color39.MultiplyRGBA(MainPurpleColor_Dynamic);
-                color39.R = (byte)(1f * (double)(int)color39.R * (double)(length - num173) / length);
-                color39.G = (byte)(1f * (double)(int)color39.G * (double)(length - num173) / length);
-                color39.B = (byte)(1f * (double)(int)color39.B * (double)(length - num173) / length);
-                color39.A = (byte)(1f * (double)(int)color39.A * (double)(length - num173) / length);
-                //color39 *= MathHelper.Clamp(NPC.velocity.Length(), 0f, 9f) / 9f;
-                color39 *= 1f - num173 / length;
-                //color39 *= _trailOpacity;
-                //color39 *= 0.8f;
-                color39 *= 1f;
-                color39 *= _dashOpacity;
-                Rectangle frame7 = NPC.frame;
-                Vector2 origin = NPC.frame.Centered();
-                Vector2 pos = NPC.oldPos[num173];
-                pos += NPC.Size / 2f;
+            if (_dashOpacity > 0f) {
+                int length = NPC.oldPos.Length - 1;
+                for (int num173 = 1; num173 < length; num173 += 1) {
+                    _ = ref NPC.oldPos[num173];
+                    Color color39 = drawColor;
+                    color39 = color39.MultiplyRGBA(MainPurpleColor_Dynamic);
+                    color39.R = (byte)(1f * (double)(int)color39.R * (double)(length - num173) / length);
+                    color39.G = (byte)(1f * (double)(int)color39.G * (double)(length - num173) / length);
+                    color39.B = (byte)(1f * (double)(int)color39.B * (double)(length - num173) / length);
+                    color39.A = (byte)(1f * (double)(int)color39.A * (double)(length - num173) / length);
+                    //color39 *= MathHelper.Clamp(NPC.velocity.Length(), 0f, 9f) / 9f;
+                    color39 *= 1f - num173 / length;
+                    //color39 *= _trailOpacity;
+                    //color39 *= 0.8f;
+                    color39 *= 1f;
+                    color39 *= _dashOpacity;
+                    Rectangle frame7 = NPC.frame;
+                    Vector2 origin = NPC.frame.Centered();
+                    Vector2 pos = NPC.oldPos[num173];
+                    pos += NPC.Size / 2f;
 
-                pos = Vector2.Lerp(pos, NPC.Center, Ease.SineIn(1f - _dashOpacity));
+                    pos = Vector2.Lerp(pos, NPC.Center, Ease.SineIn(1f - _dashOpacity));
 
-                pos -= screenPos;
+                    pos -= screenPos;
 
-                ShaderLoader.DistortShader.SetDefault(shadowTexture.Width * 2, shadowTexture.Height * 2);
-                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                    spriteBatch.Draw(shadowTexture,
-                    pos,
-                    frame7, color39 * NPC.Opacity, NPC.rotation, origin, NPC.scale, flip, 0f);
-                });
+                    ShaderLoader.DistortShader.SetDefault(shadowTexture.Width * 2, shadowTexture.Height * 2);
+                    ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                        spriteBatch.Draw(shadowTexture,
+                        pos,
+                        frame7, color39 * NPC.Opacity, NPC.rotation, origin, NPC.scale, flip, 0f);
+                    });
+                }
             }
         }
 
@@ -995,9 +1007,9 @@ sealed partial class EternalHorror : ModNPC {
 
         NPC boss = null;
         bool found = false;
-        foreach (NPC npc in Main.ActiveNPCs) {
-            if (npc.type == SelfType) {
-                boss = npc;
+        foreach (NPC bossCheck in Main.ActiveNPCs) {
+            if (bossCheck.type == SelfType) {
+                boss = bossCheck;
                 found = true;
                 break;
             }
@@ -1023,6 +1035,59 @@ sealed partial class EternalHorror : ModNPC {
 
         DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity);
 
+        var gore = Main.gore;
+        var screenPosition = Main.screenPosition;
+
+        var npc = Main.npc;
+
+        Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle((int)screenPosition.X - 800, (int)screenPosition.Y - 800, Main.screenWidth + 1600, Main.screenHeight + 1600);
+
+        void drawGores() {
+            for (int i = 0; i < 600; i++) {
+                if (!Main.gore[i].active || Main.gore[i].type <= 0)
+                    continue;
+
+
+                if (Main.gore[i].type != ModContent.GoreType<EternalHorrorGore1>() &&
+                    Main.gore[i].type != ModContent.GoreType<EternalHorrorGore2>() &&
+                    Main.gore[i].type != ModContent.GoreType<EternalHorrorGore3>()) {
+                    continue;
+                }
+
+                if (rectangle.Intersects(new Microsoft.Xna.Framework.Rectangle((int)Main.gore[i].position.X, (int)Main.gore[i].position.Y, TextureAssets.Gore[Main.gore[i].type].Width(), TextureAssets.Gore[Main.gore[i].type].Height()))) {
+                    Main.instance.LoadGore(Main.gore[i].type);
+
+                    Microsoft.Xna.Framework.Color alpha2 = Main.gore[i].GetAlpha(Lighting.GetColor((int)((double)Main.gore[i].position.X + (double)TextureAssets.Gore[gore[i].type].Width() * 0.5) / 16, (int)(((double)gore[i].position.Y + (double)TextureAssets.Gore[gore[i].type].Height() * 0.5) / 16.0)));
+                    alpha2 *= 0.875f;
+                    spriteBatch.Draw(TextureAssets.Gore[Main.gore[i].type].Value, new Vector2(Main.gore[i].position.X - Main.screenPosition.X + (float)(TextureAssets.Gore[gore[i].type].Width() / 2), gore[i].position.Y - screenPosition.Y + (float)(TextureAssets.Gore[gore[i].type].Height() / 2)) + gore[i].drawOffset, new Microsoft.Xna.Framework.Rectangle(0, 0, TextureAssets.Gore[gore[i].type].Width(), TextureAssets.Gore[gore[i].type].Height()), alpha2, gore[i].rotation, new Vector2(TextureAssets.Gore[gore[i].type].Width() / 2, TextureAssets.Gore[gore[i].type].Height() / 2), gore[i].scale, SpriteEffects.None, 0f);
+                }
+            }
+        }
+        void drawNPCs() {
+            bool behindTiles = false;
+
+            bool flag = false;
+            for (int num = 199; num >= 0; num--) {
+                try {
+                    if (npc[num].active && npc[num].type > 0 && !npc[num].hide && npc[num].ModNPC is not null && npc[num].ModNPC is EternalServant) {
+                        npc[num].position += npc[num].netOffset;
+                        if (npc[num].behindTiles == behindTiles) {
+
+                            if (NPCID.Sets.MustAlwaysDraw[npc[num].type] || rectangle.Intersects(new Microsoft.Xna.Framework.Rectangle((int)npc[num].position.X, (int)npc[num].position.Y, npc[num].width, npc[num].height))) {
+                                Main.instance.DrawNPCCheckAlt(npc[num]);
+                                Main.instance.DrawNPC(num, behindTiles);
+                            }
+                        }
+
+                        npc[num].position -= npc[num].netOffset;
+                    }
+                }
+                catch {
+                    npc[num].active = false;
+                }
+            }
+        }
+
         boss_modNPC.Draw(spriteBatch, screenPos, drawColor * MathHelper.Lerp(0.125f, 0.25f, 0.5f), rayOpacity: 0f);
 
         DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor);
@@ -1041,6 +1106,8 @@ sealed partial class EternalHorror : ModNPC {
             Position = eyePosition
         };
 
+        drawGores();
+
         ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
         float anxietyFactor = 0.125f;
         ShaderLoader.DistortShader.Anxiety = anxietyFactor + anxietyFactor * boss_modNPC.SecondPhaseOpacity;
@@ -1054,6 +1121,8 @@ sealed partial class EternalHorror : ModNPC {
         });
 
         boss_modNPC.drawLaserSpamWarning(Main.screenPosition);
+
+        drawNPCs();
 
         Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
 
