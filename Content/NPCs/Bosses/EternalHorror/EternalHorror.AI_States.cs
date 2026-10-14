@@ -1469,12 +1469,13 @@ sealed partial class EternalHorror : ModNPC {
 
                 ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f * 2f);
 
+                boss._eyeEffectOpacity = Ease.CubeIn(dustProgress);
+
                 dustProgress = Helper.YoYo(dustProgress);
                 for (int i = 0; i < 2; i++) {
                     boss.SpawnPreparationDust_Shadow(dustProgress);
                 }
 
-                boss._eyeEffectOpacity = dustProgress;
 
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
