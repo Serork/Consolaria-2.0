@@ -1474,6 +1474,8 @@ sealed partial class EternalHorror : ModNPC {
                     boss.SpawnPreparationDust_Shadow(dustProgress);
                 }
 
+                boss._eyeEffectOpacity = dustProgress;
+
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
@@ -1492,6 +1494,8 @@ sealed partial class EternalHorror : ModNPC {
                     boss.OnIterateActiveCloneData((ref cloneInfo) => {
                         cloneInfo.DashOpacity = 1f;
                     });
+
+                    boss._eyeEffectOpacity = 1f;
 
                     SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 

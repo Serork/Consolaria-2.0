@@ -401,6 +401,10 @@ sealed partial class EternalHorror : ModNPC {
             //Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
             //Lighting.AddLight(cloneInfo.VisualPosition, lightColor);
 
+            if (cloneInfo.ExplosionProgress2 > 0f) {
+                _eyeEffectOpacity = Helper.YoYo(cloneInfo.ExplosionProgress2);
+            }
+
             int dustCount = 1;
             dustCount += (int)MathF.Floor(cloneInfo.ExplosionProgress2 * 2);
             for (int k = 0; k < dustCount; k++) {
@@ -459,6 +463,8 @@ sealed partial class EternalHorror : ModNPC {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
                     SpawnScythe(Vector2.Zero, shootBasedOnRotation: true, clonePosition: cloneEyePosition);
+
+                    _eyeEffectOpacity = 1f;
                 }
             }
         }
