@@ -703,22 +703,34 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase2Transition : IAIState {
+        private static ushort PREPARATIONTIME => Helper.SecondsToFrames(2);
+
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.AICounter++;
+
+            float attackProgress_ForSlowDown = boss.AICounter / PREPARATIONTIME;
+            attackProgress_ForSlowDown = Helper.Clamp01(attackProgress_ForSlowDown);
+            float preparationSlowDown = Utils.Remap(1f - attackProgress_ForSlowDown, 0f, 1f, 0.75f, 1f, true);
+
+            npc.velocity *= preparationSlowDown;
+            npc.rotation *= preparationSlowDown;
+
+            npc.dontTakeDamage = true;
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
             boss.DeactivateAllStates();
-
-            boss.ActivateState<Phase2MoveToPlayer>();
-            boss.ActivateState<Phase2BurstLaserAttack>();
-
             boss.ResetCounters();
+
+            //boss.ActivateState<Phase2MoveToPlayer>();
+            //boss.ActivateState<Phase2BurstLaserAttack>();
 
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 //cloneInfo.ShouldUpdateVisualPosition = true;
                 cloneInfo.ShouldFade = true;
                 cloneInfo.ForceFade();
             });
-        }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) {
             //boss.SpawnRays(startRaySpeed: 0.5f);
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
