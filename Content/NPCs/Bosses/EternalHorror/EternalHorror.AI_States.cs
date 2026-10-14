@@ -1035,6 +1035,10 @@ sealed partial class EternalHorror : ModNPC {
             float laserProgress = boss.Phase1BurstLaserAttackProgress;
             float laserProgress_ForLaserRotation = laserProgress * Utils.GetLerpValue(1f, 0.5f, laserProgress, true);
 
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 1f / 60f);
+            });
+
             void shootLasers() {
                 if ((boss.AICounter < 0f && laserProgress > 0f) || boss.AICounter >= LASERATTACKTIME * 0.5f) {
                     if (boss.AICounter % 2 == 0) {
@@ -1195,6 +1199,10 @@ sealed partial class EternalHorror : ModNPC {
             float dashStrength = DASHSTRENGTH;
 
             ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
+
+            boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 1f / 60f);
+            });
 
             float dashPreparationFactor = 0.25f;
 
@@ -1480,7 +1488,7 @@ sealed partial class EternalHorror : ModNPC {
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
-                    boss.SpawnClone(/*insta: true*/);
+                    boss.SpawnClone(insta: true);
 
                     npc.ResetTrails();
 

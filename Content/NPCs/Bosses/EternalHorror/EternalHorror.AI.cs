@@ -279,6 +279,7 @@ sealed partial class EternalHorror : ModNPC {
                                                         CloneStarData: new CloneStarInfo[100]);
         if (insta) {
             _cloneData[nextCloneAddedIndex].TimeLeft = (ushort)(_cloneData[nextCloneAddedIndex].MaxTimeLeft * MathHelper.Lerp(CloneInfo.OPACITYMAXTIMELEFTFACTOR, 1f, 0.75f));
+            //_cloneData[nextCloneAddedIndex].LerpVelocityValue = 0f;
         }
     }
 
@@ -349,6 +350,10 @@ sealed partial class EternalHorror : ModNPC {
             cloneInfo.OldVisualPositions[0] = cloneInfo.VisualPosition;
             cloneInfo.OldRotations[0] = cloneInfo.Rotation;
 
+            cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.125f);
+
+            float lerpValueFactor = cloneInfo.LerpVelocityValue;
+
             //if (!HasActiveState<Phase1DashAttack>() || Phase1LastDash) {
             //    if (!cloneInfo.ShouldUpdateVisualPosition) {
             //        cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target), 0.125f * cloneInfo.LerpVelocityValue);
@@ -361,7 +366,6 @@ sealed partial class EternalHorror : ModNPC {
             //    cloneInfo.ShouldUpdateVisualPosition = true;
             //}
             if (!cloneInfo.ShouldUpdateVisualPosition) {
-                float lerpValueFactor = cloneInfo.LerpVelocityValue;
                 cloneInfo.VisualPosition = Vector2.Lerp(cloneInfo.VisualPosition, cloneInfo.GetFinalClonePosition(target),
                     0.125f * lerpValueFactor);
             }
@@ -455,7 +459,7 @@ sealed partial class EternalHorror : ModNPC {
                 Vector2 targetCenter = _cloneTargetPosition,
                         clonePosition = cloneInfo.VisualPosition;
                 float angleToTarget = clonePosition.AngleTo(targetCenter) - MathHelper.PiOver2;
-                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f);
+                cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f/* * lerpValueFactor*/);
             }
 
             if (IsInSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
