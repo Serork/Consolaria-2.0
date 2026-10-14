@@ -1467,7 +1467,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 npc.velocity *= preparationSlowDown;
 
-                ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
+                ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f * 2f);
 
                 dustProgress = Helper.YoYo(dustProgress);
                 for (int i = 0; i < 2; i++) {
