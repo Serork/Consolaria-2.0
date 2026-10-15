@@ -719,6 +719,7 @@ sealed partial class EternalHorror : ModNPC {
             npc.dontTakeDamage = true;
 
             npc.reflectsProjectiles = true;
+            npc.ReflectProjectiles(NPC.Hitbox);
 
             float transitionTime = 100f;
 
@@ -878,6 +879,8 @@ sealed partial class EternalHorror : ModNPC {
 
                 return;
             }
+
+            npc.reflectsProjectiles = false;
 
             boss.DeactivateAllStates();
 
