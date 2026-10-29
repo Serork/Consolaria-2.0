@@ -547,7 +547,7 @@ sealed partial class EternalHorror : ModNPC {
         _ai5 = 0;
     }
 
-    private Vector2 GetEyePosition(bool forDrawing = false) {
+    private Vector2 GetEyePosition(bool forDrawing = false, float angle = -10f) {
         Vector2 result = NPC.Center;
 
         if (IsInSecondPhase) {
@@ -559,7 +559,10 @@ sealed partial class EternalHorror : ModNPC {
 
             result -= rotationStep * 7.5f;
 
-            Vector2 angleToPlayer = Vector2.UnitX.RotatedBy(result.AngleTo(NPC.GetTargetData().Center));
+            if (angle == -10f) {
+                angle = result.AngleTo(NPC.GetTargetData().Center);
+            }
+            Vector2 angleToPlayer = Vector2.UnitX.RotatedBy(angle);
             result += angleToPlayer * 7.5f;
 
             if (!forDrawing) {

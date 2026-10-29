@@ -1146,20 +1146,10 @@ sealed partial class EternalHorror : ModNPC {
         DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor * boss.Opacity);
         Texture2D eyeTexture = _secondPhaseEyeTexture.Value;
         Rectangle eyeClip = eyeTexture.Bounds;
-        Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true);
-
-        Color eyeEffectColor = drawContext.DrawColor;
-
-        float blink = MathF.Sin(boss_modNPC.AICounter / 4) / 2 + 0.5f;
-        eyeEffectColor = new Color(0.875f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
-
-        drawContext = drawContext with {
-            Texture = eyeTexture,
-            Clip = eyeClip,
-            Position = eyePosition
-        };
 
         drawGores();
+
+        float eyeAngle = -10f;
 
         void drawRayWarning() {
             if (boss_modNPC.HasActiveState<Phase2ScytheAttack>()) {
@@ -1192,6 +1182,11 @@ sealed partial class EternalHorror : ModNPC {
                     Color = color_ray,
                     Scale = scale_ray
                 };
+
+                boss_modNPC._eyeDirectionChangeTime = 10f * attackPreparation2;
+                boss_modNPC._eyeAngle = Utils.AngleLerp(boss_modNPC._eyeAngle, rotation_ray + MathHelper.PiOver4 * Main.rand.NextFloatDirection(), 0.5f);
+                //eyeAngle = boss_modNPC._eyeAngle;
+
                 float opacity_ray = 0.5f * attackPreparation;
                 Vector2 position2 = boss_modNPC.GetEyePosition();
                 Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation_ray);
@@ -1215,6 +1210,19 @@ sealed partial class EternalHorror : ModNPC {
                 });
             }
         }
+
+        Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true, angle: eyeAngle);
+
+        Color eyeEffectColor = drawContext.DrawColor;
+
+        float blink = MathF.Sin(boss_modNPC.AICounter / 4) / 2 + 0.5f;
+        eyeEffectColor = new Color(0.875f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
+
+        drawContext = drawContext with {
+            Texture = eyeTexture,
+            Clip = eyeClip,
+            Position = eyePosition
+        };
 
         ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
         float anxietyFactor = 0.125f;

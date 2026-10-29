@@ -409,7 +409,7 @@ sealed partial class EternalHorror : ModNPC {
                     float lerpValue = 0.25f;
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f);
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * 0.5f);
                 }
             }
             void destroyClones() {
@@ -1250,7 +1250,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             void lookAtTarget() {
                 if (!boss.HasActiveState<Phase2MoveToPlayer>()) {
-                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, dashProgress, 0.025f * (didAtLeastOneDash2 ? 2f : 1f));
+                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, dashProgress, 0.025f);
                 }
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
@@ -1355,7 +1355,7 @@ sealed partial class EternalHorror : ModNPC {
                     float lerpValue = 0.25f;
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * (didAtLeastOneDash2 ? 2f : 1f));
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * 0.5f);
                 }
             }
             void destroyClones() {
@@ -1642,14 +1642,15 @@ sealed partial class EternalHorror : ModNPC {
 
                 npc.Opacity = Helper.Approach(npc.Opacity, progress, 0.25f);
 
-                boss._eyeEffectOpacity = Helper.Approach(boss._eyeEffectOpacity, Helper.Clamp01(boss.Phase2ScytheAttackProgress + 1f), 0.125f);
-                ShakeStrength = Helper.Approach(ShakeStrength, boss._eyeEffectOpacity, 0.125f);
+                float eyeEffectOpacity = Helper.Clamp01(boss.Phase2ScytheAttackProgress + 1f);
+                boss._eyeEffectOpacity = Helper.Approach(boss._eyeEffectOpacity, eyeEffectOpacity, 0.125f / 2f);
+                ShakeStrength = Helper.Approach(ShakeStrength, eyeEffectOpacity, 0.125f);
 
                 for (int i = 0; i < 1; i++) {
                     if (Main.rand.NextBool()) {
                         continue;
                     }
-                    boss.SpawnPreparationDust_Shadow(boss._eyeEffectOpacity);
+                    boss.SpawnPreparationDust_Shadow(eyeEffectOpacity);
                 }
 
                 boss.Phase2ScytheAttackProgress = Helper.Approach(boss.Phase2ScytheAttackProgress, 1f, 1 / 60f);
