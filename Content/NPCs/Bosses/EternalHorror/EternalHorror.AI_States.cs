@@ -1085,7 +1085,15 @@ sealed partial class EternalHorror : ModNPC {
                 {
 
                     boss.LaserAttackCount = 0;
-                    boss.ActivateState<Phase2DashAttack>();
+
+                    if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
+                        boss.Phase2CloneAttack_ShouldDoScytheAttack = false;
+
+                        boss.ActivateState<Phase2ScytheAttack>();
+                    }
+                    else {
+                        boss.ActivateState<Phase2DashAttack>();
+                    }
 
                     boss.ResetCounters();
 
@@ -1141,17 +1149,7 @@ sealed partial class EternalHorror : ModNPC {
 
             if (!didAtLeastOneDash) {
                 if (dashProgress >= 0.5f) {
-                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
-                        Vector2 clonePosition = cloneInfo.VisualPosition;
-                        //dashDirection = clonePosition.DirectionTo(targetCenter);
-                        //cloneInfo.Velocity = dashDirection * dashStrength;
-
-                        if (!cloneInfo.ShouldFade) {
-                            cloneInfo.ShouldFade = true;
-
-                            cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
-                        }
-                    });
+                    boss.PrepareCloneToExplode();
                 }
             }
 
@@ -1487,7 +1485,6 @@ sealed partial class EternalHorror : ModNPC {
                     boss.SpawnPreparationDust_Shadow(dustProgress);
                 }
 
-
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
@@ -1513,15 +1510,18 @@ sealed partial class EternalHorror : ModNPC {
 
                     npc.velocity = boss._dashVelocity;
 
-                    if (boss.Phase1CloneSpawn_ShouldDashAfter) {
-                        boss.Phase1CloneSpawn_ShouldDashAfter = false;
-                        boss.ActivateState<Phase2DashAttack>();
-                        boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
+                    //if (boss.Phase1CloneSpawn_ShouldDashAfter) {
+                    //    boss.Phase1CloneSpawn_ShouldDashAfter = false;
+                    //    boss.ActivateState<Phase2DashAttack>();
+                    //    boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
 
-                        //boss.ResetSmoothFactor();
-                    }
-                    else {
+                    //    //boss.ResetSmoothFactor();
+                    //}
+                    //else
+                    {
                         boss.ActivateState<Phase2BurstLaserAttack>();
+
+                        boss.Phase2CloneAttack_ShouldDoScytheAttack = true;
 
                         boss.ResetLaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
                     }
@@ -1539,6 +1539,16 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
+    private readonly struct Phase2ScytheAttack : IAIState {
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.PrepareCloneToExplode();
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
+
     private Dictionary<Type, IAIState> _states = null;
     private HashSet<IAIState> _activeStates = null;
 
@@ -1552,6 +1562,7 @@ sealed partial class EternalHorror : ModNPC {
 
     public float Phase2BurstLaserAttackProgress => Helper.Clamp01(AICounter / Phase2BurstLaserAttack.LASERATTACKTIME);
     public float Phase2LaserSpamAttackProgress => Ease.SineIn(Helper.Clamp01(AICounter / Phase2LaserSpamAttack.BEFORESPAMTIME));
+    public float Phase2ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase2CloneSpawn.SHADOWSPAWNTIME);
 
     private partial void InitializeStates() {
         _states = [];

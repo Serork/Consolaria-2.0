@@ -123,6 +123,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private Vector2 _eyeVelocity;
     private float _eyeDirectionChangeTime, _eyeAngle;
+    private float _shouldDoScytheAttackValue;
 
     private float _ai4, _ai5;
 
@@ -144,6 +145,7 @@ sealed partial class EternalHorror : ModNPC {
     public ref float Phase1DashAttack_ShouldBurstLaserAfterValue => ref NPC.localAI[0];
     public ref float Phase1SpawnSummonAttack_DoneValue => ref NPC.localAI[0];
     public ref float Phase2_WasDoingCloneAattackValue => ref NPC.localAI[0];
+    //public ref float Phase2CloneAttack_ShouldDoScytheAttackValue => ref NPC.localAI[0];
 
     public bool Init {
         get => InitValue != 0f;
@@ -171,6 +173,11 @@ sealed partial class EternalHorror : ModNPC {
     public bool Phase2_WasDoingCloneAttack {
         get => Phase2_WasDoingCloneAattackValue != 0f;
         set => Phase2_WasDoingCloneAattackValue = value.ToInt();
+    }
+
+    public bool Phase2CloneAttack_ShouldDoScytheAttack {
+        get => _shouldDoScytheAttackValue != 0f;
+        set => _shouldDoScytheAttackValue = value.ToInt();
     }
 
     public float SecondPhaseOpacity => Helper.Clamp01(_secondPhaseOpacity);
@@ -849,5 +856,15 @@ sealed partial class EternalHorror : ModNPC {
         else {
             _eyeDirectionChangeTime--;
         }
+    }
+
+    private void PrepareCloneToExplode() {
+        OnIterateActiveCloneData((ref cloneInfo) => {
+            if (!cloneInfo.ShouldFade) {
+                cloneInfo.ShouldFade = true;
+
+                cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
+            }
+        });
     }
 }

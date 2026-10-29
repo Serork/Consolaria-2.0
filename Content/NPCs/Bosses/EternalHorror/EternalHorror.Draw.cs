@@ -858,7 +858,10 @@ sealed partial class EternalHorror : ModNPC {
 
         float previousLerpValue = lerpValue;
         float shadowOpacity = 0f;
-        if (HasActiveState<Phase1CloneSpawn>() || HasActiveState<Phase2CloneSpawn>()) {
+        if (HasActiveState<Phase2CloneSpawn>()) {
+            shadowOpacity = Phase2ShadowSpawnProgress;
+        }
+        else if (HasActiveState<Phase1CloneSpawn>()) {
             shadowOpacity = Phase1ShadowSpawnProgress;
         }
         else {
