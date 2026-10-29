@@ -49,10 +49,13 @@ sealed partial class EternalHorror : ModNPC {
                   _copiesIntensity;
 
     private float _eyeEffectOpacity;
+    private float _cloneStateEffectOpacity;
 
     private float _secondPhaseOpacity;
 
     private RayInfo[] _rayData = null;
+
+    public Color CloneStateEffectColor => MainPurpleColor * 0.25f;
 
     private void InitializeRays() {
         _rayData = new RayInfo[RAYCOUNTMAX];
@@ -246,6 +249,8 @@ sealed partial class EternalHorror : ModNPC {
             drawColor = NPC.GetNPCColorTintedByBuffs(npcColor: drawColor);
             drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
 
+            drawColor = Color.Lerp(drawColor, CloneStateEffectColor, _cloneStateEffectOpacity);
+
             Draw(spriteBatch, screenPos, drawColor, rayOpacity: 1f - SecondPhaseOpacity);
         }
 
@@ -321,14 +326,39 @@ sealed partial class EternalHorror : ModNPC {
                 value67 *= 0.375f;
                 Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2() 
                     * num248 * num247;
-                Draw_Inner(NPC, drawContext with { 
-                    Position = position23,
-                    DrawColor = value67
-                });
+                if (_cloneStateEffectOpacity < 1f) {
+                    Draw_Inner(NPC, drawContext with {
+                        Position = position23,
+                        DrawColor = value67 * (1f - _cloneStateEffectOpacity)
+                    });
+                }
                 //mySpriteBatch.Draw(value64, position23, rCurrentNPC.frame, value67, rCurrentNPC.rotation, halfSize, rCurrentNPC.scale, spriteEffects, 0f);
             }
 
-            Draw_Inner(NPC, drawContext);
+            if (_cloneStateEffectOpacity < 1f) {
+                Draw_Inner(NPC, drawContext with {
+                    DrawColor = drawContext.DrawColor * (1f - _cloneStateEffectOpacity)
+                });
+            }
+
+            if (_cloneStateEffectOpacity > 0f) {
+                float timeLeftProgress = 0f;
+                float starOpacityExtra = 1f;
+
+                DrawUnderShadowEffect(drawContext, draw: (newPosition, newColor) => {
+                    Vector2 position = newPosition;
+                    Color color = newColor;
+
+                    Draw_Inner(NPC, drawContext with {
+                        Position = position,
+                        DrawColor = color * _cloneStateEffectOpacity
+                    });
+
+                }, sinWaveOffset: WaveOffset,
+                   progress: Utils.Remap(timeLeftProgress, 0f, 1f, MathHelper.Lerp(0.375f, 0.5f, 0.5f), 1f, true) * 0.25f,
+                   opacity: 0.375f + starOpacityExtra,
+                   sinStep: _shadowTime);
+            }
         }
         void drawGlowingEyes() {
             Texture2D eyesTexture = _eyesTexture.Value;
@@ -1036,7 +1066,7 @@ sealed partial class EternalHorror : ModNPC {
 
         Vector2 screenPos = Main.screenPosition;
 
-        DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity);
+        DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity * Utils.Remap(boss_modNPC._cloneStateEffectOpacity, 0f, 1f, 0f, 0.5f, true));
 
         var gore = Main.gore;
         var screenPosition = Main.screenPosition;
@@ -1091,7 +1121,7 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
-        boss_modNPC.Draw(spriteBatch, screenPos, drawColor * MathHelper.Lerp(0.125f, 0.25f, 0.5f), rayOpacity: 0f);
+        boss_modNPC.Draw(spriteBatch, screenPos, Color.Lerp(drawColor, boss_modNPC.CloneStateEffectColor, boss_modNPC._cloneStateEffectOpacity) * MathHelper.Lerp(0.125f, 0.25f, 0.5f), rayOpacity: 0f);
 
         DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor);
         Texture2D eyeTexture = _secondPhaseEyeTexture.Value;

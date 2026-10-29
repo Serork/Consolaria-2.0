@@ -1540,8 +1540,36 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase2ScytheAttack : IAIState {
+        public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(3);
+
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.PrepareCloneToExplode();
+
+            boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, 1f, 1f / 60f);
+
+            bool justStarted = boss.AICounter == 0f;
+
+            boss.AICounter++;
+
+            bool shadowSpawnProgress = boss.AICounter >= ATTACKPREPARATIONTIME;
+
+            float dustProgress = boss.AICounter / ATTACKPREPARATIONTIME;
+            float dustProgress2 = Helper.Clamp01(dustProgress);
+
+            float preparationSlowDown = Utils.Remap(1f - dustProgress2, 0f, 1f, 0.5f, 1f, true);
+
+            npc.velocity *= preparationSlowDown;
+
+            npc.rotation *= preparationSlowDown;
+
+            ShakeStrength = Helper.Approach(ShakeStrength, dustProgress2, 0.125f * 2f);
+
+            boss._eyeEffectOpacity = Ease.CubeIn(dustProgress2);
+
+            dustProgress2 = Helper.YoYo(dustProgress2);
+            for (int i = 0; i < 2; i++) {
+                boss.SpawnPreparationDust_Shadow(dustProgress2);
+            }
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) { }
