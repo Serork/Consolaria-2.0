@@ -899,16 +899,20 @@ sealed partial class EternalHorror : ModNPC {
 
         float previousLerpValue = lerpValue;
         float shadowOpacity = 0f;
+        bool hasShadow = false;
         if (HasActiveState<Phase2CloneSpawn>()) {
             shadowOpacity = Phase2ShadowSpawnProgress;
+            hasShadow = true;
         }
-        else if (HasActiveState<Phase1CloneSpawn>()) {
+        if (HasActiveState<Phase1CloneSpawn>()) {
             shadowOpacity = Phase1ShadowSpawnProgress;
+            hasShadow = true;
         }
-        else if (HasActiveState<Phase2ScytheAttack>()) {
+        if (HasActiveState<Phase2ScytheAttack>()) {
             shadowOpacity = Phase2ScytheAttackAngle > 0f ? Helper.Clamp01(Phase2ScytheAttackProgress + 1f) : Phase2ScythePreparationProgress;
+            hasShadow = true;
         }
-        else {
+        if (!hasShadow) {
             lerpValue = 1f;
         }
         //shadowOpacity = MathF.Max(shadowOpacity, shadowOpacity_FromClones);
