@@ -55,7 +55,14 @@ sealed partial class EternalHorror : ModNPC {
 
     private RayInfo[] _rayData = null;
 
-    public Color CloneStateEffectColor => MainPurpleColor * 0.25f;
+    public Color CloneStateEffectColor => Color.Lerp(MainPurpleColor * 0.5f, Color.White * MathHelper.Lerp(0.25f, 0.375f, 0.5f), AICounter < 0f ? 1f : 0f);
+    public float СloneStateEffectOpacity => /*Ease.CubeIn*/(_cloneStateEffectOpacity);
+
+    public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+        scale = 1.25f;
+
+        return base.DrawHealthBar(hbPosition, ref scale, ref position);
+    }
 
     private void InitializeRays() {
         _rayData = new RayInfo[RAYCOUNTMAX];
@@ -249,9 +256,9 @@ sealed partial class EternalHorror : ModNPC {
             drawColor = NPC.GetNPCColorTintedByBuffs(npcColor: drawColor);
             drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
 
-            drawColor = Color.Lerp(drawColor, CloneStateEffectColor, _cloneStateEffectOpacity);
+            drawColor = Color.Lerp(drawColor, CloneStateEffectColor, СloneStateEffectOpacity);
 
-            Draw(spriteBatch, screenPos, drawColor, rayOpacity: 1f - SecondPhaseOpacity);
+            Draw(spriteBatch, screenPos, drawColor * NPC.Opacity, drawColor, rayOpacity: 1f - SecondPhaseOpacity);
         }
 
         return false;
@@ -270,7 +277,7 @@ sealed partial class EternalHorror : ModNPC {
         return drawContext;
     }
 
-    private void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor, float rayOpacity = 1f) {
+    private void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor, Color drawColor2, float rayOpacity = 1f) {
         Texture2D texture = NPC.GetTexture(),
                   glowTexture = _glowTexture.Value,
                   shadowTexture = _shadowTexture.Value;
@@ -326,22 +333,22 @@ sealed partial class EternalHorror : ModNPC {
                 value67 *= 0.375f;
                 Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2() 
                     * num248 * num247;
-                if (_cloneStateEffectOpacity < 1f) {
+                if (СloneStateEffectOpacity < 1f) {
                     Draw_Inner(NPC, drawContext with {
                         Position = position23,
-                        DrawColor = value67 * (1f - _cloneStateEffectOpacity)
+                        DrawColor = value67 * (1f - СloneStateEffectOpacity) * NPC.Opacity
                     });
                 }
                 //mySpriteBatch.Draw(value64, position23, rCurrentNPC.frame, value67, rCurrentNPC.rotation, halfSize, rCurrentNPC.scale, spriteEffects, 0f);
             }
 
-            if (_cloneStateEffectOpacity < 1f) {
+            if (СloneStateEffectOpacity < 1f) {
                 Draw_Inner(NPC, drawContext with {
-                    DrawColor = drawContext.DrawColor * (1f - _cloneStateEffectOpacity)
+                    DrawColor = drawContext.DrawColor * (1f - СloneStateEffectOpacity)
                 });
             }
 
-            if (_cloneStateEffectOpacity > 0f) {
+            if (СloneStateEffectOpacity > 0f) {
                 float timeLeftProgress = 0f;
                 float starOpacityExtra = 1f;
 
@@ -351,7 +358,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     Draw_Inner(NPC, drawContext with {
                         Position = position,
-                        DrawColor = color * _cloneStateEffectOpacity
+                        DrawColor = color * СloneStateEffectOpacity
                     });
 
                 }, sinWaveOffset: WaveOffset,
@@ -366,7 +373,7 @@ sealed partial class EternalHorror : ModNPC {
             DrawUnderGlowEffect(drawContext, draw: (newPosition, newColor) => {
                 Draw_Inner(NPC, drawContext with {
                     Position = newPosition,
-                    DrawColor = newColor,
+                    DrawColor = newColor * Ease.CubeOut(NPC.Opacity),
                 });
             }, sinWaveOffset: WaveOffset);
         }
@@ -511,7 +518,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 Player target = NPC.GetTargetPlayer();
                 Vector2 clonePosition = cloneInfo.VisualPosition;
-                Color cloneColor = drawColor;
+                Color cloneColor = drawColor2;
                 float timeLeftProgress = cloneInfo.TimeLeftProgress;
 
                 cloneColor *= cloneInfo.Opacity;
@@ -553,7 +560,7 @@ sealed partial class EternalHorror : ModNPC {
                         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
                             spriteBatch.Draw(shadowTexture,
                             pos,
-                            frame7, color39 * NPC.Opacity, rotation, origin, NPC.scale, flip, 0f);
+                            frame7, color39/* * NPC.Opacity*/, rotation, origin, NPC.scale, flip, 0f);
                         });
                     }
                 }
@@ -568,7 +575,7 @@ sealed partial class EternalHorror : ModNPC {
                     ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
                         Draw_Inner(NPC, cloneDrawContext with {
                             Position = position,
-                            DrawColor = color,
+                            DrawColor = color/* * NPC.Opacity*/,
                             Rotation = rotation,
                         }/*, scale: NPC.scale + Ease.CubeIn(explosionProgress) * 0.25f*/);
                     });
@@ -652,7 +659,7 @@ sealed partial class EternalHorror : ModNPC {
                     ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
                         spriteBatch.Draw(shadowTexture,
                         pos,
-                        frame7, color39 * NPC.Opacity, NPC.rotation, origin, NPC.scale, flip, 0f);
+                        frame7, color39/* * NPC.Opacity*/, NPC.rotation, origin, NPC.scale, flip, 0f);
                     });
                 }
             }
@@ -718,7 +725,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             Vector2 starOffset = rotationVector2 * -offset;
 
-            Helper.DrawPrettyStarSparkle(1f, SpriteEffects.None, rCurrentNPC.Center - screenPos + starPosition + starOffset,
+            Helper.DrawPrettyStarSparkle(NPC.Opacity, SpriteEffects.None, rCurrentNPC.Center - screenPos + starPosition + starOffset,
                 Color.Lerp(Color.White, IsInSecondPhase ? MainPurpleColor : MainRedColor_Dynamic,
                 Utils.Remap(Ease.SineIn(IsInSecondPhase ? Phase2LaserSpamAttackProgress : Phase1LaserSpamAttackProgress), 0f, 1f, 0.25f, 1f, true)),
                 IsInSecondPhase ? MainPurpleColor : MainRedColor_Dynamic, starRotation, 0f, 0.5f, 0.9f, 1f,
@@ -777,6 +784,10 @@ sealed partial class EternalHorror : ModNPC {
             color *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
 
             color *= rayProgress;
+
+            if (!explosion) {
+                color *= boss.NPC.Opacity;
+            }
 
             Texture2D texture = RayTexture.Value;
             Rectangle clip = texture.Frame(2, 1, frameX: explosion ? 1 : 0);
@@ -894,6 +905,9 @@ sealed partial class EternalHorror : ModNPC {
         else if (HasActiveState<Phase1CloneSpawn>()) {
             shadowOpacity = Phase1ShadowSpawnProgress;
         }
+        else if (HasActiveState<Phase2ScytheAttack>()) {
+            shadowOpacity = Phase2ScytheAttackAngle > 0f ? Helper.Clamp01(Phase2ScytheAttackProgress + 1f) : Phase2ScythePreparationProgress;
+        }
         else {
             lerpValue = 1f;
         }
@@ -914,6 +928,10 @@ sealed partial class EternalHorror : ModNPC {
         OnIterateActiveCloneData((ref cloneInfo) => {
             cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 1 / 60f);
         });
+
+        if (!HasActiveState<Phase2ScytheAttack>()) {
+            _cloneStateEffectOpacity = Helper.Approach(_cloneStateEffectOpacity, 0f, 1 / 60f);
+        }
     }
 
     private static void MakeScreenShake() {
@@ -1066,7 +1084,8 @@ sealed partial class EternalHorror : ModNPC {
 
         Vector2 screenPos = Main.screenPosition;
 
-        DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity * Utils.Remap(boss_modNPC._cloneStateEffectOpacity, 0f, 1f, 0f, 0.5f, true));
+        float cloneStateOpacity = Utils.Remap(boss_modNPC._cloneStateEffectOpacity, 0f, 1f, 1f, 0.75f, true);
+        DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity * cloneStateOpacity);
 
         var gore = Main.gore;
         var screenPosition = Main.screenPosition;
@@ -1121,9 +1140,10 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
-        boss_modNPC.Draw(spriteBatch, screenPos, Color.Lerp(drawColor, boss_modNPC.CloneStateEffectColor, boss_modNPC._cloneStateEffectOpacity) * MathHelper.Lerp(0.125f, 0.25f, 0.5f), rayOpacity: 0f);
+        Color drawColor2 = Color.Lerp(drawColor, boss_modNPC.CloneStateEffectColor, boss_modNPC.СloneStateEffectOpacity) * MathHelper.Lerp(0.125f, 0.25f, 0.5f);
+        boss_modNPC.Draw(spriteBatch, screenPos, drawColor2 * boss.Opacity, drawColor2, rayOpacity: 0f);
 
-        DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor);
+        DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor * boss.Opacity);
         Texture2D eyeTexture = _secondPhaseEyeTexture.Value;
         Rectangle eyeClip = eyeTexture.Bounds;
         Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true);
@@ -1141,6 +1161,61 @@ sealed partial class EternalHorror : ModNPC {
 
         drawGores();
 
+        void drawRayWarning() {
+            if (boss_modNPC.HasActiveState<Phase2ScytheAttack>()) {
+                float attackPreparation = boss_modNPC.Phase2ScytheAttackAngle / MathHelper.Pi;
+                attackPreparation = MathF.Abs(attackPreparation);
+                float attackPreparation2 = attackPreparation;
+                attackPreparation = Utils.GetLerpValue(0f, 0.25f, attackPreparation, true) * Utils.GetLerpValue(1f, 0.75f, attackPreparation, true);
+                attackPreparation2 = Utils.GetLerpValue(0f, 0.5f, attackPreparation2, true) * Utils.GetLerpValue(1f, 0.5f, attackPreparation2, true);
+
+                Texture2D texture_ray = RayTexture.Value;
+                Rectangle clip_ray = texture_ray.Frame(2, 1, 1);
+                Vector2 origin_ray = clip_ray.Centered();
+                Color color_ray = MainPurpleColor;
+                color_ray *= Helper.Wave(0.75f, 1f, 15f, boss_modNPC.WaveOffset);
+                color_ray *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
+                float rotation_ray = boss_modNPC.Phase2ScytheAttackAngle - MathHelper.PiOver2 * MathF.Sign(boss_modNPC.Phase2ScytheAttackDirection);
+                float time = Main.GlobalTimeWrappedHourly * 8f;
+                float squish = MathF.Sin(time) * 0.5f;
+                Vector2 scale_ray = new(1f + squish, 1f - squish);
+                scale_ray.X *= 2.5f;
+                scale_ray.Y *= 5f;
+                scale_ray.Y *= 1.125f;
+                scale_ray.Y *= 1.25f;
+                scale_ray *= 1.5f;
+                scale_ray *= Ease.SineOut(attackPreparation2);
+                Helper.DrawInfo drawInfo = new() {
+                    Clip = clip_ray,
+                    Origin = origin_ray,
+                    Rotation = rotation_ray,
+                    Color = color_ray,
+                    Scale = scale_ray
+                };
+                float opacity_ray = 0.5f * attackPreparation;
+                Vector2 position2 = boss_modNPC.GetEyePosition();
+                Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation_ray);
+                //angleDirection *= origin_ray.Y / 3f;
+                position2 += angleDirection;
+
+                ShaderLoader.DistortShader.SetDefault(texture_ray.Width * 2, texture_ray.Height * 2);
+                ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                    int drawCount = 3;
+                    for (int k = 0; k < drawCount; k++) {
+                        float progress = k / (float)drawCount;
+                        progress -= 0.5f;
+                        spriteBatch.Draw(texture_ray, position2,
+                            drawInfo
+                            .WithRotation(progress * 0.125f * 0.5f)
+                            .WithColorOverride(
+                                Color.Lerp(color_ray,
+                                Main.hslToRgb(0.5f, 1f, 0.5f), 0f)
+                                .MultiplyAlpha(0f) * opacity_ray));
+                    }
+                });
+            }
+        }
+
         ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
         float anxietyFactor = 0.125f;
         ShaderLoader.DistortShader.Anxiety = anxietyFactor + anxietyFactor * boss_modNPC.SecondPhaseOpacity;
@@ -1149,7 +1224,7 @@ sealed partial class EternalHorror : ModNPC {
 
             Draw_Inner(boss, drawContext with {
                 Texture = _secondPhaseEyeTexture_Glow.Value,
-                DrawColor = eyeEffectColor
+                DrawColor = eyeEffectColor * boss.Opacity
             });
         });
 
@@ -1171,6 +1246,8 @@ sealed partial class EternalHorror : ModNPC {
         Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
 
         spriteBatch.Begin(in snapshot, end: true);
+
+        drawRayWarning();
 
         CanDrawOnTopOfBlinking = false;
     }

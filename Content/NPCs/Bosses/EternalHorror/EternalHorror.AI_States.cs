@@ -6,9 +6,11 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.UI.Elements;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static tModPorter.ProgressUpdate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -1086,12 +1088,13 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.LaserAttackCount = 0;
 
-                    if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
-                        boss.Phase2CloneAttack_ShouldDoScytheAttack = false;
+                    //if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
+                    //    boss.Phase2CloneAttack_ShouldDoScytheAttack = false;
 
-                        boss.ActivateState<Phase2ScytheAttack>();
-                    }
-                    else {
+                    //    boss.ActivateState<Phase2ScytheAttack>();
+                    //}
+                    //else 
+                    {
                         boss.ActivateState<Phase2DashAttack>();
                     }
 
@@ -1153,6 +1156,8 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
 
+            bool didAtLeastOneDash2 = didAtLeastOneDash;
+
             didAtLeastOneDash = true;
 
             float dustProgress = dashProgress;
@@ -1211,13 +1216,27 @@ sealed partial class EternalHorror : ModNPC {
                 if (boss.Phase2DashAttackCount >= DASHATTACKCOUNT) {
                     boss.ActivateState<Phase2MoveToPlayer>();
                     boss.DeactivateState<Phase2DashAttack>();
-                    boss.ActivateState<Phase2LaserSpamAttack>();
+
+                    bool scytheAttack = false;
+                    if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
+                        boss.Phase2CloneAttack_ShouldDoScytheAttack = false;
+
+                        boss.ActivateState<Phase2ScytheAttack>();
+                        scytheAttack = true;
+                    }
+                    else {
+                        boss.ActivateState<Phase2LaserSpamAttack>();
+                    }
                     boss.ResetCounters();
 
                     boss.ResetSmoothFactor(value: 0.25f);
                     boss.Phase2DashAttackCount = 0;
 
                     boss._dashVelocity *= 0f;
+
+                    //if (scytheAttack) {
+                    //    boss.AICounter = Phase2ScytheAttack.ATTACKPREPARATIONTIME * 2f;
+                    //}
 
                     //boss.OnIterateActiveCloneData((ref cloneInfo) => {
                     //    //cloneInfo.ShouldUpdateVisualPosition = true;
@@ -1231,7 +1250,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             void lookAtTarget() {
                 if (!boss.HasActiveState<Phase2MoveToPlayer>()) {
-                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, dashProgress, 0.025f);
+                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, dashProgress, 0.025f * (didAtLeastOneDash2 ? 2f : 1f));
                 }
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
@@ -1336,7 +1355,7 @@ sealed partial class EternalHorror : ModNPC {
                     float lerpValue = 0.25f;
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f);
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * (didAtLeastOneDash2 ? 2f : 1f));
                 }
             }
             void destroyClones() {
@@ -1540,42 +1559,151 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase2ScytheAttack : IAIState {
-        public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(3);
+        public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(1.5f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            boss.PrepareCloneToExplode();
-
-            boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, 1f, 1f / 60f);
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
 
             bool justStarted = boss.AICounter == 0f;
 
-            boss.AICounter++;
+            if (justStarted) {
+                boss.AICounter = -ATTACKPREPARATIONTIME * 1f;
+                boss.Phase2ScytheAttackDirection = 0f;
+            }
 
-            bool shadowSpawnProgress = boss.AICounter >= ATTACKPREPARATIONTIME;
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center,
+                    baseTargetCenter = targetCenter;
 
-            float dustProgress = boss.AICounter / ATTACKPREPARATIONTIME;
-            float dustProgress2 = Helper.Clamp01(dustProgress);
+            bool ended = boss.AICounter >= ATTACKPREPARATIONTIME;
 
-            float preparationSlowDown = Utils.Remap(1f - dustProgress2, 0f, 1f, 0.5f, 1f, true);
+            float attackProgress = boss.AICounter / ATTACKPREPARATIONTIME;
+            float attackProgress2 = Helper.Clamp01(attackProgress);
 
-            npc.velocity *= preparationSlowDown;
+            float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
 
-            npc.rotation *= preparationSlowDown;
+            npc.dontTakeDamage = npc.Opacity < 0.5f;
 
-            ShakeStrength = Helper.Approach(ShakeStrength, dustProgress2, 0.125f * 2f);
+            float preparationTime2 = 60f;
 
-            boss._eyeEffectOpacity = Ease.CubeIn(dustProgress2);
+            if (boss.AICounter < 0f && boss.Phase2ScytheAttackDirection == 0f) {
+                boss.AICounter++;
+            }
 
-            dustProgress2 = Helper.YoYo(dustProgress2);
-            for (int i = 0; i < 2; i++) {
-                boss.SpawnPreparationDust_Shadow(dustProgress2);
+            if (boss.AICounter >= 0f) {
+                boss.AICounter++;
+
+                boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, attackProgress2, 1f / 60f);
+
+                npc.velocity *= preparationSlowDown;
+
+                float preparationSlowDown2 = Ease.CubeIn(1f - preparationSlowDown);
+                npc.position.Y -= preparationSlowDown2 * 15f;
+                npc.Opacity = Ease.SineOut(1f - preparationSlowDown2);
+
+                if (boss.AICounter % 4 == 0 && Main.rand.NextChance(Ease.SineOut(boss._cloneStateEffectOpacity * npc.Opacity))) {
+                    boss.MakeTrailDust(velocityFactor: 1f);
+                }
+
+                if (npc.Opacity <= 0f) {
+                    boss.AICounter = -preparationTime2;
+                    boss.Phase2ScytheAttackDirection = 1f;
+                }
+
+                npc.rotation *= Ease.CubeOut(preparationSlowDown);
+
+                ShakeStrength = Helper.Approach(ShakeStrength, attackProgress2, 0.125f * 2f);
+
+                boss._eyeEffectOpacity = Ease.CubeIn(attackProgress2);
+
+                attackProgress2 = Helper.YoYo(attackProgress2);
+                for (int i = 0; i < 2; i++) {
+                    boss.SpawnPreparationDust_Shadow(attackProgress2);
+                }
+            }
+            else if (boss.Phase2ScytheAttackDirection != 0f) {
+                float to = -1f;
+                boss.AICounter = Helper.Approach(boss.AICounter, to, 1f);
+
+                float progress = 1f - MathF.Abs(boss.AICounter / preparationTime2);
+
+                float maxAttacks = 5f;
+ 
+                if (MathF.Abs(boss.Phase2ScytheAttackDirection) < maxAttacks - 1f) {
+                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.125f);
+                }
+                else {
+                    boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 0f, 1f / 60f * 2f);
+                }
+
+                npc.Center = Vector2.SmoothStep(npc.Center, baseTargetCenter - Vector2.UnitY * MathHelper.Lerp(700f, 400f, Ease.CubeOut(progress))
+                    , 0.375f * Ease.SineOut(boss.SmoothFactor));
+
+                npc.Opacity = Helper.Approach(npc.Opacity, progress, 0.25f);
+
+                boss._eyeEffectOpacity = Helper.Approach(boss._eyeEffectOpacity, Helper.Clamp01(boss.Phase2ScytheAttackProgress + 1f), 0.125f);
+                ShakeStrength = Helper.Approach(ShakeStrength, boss._eyeEffectOpacity, 0.125f);
+
+                for (int i = 0; i < 1; i++) {
+                    if (Main.rand.NextBool()) {
+                        continue;
+                    }
+                    boss.SpawnPreparationDust_Shadow(boss._eyeEffectOpacity);
+                }
+
+                boss.Phase2ScytheAttackProgress = Helper.Approach(boss.Phase2ScytheAttackProgress, 1f, 1 / 60f);
+                if (boss.Phase2ScytheAttackProgress >= 0f) {
+                    float baseDirection = MathF.Sign(boss.Phase2ScytheAttackDirection);
+
+                    boss._ai4 = Helper.Approach(boss._ai4, 1f, 0.375f);
+                    if (boss._ai4 >= 1f) {
+                        boss._ai4 = 0f;
+
+                        boss.PrepareCloneToExplode();
+
+                        boss._eyeEffectOpacity = 1f;
+
+                        if (Main.rand.NextChance(Ease.SineOut(boss._cloneStateEffectOpacity * npc.Opacity))) {
+                            boss.MakeTrailDust(velocityFactor: 1f);
+                        }
+
+                        boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: false, angleShiftToPlayer: boss.Phase2ScytheAttackAngle + baseDirection * -MathHelper.PiOver2);
+                    }
+
+                    boss.Phase2ScytheAttackAngle += 1 / 60f * 5f * baseDirection;
+                    if ((boss.Phase2ScytheAttackDirection >= 1f && boss.Phase2ScytheAttackAngle >= MathHelper.Pi) || (boss.Phase2ScytheAttackDirection <= -1f && boss.Phase2ScytheAttackAngle <= -MathHelper.Pi)) {
+                        boss.Phase2ScytheAttackAngle = 0f;
+
+                        boss._ai4 = 0f;
+
+                        boss.Phase2ScytheAttackProgress = -1f;
+
+                        float direction = MathF.Abs(boss.Phase2ScytheAttackDirection);
+                        boss.Phase2ScytheAttackDirection = boss.Phase2ScytheAttackDirection > 0f ? -direction : direction;
+                        boss.Phase2ScytheAttackDirection += 1f * -baseDirection;
+
+                        if (boss.Phase2ScytheAttackDirection >= maxAttacks) {
+                            boss.Phase2ScytheAttackDirection = 0f;
+                            boss.Phase2ScytheAttackProgress = 0f;
+                            boss.Phase2ScytheAttackAngle = 0f;
+
+                            boss.ResetCounters();
+                            boss.DeactivateState<Phase2ScytheAttack>();
+                            boss.ActivateState<Phase2BurstLaserAttack>();
+                            boss.ResetLaserAttack();
+                            boss.ResetCounters();
+                        }
+                    }
+                }
             }
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.Phase2ScytheAttackDirection = 0f;
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
-
 
     private Dictionary<Type, IAIState> _states = null;
     private HashSet<IAIState> _activeStates = null;
@@ -1591,6 +1719,7 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase2BurstLaserAttackProgress => Helper.Clamp01(AICounter / Phase2BurstLaserAttack.LASERATTACKTIME);
     public float Phase2LaserSpamAttackProgress => Ease.SineIn(Helper.Clamp01(AICounter / Phase2LaserSpamAttack.BEFORESPAMTIME));
     public float Phase2ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase2CloneSpawn.SHADOWSPAWNTIME);
+    public float Phase2ScythePreparationProgress => Helper.Clamp01(AICounter / Phase2ScytheAttack.ATTACKPREPARATIONTIME);
 
     private partial void InitializeStates() {
         _states = [];

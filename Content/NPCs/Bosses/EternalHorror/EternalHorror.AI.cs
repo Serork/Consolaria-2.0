@@ -134,8 +134,11 @@ sealed partial class EternalHorror : ModNPC {
     public ref float AICounter3 => ref NPC.ai[3];
 
     public ref float AttackCount => ref NPC.localAI[3];
+    public ref float Phase2ScytheAttackAngle => ref NPC.localAI[3];
     public ref float SmoothFactor => ref NPC.localAI[2];
+    public ref float Phase2ScytheAttackDirection => ref NPC.localAI[0];
     public ref float LaserAttackCount => ref NPC.localAI[1];
+    public ref float Phase2ScytheAttackProgress => ref NPC.localAI[1];
     public ref float Phase1DashAttackCount => ref NPC.localAI[1];
     public ref float Phase2DashAttackCount => ref NPC.localAI[1];
     public ref float Phase1LaserSpamPreparationSlowDown => ref AICounter3;
