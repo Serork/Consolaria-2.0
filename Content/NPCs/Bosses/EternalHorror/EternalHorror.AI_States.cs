@@ -409,7 +409,7 @@ sealed partial class EternalHorror : ModNPC {
                     float lerpValue = 0.25f;
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * 0.75f);
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f);
                 }
             }
             void destroyClones() {
