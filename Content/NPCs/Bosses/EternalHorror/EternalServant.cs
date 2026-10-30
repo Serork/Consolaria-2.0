@@ -8,6 +8,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using ThoriumMod.Items.Donate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -70,6 +71,56 @@ sealed class EternalServant : ModNPC {
         }
 
         NPC.SetCurrentFrame(frame, frameHeight);
+    }
+
+    public override void HitEffect(NPC.HitInfo hit) {
+        float hitDirection = hit.HitDirection;
+        int lifeMax = NPC.lifeMax;
+        float dmg = hit.Damage;
+        if (NPC.life > 0) {
+            for (int num163 = 0; (double)num163 < dmg / (double)lifeMax * 20.0; num163++) {
+                if (Main.rand.NextBool()) {
+                    continue;
+                }
+
+                int dust2 = Dust.NewDust(NPC.position, NPC.width, NPC.height, 249, hitDirection, -1f);
+                Main.dust[dust2].position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                if (Main.rand.Next(2) == 0) {
+                    Dust dust43 = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.PinkTorch)];
+                    dust43.color = EternalHorror.MainPurpleColor;
+                    dust43.position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                    dust43.noGravity = true;
+                    dust43.scale = 1.5f;
+                    dust43.fadeIn = 1f;
+                    dust43.noLightEmittence = true;
+                    Dust dust = dust43;
+                    dust.velocity *= 3f;
+                }
+            }
+        }
+        else {
+            for (int num164 = 0; num164 < 10; num164++) {
+                if (Main.rand.NextBool()) {
+                    continue;
+                }
+
+                int dust2 = Dust.NewDust(NPC.position, NPC.width, NPC.height, 249, hitDirection, -1f);
+                Main.dust[dust2].position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                Dust dust44 = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.PinkTorch)];
+                dust44.color = EternalHorror.MainPurpleColor;
+                dust44.position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                dust44.noGravity = true;
+                dust44.scale = 1.5f;
+                dust44.fadeIn = 1f;
+                dust44.noLightEmittence = true;
+                Dust dust = dust44;
+                dust.velocity *= 3f;
+            }
+
+            if (!Main.dedServ) {
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.375f, ModContent.Find<ModGore>("Consolaria/EternalServant_Gore").Type, 0.875f);
+            }
+        }
     }
 
     public override void AI() {

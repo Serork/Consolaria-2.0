@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
+[AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
@@ -84,5 +85,36 @@ sealed partial class EternalHorror : ModNPC {
 
     private void SetMusic() {
         Music = MusicLoader.GetMusicSlot(Mod, EERIEOCRAM_MUSICPATH);
+    }
+
+    public override void HitEffect(NPC.HitInfo hit) {
+        float hitDirection = hit.HitDirection;
+        int lifeMax = NPC.lifeMax;
+        float dmg = hit.Damage;
+        if (NPC.life > 0) {
+            for (int num163 = 0; (double)num163 < dmg / (double)lifeMax * 100.0; num163++) {
+                if (Main.rand.NextBool()) {
+                    continue;
+                }
+
+                int dust2 = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.CorruptTorch, hitDirection, -1f);
+                Main.dust[dust2].position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                Main.dust[dust2].noLightEmittence = true;
+                if (Main.rand.Next(2) == 0) {
+                    Dust dust43 = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Shadowflame)];
+                    dust43.color = EternalHorror.MainPurpleColor;
+                    dust43.position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                    dust43.noGravity = true;
+                    dust43.scale = 1.5f;
+                    dust43.fadeIn = 1f;
+                    dust43.noLightEmittence = true;
+                    Dust dust = dust43;
+                    dust.velocity *= 3f;
+                }
+            }
+        }
+        else {
+
+        }
     }
 }

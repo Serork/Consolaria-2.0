@@ -64,6 +64,10 @@ sealed partial class EternalHorror : ModNPC {
         return base.DrawHealthBar(hbPosition, ref scale, ref position);
     }
 
+    public override void BossHeadRotation(ref float rotation) {
+        rotation = NPC.rotation;
+    }
+
     private void InitializeRays() {
         _rayData = new RayInfo[RAYCOUNTMAX];
 
@@ -1106,7 +1110,8 @@ sealed partial class EternalHorror : ModNPC {
 
                 if (Main.gore[i].type != ModContent.GoreType<EternalHorrorGore1>() &&
                     Main.gore[i].type != ModContent.GoreType<EternalHorrorGore2>() &&
-                    Main.gore[i].type != ModContent.GoreType<EternalHorrorGore3>()) {
+                    Main.gore[i].type != ModContent.GoreType<EternalHorrorGore3>() &&
+                    Main.gore[i].type != ModContent.GoreType<EternalServant_Gore>()) {
                     continue;
                 }
 
