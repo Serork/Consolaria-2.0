@@ -27,8 +27,6 @@ sealed partial class EternalHorror : ModNPC {
                                     _backgroundTexture = null,
                                     _secondPhaseEyeTexture = null,
                                     _secondPhaseEyeTexture_Glow = null,
-                                    _pulseTexture = null,
-                                    _pulseTexture2 = null,
                                     _pulseTexture3 = null;
 
     public static Asset<Texture2D> RayTexture { get; private set; }
@@ -196,8 +194,6 @@ sealed partial class EternalHorror : ModNPC {
         _secondPhaseEyeTexture = Helper.RequestTexture(Texture + "_Eye");
         _secondPhaseEyeTexture_Glow = Helper.RequestTexture(Texture + "_Eye_Glow");
 
-        _pulseTexture = Helper.RequestTexture(Texture + "_ClonePulse");
-        _pulseTexture2 = Helper.RequestTexture(Texture + "_ClonePulse2");
         _pulseTexture3 = Helper.RequestTexture(Texture + "_ClonePulse3");
     }
 
