@@ -1665,7 +1665,7 @@ sealed partial class EternalHorror : ModNPC {
 
                         boss._eyeEffectOpacity = 1f;
 
-                        if (Main.rand.NextChance(Ease.SineOut(boss._cloneStateEffectOpacity * npc.Opacity))) {
+                        if (npc.Opacity >= 0.5f && Main.rand.NextChance(Ease.SineOut(boss._cloneStateEffectOpacity * npc.Opacity))) {
                             boss.MakeTrailDust(velocityFactor: 1f);
                         }
 
