@@ -37,6 +37,54 @@ sealed class EternalServant : ModNPC {
         }
     }
 
+    private ushort[] _customImmunityFrames;
+
+    private void InitializeCustomImmunityFrames() {
+        _customImmunityFrames = new ushort[Main.player.Length];
+    }
+
+    private void UpdateCustomImmunityFrames() {
+        for (int i = 0; i < _customImmunityFrames.Length; i++) {
+            _customImmunityFrames[i] = (ushort)Helper.Approach(_customImmunityFrames[i], 0, 1);
+        }
+    }
+
+    public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
+        if (player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                _customImmunityFrames[player.whoAmI] = 10;
+            }
+        }
+    }
+
+    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
+        if (projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                _customImmunityFrames[projectile.owner] = 10;
+            }
+        }
+    }
+
+    public override bool? CanBeHitByProjectile(Projectile projectile) {
+        if (projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                return base.CanBeHitByProjectile(projectile);
+            }
+        }
+
+        return false;
+    }
+
+    public override bool? CanBeHitByItem(Player player, Item item) {
+        if (player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                return base.CanBeHitByItem(player, item);
+            }
+        }
+
+        return false;
+    }
+
     public override void SetDefaults() {
         int width = 54; int height = width;
         NPC.Size = new Vector2(width, height);
@@ -129,6 +177,8 @@ sealed class EternalServant : ModNPC {
         if (NPC.localAI[0] == 0f) {
             NPC.localAI[0] = 1 / 60f;
 
+            InitializeCustomImmunityFrames();
+
             NPC.localAI[1] = 1f;
             NPC.localAI[2] = 1f;
 
@@ -144,6 +194,8 @@ sealed class EternalServant : ModNPC {
 
             NPC.position.Y += NPC.height / 2;
         }
+
+        UpdateCustomImmunityFrames();
 
         _appearanceFactor = Helper.Approach(_appearanceFactor, 1f, 0.1f);
 
