@@ -82,6 +82,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     public static bool EternalHorrorSummonEnded { get; private set; }
     public static bool EternalHorrorShouldBeSummoned { get; private set; }
 
+    public static Vector2 FilterPosition { get; internal set; }
+    public static float FilterMoveFactor { get; private set; }
+
     public static bool EternalHorror_SecondPhaseStarted;
 
     public delegate void OverBlinkingDrawDelegate(SpriteBatch spriteBatch);
@@ -150,9 +153,6 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         BlinkOpacity = 1f;
     }
 
-    private static Vector2 _filterPosition;
-    private static float _filterMoveFactor;
-
     public override void PostUpdateNPCs() {
         if (_spawnSoundSlotID is not null && SoundEngine.TryGetActiveSound(_spawnSoundSlotID.Value, out ActiveSound result)) {
             result.Position = Main.LocalPlayer.Center;
@@ -182,13 +182,13 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 }
 
                 if (npc.ShouldUpdateFilterPosition) {
-                    _filterMoveFactor = Helper.Approach(_filterMoveFactor, 1f, 1 / 60f);
+                    FilterMoveFactor = Helper.Approach(FilterMoveFactor, 1f, 1 / 60f);
 
-                    _filterPosition = Vector2.Lerp(_filterPosition, npc.NPC.GetTargetPlayer().Center, 0.5f * _filterMoveFactor);
+                    FilterPosition = Vector2.Lerp(FilterPosition, npc.NPC.GetTargetPlayer().Center, 0.5f * FilterMoveFactor);
+                }
 
-                    if (any2) {
-                        shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor);
-                    }
+                if (any2) {
+                    shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor);
                 }
 
                 //shader.Shader.Parameters["waveOffset"].SetValue((index + 1) * 2f);
@@ -201,18 +201,18 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             if (filter.IsActive()) {
                 var shader = filter.GetShader();
 
-                shader.UseTargetPosition(_filterPosition - new Vector2(500f, 500f));
+                shader.UseTargetPosition(FilterPosition - new Vector2(500f, 500f));
                 shader.UseOpacity(0.5f);
 
                 if (screenObstructionFactor <= 0f) {
                     Filters.Scene.Deactivate(filterName);
-                    _filterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
-                    _filterMoveFactor = 0f;
+                    FilterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
+                    FilterMoveFactor = 0f;
                 }
             }
             if (!filter.IsActive()) {
-                _filterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
-                _filterMoveFactor = 0f;
+                FilterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
+                FilterMoveFactor = 0f;
             }
 
             foreach (NPC npc in Main.ActiveNPCs) {
@@ -231,7 +231,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 if (!any) {
                     if (!any2) {
 
-                        _filterPosition = Vector2.Lerp(_filterPosition, Main.LocalPlayer.Center, 0.5f * _filterMoveFactor);
+                        //FilterPosition = Vector2.Lerp(FilterPosition, Main.LocalPlayer.Center, 0.5f * FilterMoveFactor);
 
                         var shader = filter.GetShader();
                         shader.Shader.Parameters["uSaturation"].SetValue(2f * Ease.CubeOut(screenObstructionFactor));
