@@ -1729,6 +1729,14 @@ sealed partial class EternalHorror : ModNPC {
 
             npc.velocity *= preparationSlowDown;
             npc.rotation *= Ease.CubeOut(preparationSlowDown);
+
+            foreach (Player player in Main.ActivePlayers) {
+                float lerpValue = 0.5f;
+                lerpValue *= 1 / 60f;
+                float maxDistance = 600f;
+                lerpValue *= Helper.Clamp01(npc.Center.Distance(player.Center) / maxDistance);
+                player.Center = Vector2.Lerp(player.Center, npc.Center, lerpValue);
+            }
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
