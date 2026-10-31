@@ -1723,7 +1723,7 @@ sealed partial class EternalHorror : ModNPC {
             float attackProgress = boss.AICounter / ATTACKPREPARATIONTIME;
             float attackProgress2 = Helper.Clamp01(attackProgress);
 
-            EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, Helper.YoYo(attackProgress2) * 0.125f);
+            EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, Helper.YoYo(attackProgress2) * MathHelper.Lerp(0.05f, 0.125f, 0.5f));
 
             float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
 
