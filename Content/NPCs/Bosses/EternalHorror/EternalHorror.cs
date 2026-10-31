@@ -9,6 +9,54 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 sealed partial class EternalHorror : ModNPC {
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
+    private ushort[] _customImmunityFrames;
+
+    private void InitializeCustomImmunityFrames() {
+        _customImmunityFrames = new ushort[Main.player.Length];
+    }
+
+    private void UpdateCustomImmunityFrames() {
+        for (int i = 0; i < _customImmunityFrames.Length; i++) {
+            _customImmunityFrames[i] = (ushort)Helper.Approach(_customImmunityFrames[i], 0, 1);
+        }
+    }
+
+    public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
+        if (player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                _customImmunityFrames[player.whoAmI] = 10;
+            }
+        }
+    }
+
+    public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
+        if (projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                _customImmunityFrames[projectile.owner] = 10;
+            }
+        }
+    }
+
+    public override bool? CanBeHitByProjectile(Projectile projectile) {
+        if (projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                return base.CanBeHitByProjectile(projectile);
+            }
+        }
+
+        return false;
+    }
+
+    public override bool? CanBeHitByItem(Player player, Item item) {
+        if (player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                return base.CanBeHitByItem(player, item);
+            }
+        }
+
+        return false;
+    }
+
     public static ushort SelfType => (ushort)ModContent.NPCType<EternalHorror>();
 
     public EternalHorror Self => NPC.As<EternalHorror>();
@@ -85,6 +133,10 @@ sealed partial class EternalHorror : ModNPC {
 
     private void SetMusic() {
         Music = MusicLoader.GetMusicSlot(Mod, EERIEOCRAM_MUSICPATH);
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit) {
+        
     }
 
     public override void HitEffect(NPC.HitInfo hit) {

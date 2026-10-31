@@ -215,12 +215,15 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         SomeSecondPhaseShitCode();
+        UpdateCustomImmunityFrames();
     }
 
     private void OnSpawn() {
         if (Init) {
             return;
         }
+
+        InitializeCustomImmunityFrames();
 
         ResetFlashTime();
 
