@@ -22,7 +22,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
-        if (player.whoAmI >= 0) {
+        if (Init && player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
                 _customImmunityFrames[player.whoAmI] = 10;
             }
@@ -30,7 +30,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
-        if (projectile.owner >= 0) {
+        if (Init && projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
                 _customImmunityFrames[projectile.owner] = 10;
             }
@@ -38,7 +38,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override bool? CanBeHitByProjectile(Projectile projectile) {
-        if (projectile.owner >= 0) {
+        if (Init && projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
                 return base.CanBeHitByProjectile(projectile);
             }
@@ -48,7 +48,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override bool? CanBeHitByItem(Player player, Item item) {
-        if (player.whoAmI >= 0) {
+        if (Init && player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
                 return base.CanBeHitByItem(player, item);
             }
