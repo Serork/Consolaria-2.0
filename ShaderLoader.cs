@@ -3,6 +3,7 @@ using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using RoA.Common.ScreenEffects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -186,10 +187,16 @@ sealed class ShaderLoader : ModSystem {
         batch.Begin(in snapshot);
     }
 
+    public static Effect HorrorZoneEffectData { get; private set; } = null!;
+
     public static Asset<Effect> Distort => _loadedShaders["Distort"];
     public static Asset<Effect> Primitive => _loadedShaders["Primitive"];
     public static Asset<Effect> Blur => _loadedShaders["Blur"];
     public static Asset<Effect> WavyCircle => _loadedShaders["WavyCircle"];
+    public static Asset<Effect> HorrorZone => _loadedShaders["HorrorZone"];
+
+    public static string HorrorZoneFilterName => nameof(Consolaria) + "EternalHorrorHorrorZone";
+    public static Filter HorrorZoneFilter => Filters.Scene[HorrorZoneFilterName];
 
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
@@ -207,6 +214,11 @@ sealed class ShaderLoader : ModSystem {
         if (Main.dedServ) {
             return;
         }
+
+        Asset<Effect> horrorZoneShader = ModContent.Request<Effect>("Consolaria/Assets/Effects/HorrorZone", AssetRequestMode.ImmediateLoad);
+        HorrorZoneEffectData = horrorZoneShader.Value;
+        Filters.Scene[HorrorZoneFilterName] = new Filter(new HorrorZoneShaderData(horrorZoneShader, "HorrorZonePass"), (EffectPriority)100);
+        Filters.Scene[HorrorZoneFilterName].Load();
 
         Filters.Scene[EternalHorrorShakeFilterName] = new Filter(new EternalHorrorScreenShaderData("FilterMoonLordShake", aimAtPlayer: false), EffectPriority.VeryHigh);
         Filters.Scene[EternalHorrorShakeFilterName].Load();
