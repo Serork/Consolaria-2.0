@@ -17,7 +17,7 @@ sealed class HorrorZoneShaderData(Asset<Effect> effect, string pass) : ScreenSha
         //UseColor(color);
 
         UseColor(EternalHorror.MainPurpleColor * 1f);
-        UseOpacity(0.5f);
+        //UseOpacity(0.5f);
 
         Shader.Parameters["strength"].SetValue(3.0f);
         Shader.Parameters["strength2"].SetValue(1.5f);

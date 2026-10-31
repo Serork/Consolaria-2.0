@@ -10,6 +10,7 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -150,9 +151,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     }
 
     private static Vector2 _filterPosition;
-    private static bool _updateFilterPosition = true;
-    private static float _canUppdateFilterPosition;
-
+    private static float _filterMoveFactor;
 
     public override void PostUpdateNPCs() {
         if (_spawnSoundSlotID is not null && SoundEngine.TryGetActiveSound(_spawnSoundSlotID.Value, out ActiveSound result)) {
@@ -163,19 +162,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         HandleEyes();
         HandleSouls();
 
-        _canUppdateFilterPosition = Helper.Approach(_canUppdateFilterPosition, 0f, 1f);
-
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
-        //    if (_canUppdateFilterPosition <= 0f) {
-        //        _canUppdateFilterPosition = 0f;
-        //        _updateFilterPosition = !_updateFilterPosition;
-        //    }
-        //}
-
         float screenObstructionFactor = Utils.GetLerpValue(0.5f, 0.95f, EternalHorror.ScreenObstruction, true);
+        screenObstructionFactor = Helper.Clamp01(screenObstructionFactor);
 
         if (!Main.dedServ) {
-            //bool any = false;
+            bool any = false;
+            bool any2 = EternalHorrorSummonEnded;
 
             void applyFilter(EternalHorror npc) {
                 string filterName = ShaderLoader.HorrorZoneFilterName;
@@ -189,11 +181,15 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                     Filters.Scene.Activate(filterName);
                 }
 
-                if (_updateFilterPosition) {
-                    _filterPosition = Vector2.Lerp(_filterPosition, npc.NPC.GetTargetPlayer().Center, 0.5f);
+                if (npc.ShouldUpdateFilterPosition) {
+                    _filterMoveFactor = Helper.Approach(_filterMoveFactor, 1f, 1 / 60f);
+
+                    _filterPosition = Vector2.Lerp(_filterPosition, npc.NPC.GetTargetPlayer().Center, 0.5f * _filterMoveFactor);
+
+                    if (any2) {
+                        shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor);
+                    }
                 }
-                shader.UseTargetPosition(_filterPosition - new Vector2(500f, 500f));
-                shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor);
 
                 //shader.Shader.Parameters["waveOffset"].SetValue((index + 1) * 2f);
             }
@@ -202,8 +198,21 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
             var filter = Filters.Scene[filterName];
 
-            if (filter.IsActive() && screenObstructionFactor <= 0f) {
-                Filters.Scene.Deactivate(filterName);
+            if (filter.IsActive()) {
+                var shader = filter.GetShader();
+
+                shader.UseTargetPosition(_filterPosition - new Vector2(500f, 500f));
+                shader.UseOpacity(0.5f);
+
+                if (screenObstructionFactor <= 0f) {
+                    Filters.Scene.Deactivate(filterName);
+                    _filterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
+                    _filterMoveFactor = 0f;
+                }
+            }
+            if (!filter.IsActive()) {
+                _filterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
+                _filterMoveFactor = 0f;
             }
 
             foreach (NPC npc in Main.ActiveNPCs) {
@@ -215,14 +224,29 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                 applyFilter(modNPC);
 
-                //any = true;
+                any = true;
+            }
+
+            if (filter.IsActive()) {
+                if (!any) {
+                    if (!any2) {
+
+                        _filterPosition = Vector2.Lerp(_filterPosition, Main.LocalPlayer.Center, 0.5f * _filterMoveFactor);
+
+                        var shader = filter.GetShader();
+                        shader.Shader.Parameters["uSaturation"].SetValue(2f * Ease.CubeOut(screenObstructionFactor));
+                    }
+                }      
             }
         }
 
         bool bossAlive = NPC.AnyNPCs(EternalHorror.SelfType);
-        if (!bossAlive) {
-            _updateFilterPosition = true;
-        }
+
+        //if (!bossAlive) {
+        //    _filterPosition = new Vector2(0f, 0f);
+        //    _filterMoveFactor = 0f;
+        //}
+
         if (EternalHorrorSummonEnded && !bossAlive) {
             EternalHorror.MakeMidnight(speedFactor: 1f);
         }

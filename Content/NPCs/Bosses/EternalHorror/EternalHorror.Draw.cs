@@ -123,7 +123,7 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         for (int i = 0; i < 1; i++) {
-            if (Main.rand.NextChance(Ease.CubeOut(GetAllRayProgress())) && Main.rand.NextBool()) {
+            if (Main.rand.NextChance(Ease.CubeOut(GetAllRayProgress())) && Main.rand.NextBool(IsInSecondPhase ? 2 : 1)) {
                 Color colorTint = Color.Lerp(MainRedColor_Dynamic, MainPurpleColor, 1f/*Main.rand.NextFloat()*/) * 0.5f;
 
                 Vector2 position = NPC.Center

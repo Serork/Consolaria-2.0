@@ -1087,13 +1087,18 @@ sealed partial class EternalHorror : ModNPC {
                 {
 
                     boss.LaserAttackCount = 0;
+                    if (boss.Phase2ShouldDoSpiralAttack) {
+                        boss.Phase2ShouldDoSpiralAttack = false;
+
+                        boss.ActivateState<Phase2SpiralAttack>();
+                    }
 
                     //if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
                     //    boss.Phase2CloneAttack_ShouldDoScytheAttack = false;
 
                     //    boss.ActivateState<Phase2ScytheAttack>();
                     //}
-                    //else 
+                    else 
                     {
                         boss.ActivateState<Phase2DashAttack>();
                     }
@@ -1596,7 +1601,6 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, attackProgress2, 1f / 60f);
 
-                npc.velocity *= preparationSlowDown;
 
                 float preparationSlowDown2 = Ease.CubeIn(1f - preparationSlowDown);
                 npc.position.Y -= preparationSlowDown2 * 15f;
@@ -1611,6 +1615,7 @@ sealed partial class EternalHorror : ModNPC {
                     boss.Phase2ScytheAttackDirection = 1f;
                 }
 
+                npc.velocity *= preparationSlowDown;
                 npc.rotation *= Ease.CubeOut(preparationSlowDown);
 
                 ShakeStrength = Helper.Approach(ShakeStrength, attackProgress2, 0.125f * 2f);
@@ -1692,6 +1697,9 @@ sealed partial class EternalHorror : ModNPC {
                             boss.ResetCounters();
                             boss.DeactivateState<Phase2ScytheAttack>();
                             boss.ActivateState<Phase2BurstLaserAttack>();
+
+                            boss.Phase2ShouldDoSpiralAttack = true;
+
                             boss.ResetLaserAttack();
                             boss.ResetCounters();
                         }
@@ -1702,6 +1710,27 @@ sealed partial class EternalHorror : ModNPC {
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             boss.Phase2ScytheAttackDirection = 0f;
+        }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
+    private readonly struct Phase2SpiralAttack : IAIState {
+        public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(1.5f);
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.AICounter++;
+
+            float attackProgress = boss.AICounter / ATTACKPREPARATIONTIME;
+            float attackProgress2 = Helper.Clamp01(attackProgress);
+
+            float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
+
+            npc.velocity *= preparationSlowDown;
+            npc.rotation *= Ease.CubeOut(preparationSlowDown);
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.DeactivateState<Phase2MoveToPlayer>();
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
@@ -1721,6 +1750,8 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase2LaserSpamAttackProgress => Ease.SineIn(Helper.Clamp01(AICounter / Phase2LaserSpamAttack.BEFORESPAMTIME));
     public float Phase2ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase2CloneSpawn.SHADOWSPAWNTIME);
     public float Phase2ScythePreparationProgress => Helper.Clamp01(AICounter / Phase2ScytheAttack.ATTACKPREPARATIONTIME);
+
+    public bool ShouldUpdateFilterPosition => !HasActiveState<Phase2SpiralAttack>();
 
     private partial void InitializeStates() {
         _states = [];

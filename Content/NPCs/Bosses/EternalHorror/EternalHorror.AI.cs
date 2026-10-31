@@ -123,7 +123,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private Vector2 _eyeVelocity;
     private float _eyeDirectionChangeTime, _eyeAngle;
-    private float _shouldDoScytheAttackValue;
+    private float _shouldDoScytheAttackValue, _shouldDoSpiralAttackValue;
 
     private float _ai4, _ai5;
 
@@ -181,6 +181,11 @@ sealed partial class EternalHorror : ModNPC {
     public bool Phase2CloneAttack_ShouldDoScytheAttack {
         get => _shouldDoScytheAttackValue != 0f;
         set => _shouldDoScytheAttackValue = value.ToInt();
+    }
+
+    public bool Phase2ShouldDoSpiralAttack {
+        get => _shouldDoSpiralAttackValue != 0f;
+        set => _shouldDoSpiralAttackValue = value.ToInt();
     }
 
     public float SecondPhaseOpacity => Helper.Clamp01(_secondPhaseOpacity);
