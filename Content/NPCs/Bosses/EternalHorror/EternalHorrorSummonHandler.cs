@@ -164,6 +164,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
         float screenObstructionFactor = Utils.GetLerpValue(0.5f, 0.95f, EternalHorror.ScreenObstruction, true);
         screenObstructionFactor = Helper.Clamp01(screenObstructionFactor);
+        screenObstructionFactor = Ease.QuadOut(screenObstructionFactor);
 
         if (!Main.dedServ) {
             bool any = false;
@@ -184,7 +185,11 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 if (npc.ShouldUpdateFilterPosition) {
                     FilterMoveFactor = Helper.Approach(FilterMoveFactor, 1f, 1 / 60f);
 
-                    FilterPosition = Vector2.Lerp(FilterPosition, npc.NPC.GetTargetPlayer().Center, 0.5f * FilterMoveFactor);
+                    Vector2 to = npc.NPC.GetTargetPlayer().Center;
+                    if (FilterPosition == Vector2.Zero) {
+                        FilterPosition = to;
+                    }
+                    FilterPosition = Vector2.Lerp(FilterPosition, to, 0.5f * FilterMoveFactor);
                 }
 
                 if (any2) {
@@ -206,12 +211,12 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                 if (screenObstructionFactor <= 0f) {
                     Filters.Scene.Deactivate(filterName);
-                    FilterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
+                    FilterPosition = Vector2.Zero;
                     FilterMoveFactor = 0f;
                 }
             }
             if (!filter.IsActive()) {
-                FilterPosition = new Vector2(Main.LocalPlayer.Center.X, Main.LocalPlayer.Center.Y + EternalHorror.SPAWNOFFSETY * 2f);
+                FilterPosition = Vector2.Zero;
                 FilterMoveFactor = 0f;
             }
 

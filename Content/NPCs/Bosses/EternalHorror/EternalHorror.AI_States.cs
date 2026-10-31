@@ -341,7 +341,7 @@ sealed partial class EternalHorror : ModNPC {
                         return;
                     }
 
-                    npc.ResetTrails();
+                    //npc.ResetTrails();
 
                     SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
@@ -687,7 +687,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
             else {
-                npc.ResetTrails();
+                //npc.ResetTrails();
 
                 boss._copiesIntensity = preparationProgress2;
 
@@ -1294,7 +1294,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 
-                    npc.ResetTrails();
+                    //npc.ResetTrails();
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     boss._dashVelocity = dashDirection * dashStrength;
 
@@ -1514,7 +1514,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.SpawnClone(insta: true);
 
-                    npc.ResetTrails();
+                    //npc.ResetTrails();
 
                     Player target = npc.GetTargetPlayer();
                     Vector2 targetCenter = target.Center;
@@ -1670,7 +1670,7 @@ sealed partial class EternalHorror : ModNPC {
 
                         boss._eyeEffectOpacity = 1f;
 
-                        if (npc.Opacity >= 0.5f && Main.rand.NextChance(Ease.SineOut(boss._cloneStateEffectOpacity * npc.Opacity))) {
+                        if (npc.Opacity >= 0.25f && Main.rand.NextChance(Ease.SineOut(boss._cloneStateEffectOpacity * npc.Opacity))) {
                             boss.MakeTrailDust(velocityFactor: 1f);
                         }
 
@@ -1723,7 +1723,7 @@ sealed partial class EternalHorror : ModNPC {
             float attackProgress = boss.AICounter / ATTACKPREPARATIONTIME;
             float attackProgress2 = Helper.Clamp01(attackProgress);
 
-            EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, Helper.YoYo(attackProgress2) * MathHelper.Lerp(0.05f, 0.125f, 0.5f));
+            EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, 1 / 60f);
 
             float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
 
