@@ -33,8 +33,12 @@ sealed class HorrorZoneShaderData(Asset<Effect> effect, string pass) : ScreenSha
         float time = Main.GlobalTimeWrappedHourly;
         Main.GlobalTimeWrappedHourly /= 10f;
 
+        Vector2 zoom = Main.GameViewMatrix.Zoom;
+        Main.GameViewMatrix.Zoom = Vector2.One;
+
         base.Apply();
 
         Main.GlobalTimeWrappedHourly = time;
+        Main.GameViewMatrix.Zoom = zoom;
     }
 }
