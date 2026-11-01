@@ -1792,7 +1792,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 npc.velocity = Vector2.Lerp(npc.velocity, Vector2.UnitY.RotatedBy(rotation * boss.Phase2ScytheAttackDirection) * maxDistance * Helper.YoYo(attackProgress3) * 0.125f, (0.5f + 0.5f * attackProgress6) * (1f - attackProgress7));
                 boss._dashVelocity = npc.velocity;
-                boss._dashOpacity = attackProgress6 * Utils.GetLerpValue(1f, 0.875f, attackProgress3, true);
+                boss._dashOpacity = attackProgress6/* * Utils.GetLerpValue(1f, 0.875f, attackProgress3, true)*/;
                 rotation = npc.velocity.ToRotation() + rotationOffset;
                 npc.rotation = npc.rotation.AngleLerp(rotation, ROTATIONLERP * attackProgress6);
 
