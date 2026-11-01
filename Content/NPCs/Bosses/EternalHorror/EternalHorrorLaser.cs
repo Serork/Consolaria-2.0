@@ -15,7 +15,7 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
-    private static ushort TIMELEFT => 240;
+    private static ushort TIMELEFT => 360;
 
     private static SoundStyle ReflectSound => SoundID.Item150 with { Pitch = -1f, Volume = 0.5f };
 
