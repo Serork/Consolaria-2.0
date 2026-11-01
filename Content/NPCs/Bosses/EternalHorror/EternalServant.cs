@@ -50,6 +50,10 @@ sealed class EternalServant : ModNPC {
     }
 
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
+        if (NPC.localAI[0] == 0f) {
+            return;
+        }
+
         if (player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
                 _customImmunityFrames[player.whoAmI] = 10;
@@ -58,6 +62,10 @@ sealed class EternalServant : ModNPC {
     }
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
+        if (NPC.localAI[0] == 0f) {
+            return;
+        }
+
         if (projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
                 _customImmunityFrames[projectile.owner] = 10;
@@ -66,6 +74,10 @@ sealed class EternalServant : ModNPC {
     }
 
     public override bool? CanBeHitByProjectile(Projectile projectile) {
+        if (NPC.localAI[0] == 0f) {
+            return false;
+        }
+
         if (projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
                 return base.CanBeHitByProjectile(projectile);
@@ -76,6 +88,10 @@ sealed class EternalServant : ModNPC {
     }
 
     public override bool? CanBeHitByItem(Player player, Item item) {
+        if (NPC.localAI[0] == 0f) {
+            return false;
+        }
+
         if (player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
                 return base.CanBeHitByItem(player, item);
