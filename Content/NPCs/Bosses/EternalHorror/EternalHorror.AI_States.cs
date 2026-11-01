@@ -1145,13 +1145,24 @@ sealed partial class EternalHorror : ModNPC {
             //targetCenter.X = MathHelper.Lerp(targetCenter.X, npc.Center.X, 0.75f * smoothFactor);
             //targetCenter.Y = MathHelper.Lerp(targetCenter.Y, npc.Center.Y, 0.5f * smoothFactor);
 
-            float dashTime = DASHTIME;
+            float dashTime = MathHelper.Lerp(DASHTIME_FIRSTDASH, DASHTIME, boss._ai5);
 
             bool didAtLeastOneDash = boss.Phase2DashAttackCount > 0;
 
-            if (!didAtLeastOneDash && !boss.Phase2ShouldDoSpiralAttack) {
-                dashTime = DASHTIME_FIRSTDASH;
+            if (!didAtLeastOneDash) {
+                if (!boss.Phase2ShouldDoSpiralAttack) {
+                    dashTime = DASHTIME_FIRSTDASH;
+                }
             }
+            if (didAtLeastOneDash || boss.Phase2ShouldDoSpiralAttack)  {
+                boss._ai5 = Helper.Approach(boss._ai5, 1f, 1 / 60f);
+            }
+
+            //if (boss._ai5 == 0f) {
+            //    boss._ai5 = dashTime;
+            //}
+
+            //dashTime = Helper.Approach(boss._ai5, dashTime, 5f);
 
             if (didAtLeastOneDash && boss.Phase2ShouldDoSpiralAttack) {
                 boss.Phase2ShouldDoSpiralAttack = false;
@@ -1223,6 +1234,8 @@ sealed partial class EternalHorror : ModNPC {
 
             bool shouldResetState() {
                 if (boss.Phase2DashAttackCount >= DASHATTACKCOUNT) {
+                    boss._ai5 = 0f;
+
                     boss.ActivateState<Phase2MoveToPlayer>();
                     boss.DeactivateState<Phase2DashAttack>();
 
@@ -1404,6 +1417,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             boss._dashVelocity *= 0f;
             boss._dashOpacity = 0f;
+            boss._ai5 = 0f;
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
@@ -1826,7 +1840,7 @@ sealed partial class EternalHorror : ModNPC {
                     boss._tempPosition = default;
                 }
 
-                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f - attackProgress3, 1 / 60f);
+                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.CubeOut(1f - attackProgress3), 1f);
             }
 
             if (boss._tempPosition != default) {
