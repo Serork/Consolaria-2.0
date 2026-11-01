@@ -8,6 +8,10 @@ using Terraria.Graphics.Shaders;
 namespace RoA.Common.ScreenEffects;
 
 sealed class HorrorZoneShaderData(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
+    public static float Time { get; internal set; }
+
+    public static float TimeFactor { get; internal set; } = 1 / 60f;
+
     public override void Update(GameTime gameTime) {
         //UseImage(ResourceManager.Noise, 1);
 
@@ -30,8 +34,10 @@ sealed class HorrorZoneShaderData(Asset<Effect> effect, string pass) : ScreenSha
     }
 
     public override void Apply() {
+        Time += TimeFactor / 10f;
+
         float time = Main.GlobalTimeWrappedHourly;
-        Main.GlobalTimeWrappedHourly /= 10f;
+        Main.GlobalTimeWrappedHourly = Time;
 
         Vector2 zoom = Main.GameViewMatrix.Zoom;
         Main.GameViewMatrix.Zoom = Vector2.One;

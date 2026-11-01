@@ -1,5 +1,6 @@
 ﻿using Consolaria.Common.Particles;
 using Microsoft.Xna.Framework;
+using RoA.Common.ScreenEffects;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -1137,6 +1138,8 @@ sealed partial class EternalHorror : ModNPC {
         public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f, 1 / 60f * 0.125f);
+
             Player target = npc.GetTargetPlayer();
             Vector2 targetCenter = target.Center;
 
@@ -1840,7 +1843,8 @@ sealed partial class EternalHorror : ModNPC {
                     boss._tempPosition = default;
                 }
 
-                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.SineOut(1f - attackProgress3), 1f / 60f * 2.5f);
+                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.SineOut(1f - attackProgress3) * 2f, 1f / 60f * 2.5f * 2f);
+                HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 2f, 1 / 60f * 0.125f);
             }
 
             if (boss._tempPosition != default) {
