@@ -1827,7 +1827,7 @@ sealed partial class EternalHorror : ModNPC {
 
             if (boss._tempPosition != default) {
                 foreach (Player player in Main.ActivePlayers) {
-                    float lerpValue = MathHelper.Lerp(0.625f, 0.75f, 1f);
+                    float lerpValue = MathHelper.Lerp(0.625f, 0.75f, 0.5f);
                     lerpValue *= 1 / 60f;
                     lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / maxDistance);
                     player.Center = Vector2.Lerp(player.Center, boss._tempPosition, lerpValue * EternalHorrorSummonHandler.FilterOpacity);
