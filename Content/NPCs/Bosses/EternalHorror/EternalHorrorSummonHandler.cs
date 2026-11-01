@@ -212,7 +212,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             if (filter.IsActive()) {
                 var shader = filter.GetShader();
 
-                shader.UseTargetPosition(FilterPosition - new Vector2(500f, 500f));
+                shader.UseTargetPosition(FilterPosition - new Vector2(500f, 500f) * (1f / Main.GameViewMatrix.Zoom.X));
                 shader.UseOpacity(0.5f);
 
                 if (screenObstructionFactor <= 0f) {
