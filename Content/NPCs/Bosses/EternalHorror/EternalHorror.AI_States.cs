@@ -1855,6 +1855,7 @@ sealed partial class EternalHorror : ModNPC {
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             //boss.DeactivateState<Phase2MoveToPlayer>();
+            boss._tempPosition = default;
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
