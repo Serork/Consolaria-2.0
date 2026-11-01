@@ -1757,6 +1757,8 @@ sealed partial class EternalHorror : ModNPC {
                 boss._copiesIntensity = attackProgress2;
 
                 ShakeStrength = Helper.Approach(ShakeStrength, attackProgress2, 0.125f);
+
+                boss.Phase2ScytheAttackDirection = npc.direction;
             }
             else {
                 float progress = boss.AICounter - ATTACKPREPARATIONTIME;
@@ -1788,7 +1790,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 float attackProgress7 = Utils.GetLerpValue(0.875f, 1f, attackProgress3, true);
 
-                npc.velocity = Vector2.Lerp(npc.velocity, Vector2.UnitY.RotatedBy(rotation) * maxDistance * Helper.YoYo(attackProgress3) * 0.125f, (0.5f + 0.5f * attackProgress6) * (1f - attackProgress7));
+                npc.velocity = Vector2.Lerp(npc.velocity, Vector2.UnitY.RotatedBy(rotation * boss.Phase2ScytheAttackDirection) * maxDistance * Helper.YoYo(attackProgress3) * 0.125f, (0.5f + 0.5f * attackProgress6) * (1f - attackProgress7));
                 boss._dashVelocity = npc.velocity;
                 boss._dashOpacity = attackProgress6 * Utils.GetLerpValue(1f, 0.875f, attackProgress3, true);
                 rotation = npc.velocity.ToRotation() + rotationOffset;
@@ -1801,6 +1803,8 @@ sealed partial class EternalHorror : ModNPC {
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * 2f * attackProgress7);
 
                 if (attackProgress3 >= 0.9f) {
+                    boss.Phase2ScytheAttackDirection = 0;
+
                     boss.ResetCounters();
                     boss.DeactivateState<Phase2SpiralAttack>();
 
