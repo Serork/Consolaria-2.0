@@ -10,7 +10,6 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
