@@ -1810,7 +1810,7 @@ sealed partial class EternalHorror : ModNPC {
                 rotation = npc.velocity.ToRotation() + rotationOffset;
                 npc.rotation = npc.rotation.AngleLerp(rotation, ROTATIONLERP * attackProgress6);
 
-                if (boss._dashOpacity >= 0.5f && boss.AICounter % 6 == 0) {
+                if (boss._dashOpacity >= 0.5f && boss.AICounter % 6 == 0 && attackProgress3 <= 0.8f) {
                     SoundEngine.PlaySound(Phase1SummonSpawnAttack.SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
                 }
 
