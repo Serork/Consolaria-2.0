@@ -34,7 +34,6 @@ sealed class HorrorZoneShaderData(Asset<Effect> effect, string pass) : ScreenSha
     }
 
     public override void Apply() {
-        Main.NewText(TimeFactor);
         Time += TimeFactor / 10f;
 
         float time = Main.GlobalTimeWrappedHourly;
