@@ -84,6 +84,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     public static Vector2 FilterPosition { get; internal set; }
     public static float FilterMoveFactor { get; private set; }
+    public static float FilterOpacity { get; internal set; }
 
     public static bool EternalHorror_SecondPhaseStarted;
 
@@ -190,10 +191,15 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                         FilterPosition = to;
                     }
                     FilterPosition = Vector2.Lerp(FilterPosition, to, 0.5f * FilterMoveFactor);
+
+                    FilterOpacity = Helper.Approach(FilterOpacity, 1f, 1 / 60f);
+                }
+                else {
+                    FilterMoveFactor = 1f;
                 }
 
                 if (any2) {
-                    shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor);
+                    shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor * FilterOpacity);
                 }
 
                 //shader.Shader.Parameters["waveOffset"].SetValue((index + 1) * 2f);
@@ -239,7 +245,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                         //FilterPosition = Vector2.Lerp(FilterPosition, Main.LocalPlayer.Center, 0.5f * FilterMoveFactor);
 
                         var shader = filter.GetShader();
-                        shader.Shader.Parameters["uSaturation"].SetValue(2f * Ease.CubeOut(screenObstructionFactor));
+                        shader.Shader.Parameters["uSaturation"].SetValue(2f * Ease.CubeOut(screenObstructionFactor) * FilterOpacity);
                     }
                 }      
             }

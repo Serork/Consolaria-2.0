@@ -1149,8 +1149,12 @@ sealed partial class EternalHorror : ModNPC {
 
             bool didAtLeastOneDash = boss.Phase2DashAttackCount > 0;
 
-            if (!didAtLeastOneDash) {
+            if (!didAtLeastOneDash && !boss.Phase2ShouldDoSpiralAttack) {
                 dashTime = DASHTIME_FIRSTDASH;
+            }
+
+            if (didAtLeastOneDash && boss.Phase2ShouldDoSpiralAttack) {
+                boss.Phase2ShouldDoSpiralAttack = false;
             }
 
             float dashProgress = boss.AICounter / dashTime;
@@ -1715,7 +1719,8 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private readonly struct Phase2SpiralAttack : IAIState {
-        public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(1.5f);
+        public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(0.75f);
+        public static float ATTACKTIME => Helper.SecondsToFrames(3f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.AICounter++;
@@ -1723,24 +1728,115 @@ sealed partial class EternalHorror : ModNPC {
             float attackProgress = boss.AICounter / ATTACKPREPARATIONTIME;
             float attackProgress2 = Helper.Clamp01(attackProgress);
 
-            EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, 1 / 60f);
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center,
+                    baseTargetCenter = targetCenter;
+            float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
 
-            float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
+            if (boss._tempPosition == default) {
+                boss._tempPosition = npc.Center;
+            }
 
-            npc.velocity *= preparationSlowDown;
-            npc.rotation *= Ease.CubeOut(preparationSlowDown);
+            float maxDistance = 600f;
 
-            foreach (Player player in Main.ActivePlayers) {
-                float lerpValue = 0.5f;
-                lerpValue *= 1 / 60f;
-                float maxDistance = 600f;
-                lerpValue *= Helper.Clamp01(npc.Center.Distance(player.Center) / maxDistance);
-                player.Center = Vector2.Lerp(player.Center, npc.Center, lerpValue);
+            EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, boss._tempPosition, 1 / 60f * 1f);
+
+            if (attackProgress2 < 1f) {
+                float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 0.75f, true);
+
+                float dustProgress = Helper.YoYo(attackProgress2);
+                for (int i = 0; i < 2; i++) {
+                    boss.SpawnPreparationDust_Shadow(dustProgress);
+                }
+
+                boss._tempPosition = Vector2.Lerp(boss._tempPosition, npc.Center, 0.125f);
+
+                npc.velocity *= Ease.CubeOut(preparationSlowDown);
+                //npc.rotation = Utils.AngleLerp(npc.rotation, angleToTarget, ROTATIONLERP * Ease.CubeOut(preparationSlowDown));
+
+                boss._copiesIntensity = attackProgress2;
+
+                ShakeStrength = Helper.Approach(ShakeStrength, attackProgress2, 0.125f);
+            }
+            else {
+                float progress = boss.AICounter - ATTACKPREPARATIONTIME;
+
+                if (progress <= 0f) {
+                    boss.DeactivateState<Phase2MoveToPlayer>();
+                    //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                }
+
+                float attackProgress3 = progress / ATTACKTIME;
+                float attackProgress4 = Helper.Clamp01(attackProgress3);
+
+                float progress2 = progress * 0.125f;
+                progress2 /= 1.5f;
+                float rotation = progress2;
+
+                float rotationOffset = -MathHelper.PiOver2;
+
+                rotation += rotationOffset;
+
+                float attackProgress5 = MathF.Pow(attackProgress4, 2000f);
+                attackProgress5 = Helper.Clamp01(attackProgress5);
+                rotation *= 1f - attackProgress5;
+
+                //rotation *= Ease.CubeOut(1f - attackProgress4);
+
+                float attackProgress6 = Utils.GetLerpValue(0f, 0.25f, attackProgress3, true);
+                //attackProgress6 *= Utils.GetLerpValue(1f, 0.75f, attackProgress3, true);
+
+                float attackProgress7 = Utils.GetLerpValue(0.875f, 1f, attackProgress3, true);
+
+                npc.velocity = Vector2.Lerp(npc.velocity, Vector2.UnitY.RotatedBy(rotation) * maxDistance * Helper.YoYo(attackProgress3) * 0.125f, (0.5f + 0.5f * attackProgress6) * (1f - attackProgress7));
+                boss._dashVelocity = npc.velocity;
+                boss._dashOpacity = attackProgress6 * Utils.GetLerpValue(1f, 0.875f, attackProgress3, true);
+                rotation = npc.velocity.ToRotation() + rotationOffset;
+                npc.rotation = npc.rotation.AngleLerp(rotation, ROTATIONLERP * attackProgress6);
+
+                if (boss._dashOpacity >= 0.75f && boss.AICounter % 6 == 0) {
+                    SoundEngine.PlaySound(Phase1SummonSpawnAttack.SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                }
+
+                npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * 2f * attackProgress7);
+
+                if (attackProgress3 >= 0.95f) {
+                    boss.ResetCounters();
+                    boss.DeactivateState<Phase2SpiralAttack>();
+
+                    //boss.ResetLaserAttack(applyExtraIncreasedDelay: true);
+
+                    boss.ActivateState<Phase2DashAttack>();
+                    boss.ActivateState<Phase2MoveToPlayer>();
+
+                    //boss._dashVelocity *= 0f;
+                    //boss._dashOpacity = 0f;
+
+                    boss.Phase2ShouldDoSpiralAttack = true;
+
+                    //boss.ResetLaserAttack();
+                    //boss.ResetCounters();
+
+                    boss.ResetSmoothFactor(value: 0.25f);
+
+                    boss._tempPosition = default;
+                }
+
+                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f - attackProgress3, 1 / 60f);
+            }
+
+            if (boss._tempPosition != default) {
+                foreach (Player player in Main.ActivePlayers) {
+                    float lerpValue = MathHelper.Lerp(0.625f, 0.75f, 1f);
+                    lerpValue *= 1 / 60f;
+                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / maxDistance);
+                    player.Center = Vector2.Lerp(player.Center, boss._tempPosition, lerpValue * EternalHorrorSummonHandler.FilterOpacity);
+                }
             }
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
-            boss.DeactivateState<Phase2MoveToPlayer>();
+            //boss.DeactivateState<Phase2MoveToPlayer>();
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }

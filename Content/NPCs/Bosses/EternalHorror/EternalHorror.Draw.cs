@@ -912,6 +912,13 @@ sealed partial class EternalHorror : ModNPC {
             shadowOpacity = Phase2ScytheAttackAngle > 0f ? Helper.Clamp01(Phase2ScytheAttackProgress + 1f) : Phase2ScythePreparationProgress;
             hasShadow = true;
         }
+        if (HasActiveState<Phase2SpiralAttack>()) {
+            float attackProgress = AICounter / Phase2SpiralAttack.ATTACKPREPARATIONTIME;
+            float attackProgress2 = Helper.Clamp01(attackProgress);
+
+            shadowOpacity = /*Helper.YoYo*/(attackProgress2);
+            hasShadow = true;
+        }
         if (!hasShadow) {
             lerpValue = 1f;
         }
