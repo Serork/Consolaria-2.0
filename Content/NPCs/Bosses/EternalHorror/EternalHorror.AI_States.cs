@@ -1840,7 +1840,7 @@ sealed partial class EternalHorror : ModNPC {
                     boss._tempPosition = default;
                 }
 
-                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.CubeOut(1f - attackProgress3), 1f);
+                EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.SineOut(1f - attackProgress3), 1f / 60f * 2.5f);
             }
 
             if (boss._tempPosition != default) {
