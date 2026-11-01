@@ -1844,7 +1844,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.SineOut(1f - attackProgress3) * 2f, 1f / 60f * 2.5f * 2f);
-                HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 2f, 1 / 60f * 0.125f);
+                HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 0.5f, 1 / 60f * 0.125f);
             }
 
             if (boss._tempPosition != default) {
