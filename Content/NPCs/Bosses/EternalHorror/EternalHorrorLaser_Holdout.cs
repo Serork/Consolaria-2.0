@@ -63,13 +63,20 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
         if (Projectile.ai[0] % num37 == 0f)
             flag9 = true;
 
-        if (Projectile.ai[1] >= 1f) {
-            Projectile.ai[1] = 0f;
+        var target = Target.As<EternalHorror>();
+
+        Vector2 eyePosition = target.GetEyePosition(true, laser: true);
+
+        Helper.SpawnDebugDusts(eyePosition);
+
+        if (Projectile.localAI[2] >= 1f) {
+            Projectile.localAI[2] = 0f;
             flag9 = true;
-            if (Main.myPlayer == Projectile.owner) {
+            //if (Main.myPlayer == Projectile.owner)
+            {
                 float num39 = 30f/*player.inventory[player.selectedItem].shootSpeed*/ * Projectile.scale;
                 Vector2 vector18 = vector;
-                Vector2 value6 = Target.Center + Vector2.UnitY.RotatedBy(Target.rotation) * 5f - vector18;
+                Vector2 value6 = Target.Center + Vector2.UnitY.RotatedBy(target.LaserRotation) * 1f - vector18;
                 //if (player.gravDir == -1f)
                 //    value6.Y = (float)(Main.screenHeight - Main.mouseY) + Main.screenPosition.Y - vector18.Y;
 
@@ -127,11 +134,9 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
             }
         }
 
-        var target = Target.As<EternalHorror>();
-
-        Projectile.position = target.GetEyePosition(true, laser: true) - Projectile.Size / 2f;
+        Projectile.position = eyePosition - Projectile.Size / 2f;
         Projectile.rotation = Projectile.velocity.ToRotation() + num;
-        //Projectile.position += Vector2.UnitY.RotatedBy(Projectile.rotation) * 50f;
+        Projectile.position += Vector2.UnitY.RotatedBy(Projectile.rotation) * 50f;
         Projectile.spriteDirection = Projectile.direction;
         Projectile.timeLeft = 2;
         //player.ChangeDir(Projectile.direction);
@@ -142,7 +147,7 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
         if (Projectile.ai[0] < 180f) {
             Projectile.ai[0] += 2f - 1f * Projectile.ai[0] / 180f;
         }
-        Projectile.ai[1] += 1f;
+        Projectile.localAI[2] += 1f;
     }
 
     public override bool? CanDamage() => false;

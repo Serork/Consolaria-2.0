@@ -6,14 +6,17 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
     private static Asset<Texture2D> _laser = null!;
 
+    private float _scaleX;
+
     public override void SetStaticDefaults() {
-        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1000;
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
 
         if (!Main.dedServ) {
             _laser = ModContent.Request<Texture2D>(Texture + "2");
@@ -79,7 +82,12 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         //    Projectile.Opacity = 0.4f + (projectile2.ai[0] - 120f) / 60f * 0.6f;
         //}
 
-        Projectile.Opacity = Helper.Approach(Projectile.Opacity, 1f, 1 / 60f / 5f);
+        if (projectile2.ai[1] >= 0f) {
+            Projectile.Opacity = Helper.Approach(Projectile.Opacity, 1f, 1 / 60f / MathHelper.Lerp(3.75f, 5f, 0.5f));
+        }
+        else {
+            _scaleX = Helper.Approach(_scaleX, 0f, 0.125f * 0.5f);
+        }
 
         num710 = -22f + progress * 20f;
 
@@ -116,7 +124,10 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         Projectile.position += projectile2.velocity.ToRotation().ToRotationVector2() * num710;
         Projectile.position += zero2;
         Projectile.velocity = Vector2.Normalize(projectile2.velocity).RotatedBy(num706);
-        Projectile.scale = 2f * (1f - num708);
+        if (projectile2.ai[1] >= 0f) {
+            Projectile.scale = 2f * (1f - num708);
+            _scaleX = 1f;
+        }
         //damage = projectile2.damage;
         if (projectile2.ai[0] >= 180f) {
             Projectile.damage *= 3;
@@ -156,7 +167,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
         num718 = 2000f;
 
-        amount = 1 / 60f * 5f;
+        //amount = 1 / 60f * 5f;
 
         Projectile.localAI[1] = MathHelper.Lerp(Projectile.localAI[1], num718, amount);
 
@@ -165,7 +176,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
             Projectile.localAI[2] = 256f;
         }
 
-        DelegateMethods.v3_1 = EternalHorror.MainPurpleColor.ModifyRGB(0.5f).ToVector3() * 1f;
+        DelegateMethods.v3_1 = EternalHorror.MainPurpleColor.ModifyRGB(0.5f).ToVector3() * 1f * Projectile.Opacity * Ease.QuartOut(_scaleX);
         Utils.PlotTileLine(Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], (float)Projectile.width * Projectile.scale, DelegateMethods.CastLight);
     }
 
@@ -175,6 +186,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
     public static void RainbowLaserDraw(int stage, Vector2 currentPosition, float distanceLeft, Rectangle lastFrame, out float distCovered, out Rectangle frame, out Vector2 origin, out Color color) {
         color = DelegateMethods.c_1;
+        color *= 0.5f;
         switch (stage) {
             case 0:
                 distCovered = 33f;
@@ -199,6 +211,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
                 break;
         }
 
+
         if (_segment <= 3f) {
             float scaleFactor = MathHelper.Lerp(0.125f, 1f, _segment / 3f);
             color *= scaleFactor;
@@ -208,7 +221,8 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
-        if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
+        //if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType))
+        {
             Projectile proj = Projectile;
 
             if (!(proj.velocity == Vector2.Zero)) {
@@ -221,7 +235,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
                 color73.A = (byte)((float)(int)color73.A * laserAlphaMultiplier);
                 float wave = (Projectile.whoAmI + 1) * 2f;
                 color73 *= Helper.Wave(0.25f, 1.5f, 15f, wave);
-                color73 *= 1f;
+                color73 *= 0.5f;
                 Vector2 vector56 = proj.Center.Floor();
                 vector56 += proj.velocity * proj.scale * 10.5f * 0.75f;
                 num270 -= proj.scale * 14.5f * proj.scale;
@@ -248,12 +262,14 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
                 Color color = DelegateMethods.c_1;
 
+                float _scaleX2 = Ease.QuartOut(_scaleX);
+
                 void drawLaser(Color color) {
                     var batch = Main.spriteBatch;
-                    ShaderLoader.HorrorLaserShader.Start = (int)Projectile.localAI[2] / (float)laser.Width;
-                    ShaderLoader.HorrorLaserShader.End = ((int)Projectile.localAI[2] + 256) / (float)laser.Width;
+                    ShaderLoader.HorrorLaserShader.Start = (int)(Projectile.localAI[2] * 1f) / (float)laser.Width;
+                    ShaderLoader.HorrorLaserShader.End = ((int)Projectile.localAI[2] + 256 / 1.5f) / (float)laser.Width;
                     ShaderLoader.HorrorLaserShader.Start2 = ((int)Projectile.localAI[2] + 256 / 1) / (float)laser.Width;
-                    ShaderLoader.HorrorLaserShader.End2 = ((int)Projectile.localAI[2] + 512 * 0.875f) / (float)laser.Width;
+                    ShaderLoader.HorrorLaserShader.End2 = ((int)Projectile.localAI[2] + 512 * 1f) / (float)laser.Width;
                     ShaderLoader.HorrorLaserShader.Pow = 0.5f;
                     ShaderLoader.ApplyEffect(ShaderLoader.HorrorLaser.Value, batch, () => {
                         batch.Draw(laser,
@@ -262,7 +278,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
                             color,
                             Projectile.rotation + MathHelper.PiOver2,
                             new Vector2(0.0f, (float)(512 / 4f)),
-                            new Vector2((float)((double)num / 512) * (1f - (_scale - 1f) * 0.15f), 0.75f) * scale2, SpriteEffects.None, 0.0f);
+                            new Vector2((float)((double)num / 512) * (1f - (_scale - 1f) * 0.15f), 0.75f) * scale2 * new Vector2(1f, _scaleX2), SpriteEffects.None, 0.0f);
                     });
                 }
 
@@ -270,11 +286,11 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
                 drawLaser(color);
 
                 _segment = 0;
-                Utils.DrawLaser(Main.spriteBatch, value67, vector56 - Main.screenPosition, vector56 + proj.velocity * num270 - Main.screenPosition, vector57, RainbowLaserDraw);
+                Utils.DrawLaser(Main.spriteBatch, value67, vector56 - Main.screenPosition, vector56 + proj.velocity * num270 - Main.screenPosition, vector57 * new Vector2(_scaleX2, 1f), RainbowLaserDraw);
                 DelegateMethods.c_1 = new Microsoft.Xna.Framework.Color(255, 255, 255, 127) * 0.75f * proj.Opacity;
 
                 _segment = 0;
-                Utils.DrawLaser(Main.spriteBatch, value67, vector56 - Main.screenPosition, vector56 + proj.velocity * num270 - Main.screenPosition, vector57 / 2f, RainbowLaserDraw);
+                Utils.DrawLaser(Main.spriteBatch, value67, vector56 - Main.screenPosition, vector56 + proj.velocity * num270 - Main.screenPosition, vector57 / 2f * new Vector2(_scaleX2, 1f), RainbowLaserDraw);
 
                 drawLaser(color);
 

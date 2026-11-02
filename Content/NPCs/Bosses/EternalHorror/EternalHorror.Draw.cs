@@ -924,8 +924,10 @@ sealed partial class EternalHorror : ModNPC {
             float attackProgress = AICounter / Phase2BigLaserAttack.ATTACKTIME;
             float attackProgress2 = Helper.Clamp01(attackProgress);
 
-            shadowOpacity = /*Helper.YoYo*/(attackProgress2);
-            hasShadow = true;
+            if (attackProgress < 1f) {
+                shadowOpacity = attackProgress2;
+                hasShadow = true;
+            }
         }
         if (!hasShadow) {
             lerpValue = 1f;
@@ -956,7 +958,7 @@ sealed partial class EternalHorror : ModNPC {
         //if (HasActiveState<Phase2BigLaserAttack>()) {
         //    eyeScale = 1.25f;
         //}
-        _eyeScale = Helper.Approach(_eyeScale, 1f, 1 / 60f);
+        _eyeScale = Helper.Approach(_eyeScale, 1f, 1 / 60f * 0.5f);
     }
 
     private static void MakeScreenShake() {

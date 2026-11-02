@@ -123,12 +123,14 @@ sealed partial class EternalHorror : ModNPC {
 
     private Vector2 _eyeVelocity;
     private float _eyeScale;
-    private float _eyeDirectionChangeTime, _eyeAngle;
+    private float _eyeDirectionChangeTime, _eyeAngle, _eyeAngle2;
     private float _shouldDoScytheAttackValue, _shouldDoSpiralAttackValue, _shouldDoBigLaserAttackValue;
 
     private float _ai4, _ai5;
 
     public Vector2 EyeVelocity => _eyeVelocity;
+
+    public float LaserRotation { get; private set; }
 
     public ref float InitValue => ref NPC.ai[0];
 
@@ -580,6 +582,15 @@ sealed partial class EternalHorror : ModNPC {
 
             if (angle == -10f) {
                 angle = result.AngleTo(NPC.GetTargetData().Center);
+
+                float lerpValue = 1f;
+                if (LaserRotation != 0f) {
+                    angle = LaserRotation + MathHelper.PiOver2;
+                    lerpValue = 0.125f;
+                }
+
+                _eyeAngle2 = Utils.AngleLerp(_eyeAngle2, angle, lerpValue);
+                angle = _eyeAngle2;
             }
             Vector2 angleToPlayer = Vector2.UnitX.RotatedBy(angle);
             result += angleToPlayer * 7.5f * eyeScale;
@@ -590,7 +601,7 @@ sealed partial class EternalHorror : ModNPC {
             else {
                 result += _eyeVelocity;
                 if (laser) {
-                    result -= rotationStep * 45f * eyeScale * 2.125f;
+                    result -= rotationStep * 45f * eyeScale * 1f;
                 }
             }
         }
@@ -631,6 +642,16 @@ sealed partial class EternalHorror : ModNPC {
         Vector2 center = vector8;
         Vector2 velocity = new(speedX, speedY);
 
+        SpawnEyeParticle(center, velocity);
+
+        if (Helper.IsClient()) {
+            return;
+        }
+        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorScythe>(),
+            27, 1.5f, Main.myPlayer);
+    }
+
+    private void SpawnEyeParticle(Vector2 center, Vector2 velocity) {
         Color color = MainPurpleColor;
 
         int num5 = Main.rand.Next(20, 40);
@@ -658,12 +679,6 @@ sealed partial class EternalHorror : ModNPC {
 
         prettySparkleParticle.Velocity *= 0.3f;
         Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
-
-        if (Helper.IsClient()) {
-            return;
-        }
-        Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorScythe>(),
-            27, 1.5f, Main.myPlayer);
     }
 
     private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false) {
