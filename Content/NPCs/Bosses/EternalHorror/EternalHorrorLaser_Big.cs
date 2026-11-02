@@ -6,7 +6,6 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 

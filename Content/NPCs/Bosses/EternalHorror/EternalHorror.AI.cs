@@ -35,9 +35,9 @@ sealed partial class EternalHorror : ModNPC {
         public readonly bool Active => Progress != 0f;
     }
 
-    public record struct CloneInfo(Vector2 Position, Vector2 TargetPosition, ushort TimeLeft, 
-                                                                             ushort MaxTimeLeft, 
-                                                                             float Rotation = 0f, 
+    public record struct CloneInfo(Vector2 Position, Vector2 TargetPosition, ushort TimeLeft,
+                                                                             ushort MaxTimeLeft,
+                                                                             float Rotation = 0f,
                                                                              Vector2 VisualPosition = default,
                                                                              Vector2 Velocity = default,
                                                                              bool ShouldUpdateVisualPosition = true,
@@ -48,7 +48,8 @@ sealed partial class EternalHorror : ModNPC {
                                                                              CloneStarInfo[] CloneStarData = null,
                                                                              float AllStarOpacityFactor = 0f,
                                                                              float LerpVelocityValue = 1f,
-                                                                             int ExplosionTime = -1) {
+                                                                             int ExplosionTime = -1,
+                                                                             bool FromSecondPhase = false) {
         public static float OPACITYMAXTIMELEFTFACTOR => 0.75f;
         public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(2f);
 
@@ -305,7 +306,8 @@ sealed partial class EternalHorror : ModNPC {
                                                         OldVisualPositions: new Vector2[NPC.oldPos.Length],
                                                         OldRotations: new float[NPC.oldRot.Length],
                                                         DashOpacity: 0f,
-                                                        CloneStarData: new CloneStarInfo[100]);
+                                                        CloneStarData: new CloneStarInfo[100],
+                                                        FromSecondPhase: IsInSecondPhase);
         if (insta) {
             _cloneData[nextCloneAddedIndex].TimeLeft = (ushort)(_cloneData[nextCloneAddedIndex].MaxTimeLeft * MathHelper.Lerp(CloneInfo.OPACITYMAXTIMELEFTFACTOR, 1f, 0.75f));
             //_cloneData[nextCloneAddedIndex].LerpVelocityValue = 0f;
@@ -491,7 +493,7 @@ sealed partial class EternalHorror : ModNPC {
                 cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f/* * lerpValueFactor*/);
             }
 
-            if (IsInSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
+            if (cloneInfo.FromSecondPhase && !cloneInfo.ShouldUpdateVisualPosition) {
                 if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f && cloneInfo.Opacity >= 0.5f && cloneInfo.TimeLeft % 25 == 0) {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;

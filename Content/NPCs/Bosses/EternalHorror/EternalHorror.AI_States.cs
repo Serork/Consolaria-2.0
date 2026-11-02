@@ -1816,7 +1816,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 float attackProgress7 = Utils.GetLerpValue(0.875f, 1f, attackProgress3, true);
 
-                npc.velocity = Vector2.Lerp(npc.velocity, Vector2.UnitY.RotatedBy(rotation * boss.Phase2ScytheAttackDirection) * maxDistance * 0.875f * Helper.YoYo(attackProgress3) * 0.125f, (0.5f + 0.5f * attackProgress6) * (1f - attackProgress7));
+                npc.velocity = Vector2.Lerp(npc.velocity, Vector2.UnitY.RotatedBy(rotation * boss.Phase2ScytheAttackDirection) * maxDistance * 1f * Helper.YoYo(attackProgress3) * 0.125f, (0.5f + 0.5f * attackProgress6) * (1f - attackProgress7));
                 boss._dashVelocity = npc.velocity;
                 boss._dashOpacity = attackProgress6/* * Utils.GetLerpValue(1f, 0.875f, attackProgress3, true)*/;
                 rotation = npc.velocity.ToRotation() + rotationOffset;
@@ -1862,7 +1862,7 @@ sealed partial class EternalHorror : ModNPC {
                 foreach (Player player in Main.ActivePlayers) {
                     float lerpValue = 0.5f;
                     lerpValue *= 1 / 60f;
-                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / (maxDistance * 1.25f));
+                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / (maxDistance * 1.5f));
                     player.Center = Vector2.Lerp(player.Center, boss._tempPosition, lerpValue * EternalHorrorSummonHandler.FilterOpacity);
                 }
             }
@@ -2073,7 +2073,7 @@ sealed partial class EternalHorror : ModNPC {
 
             boss.Phase2DashAttackCount = -1;
 
-            boss.AICounter = -ATTACKTIME / 2;
+            boss.AICounter = -ATTACKTIME;
         }
 
         void IAIState.OnEnd(NPC npc, EternalHorror boss) {
