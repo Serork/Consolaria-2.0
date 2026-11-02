@@ -1728,7 +1728,7 @@ sealed partial class EternalHorror : ModNPC {
 
                             boss.Phase2ShouldDoSpiralAttack = true;
 
-                            boss.ResetLaserAttack();
+                            boss.ResetLaserAttack(applyExtraIncreasedDelay: true);
                             boss.ResetCounters();
                         }
                     }
