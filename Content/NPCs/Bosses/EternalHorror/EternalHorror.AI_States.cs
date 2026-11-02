@@ -917,7 +917,7 @@ sealed partial class EternalHorror : ModNPC {
                 //cloneInfo.Velocity *= 0f;
                 //cloneInfo.DashOpacity *= 0f;
                 cloneInfo.ShouldFade = true;
-                //cloneInfo.ForceFade();
+                cloneInfo.ForceFade();
             });
 
             //boss.SpawnRays(startRaySpeed: 0.5f);
