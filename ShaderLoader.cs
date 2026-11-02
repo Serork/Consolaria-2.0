@@ -8,12 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Resources;
 using Terraria;
-using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
-using Terraria.Initializers;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
 using static Consolaria.Helper;
@@ -22,6 +19,40 @@ using static Terraria.ModLoader.Core.TmodFile;
 namespace Consolaria;
 
 sealed class ShaderLoader : ModSystem {
+    public static class HorrorLaserShader {
+        public static Effect Effect => HorrorLaser.Value;
+
+        private static float _start;
+        public static float Start {
+            get => _start;
+            set => Effect?.Parameters["start"].SetValue(_start = value);
+        }
+
+        private static float _end;
+        public static float End {
+            get => _end;
+            set => Effect?.Parameters["end"].SetValue(_end = value);
+        }
+
+        private static float _start2;
+        public static float Start2 {
+            get => _start2;
+            set => Effect?.Parameters["start2"].SetValue(_start2 = value);
+        }
+
+        private static float _end2;
+        public static float End2 {
+            get => _end2;
+            set => Effect?.Parameters["end2"].SetValue(_end2 = value);
+        }
+
+        private static float _pow;
+        public static float Pow {
+            get => _pow;
+            set => Effect?.Parameters["powValue"].SetValue(_pow = value);
+        }
+    }
+
     public static class WavyCircleShader {
         public static Effect Effect => WavyCircle.Value;
 
@@ -194,6 +225,7 @@ sealed class ShaderLoader : ModSystem {
     public static Asset<Effect> Blur => _loadedShaders["Blur"];
     public static Asset<Effect> WavyCircle => _loadedShaders["WavyCircle"];
     public static Asset<Effect> HorrorZone => _loadedShaders["HorrorZone"];
+    public static Asset<Effect> HorrorLaser => _loadedShaders["HorrorLaser"];
 
     public static string HorrorZoneFilterName => nameof(Consolaria) + "EternalHorrorHorrorZone";
     public static Filter HorrorZoneFilter => Filters.Scene[HorrorZoneFilterName];

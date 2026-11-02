@@ -122,10 +122,13 @@ sealed partial class EternalHorror : ModNPC {
     private Vector2 _cloneTargetPosition;
 
     private Vector2 _eyeVelocity;
+    private float _eyeScale;
     private float _eyeDirectionChangeTime, _eyeAngle;
-    private float _shouldDoScytheAttackValue, _shouldDoSpiralAttackValue;
+    private float _shouldDoScytheAttackValue, _shouldDoSpiralAttackValue, _shouldDoBigLaserAttackValue;
 
     private float _ai4, _ai5;
+
+    public Vector2 EyeVelocity => _eyeVelocity;
 
     public ref float InitValue => ref NPC.ai[0];
 
@@ -157,7 +160,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public bool IsInSecondPhase => EternalHorrorSummonHandler.BlinkProgress_Out >= 1f && IsInSecondPhase_Base;
-    public bool IsInSecondPhase_Base => NPC.life < NPC.lifeMax / 2f;
+    public bool IsInSecondPhase_Base => true/*NPC.life < NPC.lifeMax / 2f*/;
 
     public bool Phase1CloneSpawn_ShouldDashAfter {
         get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
@@ -187,6 +190,11 @@ sealed partial class EternalHorror : ModNPC {
     public bool Phase2ShouldDoSpiralAttack {
         get => _shouldDoSpiralAttackValue != 0f;
         set => _shouldDoSpiralAttackValue = value.ToInt();
+    }
+
+    public bool Phase2ShouldDoBigLaserAttack {
+        get => _shouldDoBigLaserAttackValue != 0f;
+        set => _shouldDoBigLaserAttackValue = value.ToInt();
     }
 
     public float SecondPhaseOpacity => Helper.Clamp01(_secondPhaseOpacity);
@@ -556,7 +564,7 @@ sealed partial class EternalHorror : ModNPC {
         _ai5 = 0;
     }
 
-    private Vector2 GetEyePosition(bool forDrawing = false, float angle = -10f) {
+    public Vector2 GetEyePosition(bool forDrawing = false, float angle = -10f, bool laser = false) {
         Vector2 result = NPC.Center;
 
         if (IsInSecondPhase) {
@@ -566,19 +574,24 @@ sealed partial class EternalHorror : ModNPC {
             float eyeScale = NPC.scale;
             eyeScale *= 1f/*Helper.Wave(0.875f, 1f, 5f, boss.whoAmI)*/;
 
-            result -= rotationStep * 7.5f;
+            result -= rotationStep * 7.5f * eyeScale;
+
+            result += rotationStep * 45f * (_eyeScale - 1f);
 
             if (angle == -10f) {
                 angle = result.AngleTo(NPC.GetTargetData().Center);
             }
             Vector2 angleToPlayer = Vector2.UnitX.RotatedBy(angle);
-            result += angleToPlayer * 7.5f;
+            result += angleToPlayer * 7.5f * eyeScale;
 
             if (!forDrawing) {
-                result -= rotationStep * 45f;
+                result -= rotationStep * 45f * eyeScale;
             }
             else {
                 result += _eyeVelocity;
+                if (laser) {
+                    result -= rotationStep * 45f * eyeScale * 2.125f;
+                }
             }
         }
 

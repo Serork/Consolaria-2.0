@@ -1793,6 +1793,8 @@ Mods: {
 			// EternalHorrorCloneExplosion.DisplayName: Eternal Horror Clone Explosion
 			// EternalHorrorCloneExplosionSkull.DisplayName: Eternal Horror Clone Explosion Skull
 			// EternalHorrorScythe.DisplayName: Eternal Horror Scythe
+			// EternalHorrorLaser_Big.DisplayName: Eternal Horror Laser_ Big
+			// EternalHorrorLaser_Holdout.DisplayName: Eternal Horror Laser_ Holdout
 		}
 
 		Tiles: {

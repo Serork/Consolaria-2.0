@@ -892,7 +892,8 @@ sealed partial class EternalHorror : ModNPC {
             boss.ResetLaserAttack(applyExtraIncreasedDelay: true);
 
             boss.ActivateState<Phase2MoveToPlayer>();
-            boss.ActivateState<Phase2BurstLaserAttack>();
+            //boss.ActivateState<Phase2BurstLaserAttack>();
+            boss.ActivateState<Phase2BigLaserAttack>();
 
             npc.dontTakeDamage = false;
 
@@ -950,6 +951,9 @@ sealed partial class EternalHorror : ModNPC {
                 boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.025f);
             }
             void lookAtTarget() {
+                if (boss.HasActiveState<Phase2BigLaserAttack>()) {
+                    return;
+                }
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
                 if (shouldDash) {
                     return;
@@ -1243,7 +1247,12 @@ sealed partial class EternalHorror : ModNPC {
                     boss.DeactivateState<Phase2DashAttack>();
 
                     bool scytheAttack = false;
-                    if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
+                    if (boss.Phase2ShouldDoBigLaserAttack) {
+                        boss.Phase2ShouldDoBigLaserAttack = false;
+
+                        boss.ActivateState<Phase2BigLaserAttack>();
+                    }
+                    else if (boss.Phase2CloneAttack_ShouldDoScytheAttack) {
                         boss.Phase2CloneAttack_ShouldDoScytheAttack = false;
 
                         boss.ActivateState<Phase2ScytheAttack>();
@@ -1835,6 +1844,8 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.Phase2ShouldDoSpiralAttack = true;
 
+                    boss.Phase2ShouldDoBigLaserAttack = true;
+
                     //boss.ResetLaserAttack();
                     //boss.ResetCounters();
 
@@ -1849,9 +1860,9 @@ sealed partial class EternalHorror : ModNPC {
 
             if (boss._tempPosition != default) {
                 foreach (Player player in Main.ActivePlayers) {
-                    float lerpValue = MathHelper.Lerp(0.625f, 0.75f, 0.5f);
+                    float lerpValue = 0.5f;
                     lerpValue *= 1 / 60f;
-                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / maxDistance);
+                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / (maxDistance * 1.25f));
                     player.Center = Vector2.Lerp(player.Center, boss._tempPosition, lerpValue * EternalHorrorSummonHandler.FilterOpacity);
                 }
             }
@@ -1861,6 +1872,76 @@ sealed partial class EternalHorror : ModNPC {
             //boss.DeactivateState<Phase2MoveToPlayer>();
             boss._tempPosition = default;
         }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
+    private readonly struct Phase2BigLaserAttack : IAIState {
+        public static float ATTACKTIME => Helper.SecondsToFrames(3f);
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.AICounter++;
+
+            float attackProgress = boss.AICounter / ATTACKTIME;
+            float attackProgress2 = Helper.Clamp01(attackProgress);
+
+            Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = target.Center,
+                    baseTargetCenter = targetCenter;
+            float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
+
+            float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0.5f, 1f, true);
+            float preparationSlowDown2 = Utils.Remap(1f - attackProgress2, 0f, 1f, 0.25f, 1f, true);
+
+            float dustProgress = attackProgress2;
+
+            ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
+
+            boss._eyeEffectOpacity = dustProgress;
+
+            dustProgress = Helper.YoYo(dustProgress);
+            for (int i = 0; i < 2; i++) {
+                boss.SpawnPreparationDust_Shadow(dustProgress);
+            }
+
+            npc.velocity *= Ease.CubeOut(preparationSlowDown);
+            //npc.rotation *= Ease.CubeOut(preparationSlowDown);
+            void setRotation(float smoothFactor = 1f) {
+                npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor * smoothFactor * preparationSlowDown2);
+            }
+            setRotation();
+
+            boss._eyeScale = Helper.Approach(boss._eyeScale, 1f + attackProgress2 * 0.25f, 1f / 60f * 2f);
+
+            var laser = ModContent.ProjectileType<EternalHorrorLaser_Holdout>();
+
+            if (attackProgress >= 2f) {
+                boss.AICounter = 0f;
+
+                foreach (Projectile projectile in Main.ActiveProjectiles) {
+                    if (projectile.type == laser && projectile.ai[2] == npc.whoAmI) {
+                        projectile.Kill();
+                    }
+                }
+
+                return;
+            }
+
+            {
+                bool noProj = true;
+                foreach (Projectile projectile in Main.ActiveProjectiles) {
+                    if (projectile.type == laser && projectile.ai[2] == npc.whoAmI) {
+                        noProj = false;
+                        break;
+                    }
+                }
+
+                if (!Helper.IsClient() && noProj) {
+                    Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, npc.Center.DirectionTo(baseTargetCenter), laser, 50, 0, Main.myPlayer, ai2: npc.whoAmI);
+                }
+            }
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 

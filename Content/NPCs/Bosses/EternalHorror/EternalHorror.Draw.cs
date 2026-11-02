@@ -10,6 +10,7 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Terraria.GameContent.PlayerEyeHelper;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -919,6 +920,13 @@ sealed partial class EternalHorror : ModNPC {
             shadowOpacity = /*Helper.YoYo*/(attackProgress2);
             hasShadow = true;
         }
+        if (HasActiveState<Phase2BigLaserAttack>()) {
+            float attackProgress = AICounter / Phase2BigLaserAttack.ATTACKTIME;
+            float attackProgress2 = Helper.Clamp01(attackProgress);
+
+            shadowOpacity = /*Helper.YoYo*/(attackProgress2);
+            hasShadow = true;
+        }
         if (!hasShadow) {
             lerpValue = 1f;
         }
@@ -943,6 +951,12 @@ sealed partial class EternalHorror : ModNPC {
         if (!HasActiveState<Phase2ScytheAttack>()) {
             _cloneStateEffectOpacity = Helper.Approach(_cloneStateEffectOpacity, 0f, 1 / 60f);
         }
+
+        //float eyeScale = 1f;
+        //if (HasActiveState<Phase2BigLaserAttack>()) {
+        //    eyeScale = 1.25f;
+        //}
+        _eyeScale = Helper.Approach(_eyeScale, 1f, 1 / 60f);
     }
 
     private static void MakeScreenShake() {
@@ -1223,7 +1237,7 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
-        Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true, angle: eyeAngle);
+        Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true, angle: eyeAngle, laser: false);
 
         Color eyeEffectColor = drawContext.DrawColor;
 
@@ -1233,19 +1247,21 @@ sealed partial class EternalHorror : ModNPC {
         drawContext = drawContext with {
             Texture = eyeTexture,
             Clip = eyeClip,
-            Position = eyePosition
+            Position = eyePosition,
         };
+
+        float eyeScale = boss_modNPC._eyeScale;
 
         ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
         float anxietyFactor = 0.125f;
         ShaderLoader.DistortShader.Anxiety = anxietyFactor + anxietyFactor * boss_modNPC.SecondPhaseOpacity;
         ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-            Draw_Inner(boss, drawContext);
+            Draw_Inner(boss, drawContext, scale: eyeScale);
 
             Draw_Inner(boss, drawContext with {
                 Texture = _secondPhaseEyeTexture_Glow.Value,
                 DrawColor = eyeEffectColor * boss.Opacity
-            });
+            }, scale: eyeScale);
         });
 
         boss_modNPC.drawLaserSpamWarning(Main.screenPosition);
