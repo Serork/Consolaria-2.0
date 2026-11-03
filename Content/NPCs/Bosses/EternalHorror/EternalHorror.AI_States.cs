@@ -1427,8 +1427,8 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
-            boss._dashVelocity *= 0f;
-            boss._dashOpacity = 0f;
+            //boss._dashVelocity *= 0f;
+            //boss._dashOpacity = 0f;
             boss._ai5 = 0f;
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
@@ -1654,8 +1654,12 @@ sealed partial class EternalHorror : ModNPC {
                 for (int i = 0; i < 2; i++) {
                     boss.SpawnPreparationDust_Shadow(attackProgress2);
                 }
+
+                npc.dontTakeDamage = npc.Opacity < 0.75f;
             }
             else if (boss.Phase2ScytheAttackDirection != 0f) {
+                npc.dontTakeDamage = npc.Opacity < 0.5f;
+
                 float to = -1f;
                 boss.AICounter = Helper.Approach(boss.AICounter, to, 1f);
 
@@ -1734,8 +1738,6 @@ sealed partial class EternalHorror : ModNPC {
                     }
                 }
             }
-
-            npc.dontTakeDamage = npc.Opacity < 0.75f;
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
