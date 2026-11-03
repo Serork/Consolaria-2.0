@@ -25,6 +25,48 @@ sealed partial class EternalHorror : ModNPC {
         public void OnEnd(NPC npc, EternalHorror boss) { }
     }
 
+    public readonly struct DeathState : IAIState {
+        public static float SLOWTIME => Helper.SecondsToFrames(3f);
+
+        void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.AICounter++;
+
+            float attackProgress = boss.AICounter / SLOWTIME;
+
+            float attackProgress2 = Helper.Clamp01(attackProgress);
+
+            float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0.5f, 1f, true);
+            float preparationSlowDown2 = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
+
+            npc.velocity *= preparationSlowDown2;
+            npc.rotation *= preparationSlowDown2;
+
+            if (boss._ai4 == 0f) {
+                Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, 1f, 1 / 60f * 0.375f);
+            }
+            else {
+                boss._ai4++;
+
+                if (boss._ai4 >= 60f) {
+                    npc.dontTakeDamage = false;
+                    npc.life = 0;
+                    npc.checkDead();
+                    //npc.netUpdate = true;
+                }
+            }
+            if (Whitening_ForDeath >= 1f) {
+                boss._ai4 = 1f;
+            }
+        }
+
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.ActivateState<Phase2MoveToPlayer>();
+            boss.ResetCounters();
+            boss._ai4 = 0f;
+        }
+        void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+    }
+
     public readonly struct Phase1MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.TargetPlayer();

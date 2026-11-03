@@ -2,15 +2,16 @@
 using Consolaria.Content.Gores;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Linq;
 using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.Events;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Terraria.GameContent.PlayerEyeHelper;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -37,6 +38,7 @@ sealed partial class EternalHorror : ModNPC {
     private static float _shakeIntensity;
 
     public static float ShakeStrength;
+    public static float Whitening_ForDeath;
 
     private float _seed;
     private float _raySpeed;
@@ -200,6 +202,18 @@ sealed partial class EternalHorror : ModNPC {
 
     private partial void Load_ApplyShaderEffects() {
         On_Main.UpdateTime += On_Main_UpdateTime;
+        On_MoonlordDeathDrama.DrawWhite += On_MoonlordDeathDrama_DrawWhite;
+        On_MoonlordDeathDrama.Update += On_MoonlordDeathDrama_Update;
+    }
+
+    private void On_MoonlordDeathDrama_Update(On_MoonlordDeathDrama.orig_Update orig) {
+        orig();
+
+        Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, 0f, 1 / 60f * 0.125f);
+    }
+
+    private void On_MoonlordDeathDrama_DrawWhite(On_MoonlordDeathDrama.orig_DrawWhite orig, SpriteBatch spriteBatch) {
+        orig(spriteBatch);
     }
 
     private void On_Main_UpdateTime(On_Main.orig_UpdateTime orig) {
@@ -1092,201 +1106,210 @@ sealed partial class EternalHorror : ModNPC {
                 break;
             }
         }
-        if (!found) {
-            return;
-        }
-        EternalHorror boss_modNPC = boss.As<EternalHorror>();
-        if (!boss_modNPC.IsInSecondPhase_Base) {
-            CanDrawOnTopOfBlinking = true;
-            return;
-        }
-
-        CanDrawOnTopOfBlinking = true;
-
-        Color drawColor = Lighting.GetColor(boss.Center.ToTileCoordinates());
-        drawColor = boss.GetNPCColorTintedByBuffs(npcColor: drawColor);
-        drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
-
-        drawColor *= boss_modNPC.SecondPhaseOpacity;
-
-        Vector2 screenPos = Main.screenPosition;
-
-        float cloneStateOpacity = Utils.Remap(boss_modNPC._cloneStateEffectOpacity, 0f, 1f, 1f, 0.75f, true);
-        DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity * cloneStateOpacity);
-
-        var gore = Main.gore;
-        var screenPosition = Main.screenPosition;
-
-        var npc = Main.npc;
-
-        Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle((int)screenPosition.X - 800, (int)screenPosition.Y - 800, Main.screenWidth + 1600, Main.screenHeight + 1600);
-
-        void drawGores() {
-            for (int i = 0; i < 600; i++) {
-                if (!Main.gore[i].active || Main.gore[i].type <= 0)
-                    continue;
-
-
-                if (Main.gore[i].type != ModContent.GoreType<EternalHorrorGore1>() &&
-                    Main.gore[i].type != ModContent.GoreType<EternalHorrorGore2>() &&
-                    Main.gore[i].type != ModContent.GoreType<EternalHorrorGore3>() &&
-                    Main.gore[i].type != ModContent.GoreType<EternalServant_Gore>()) {
-                    continue;
-                }
-
-                if (rectangle.Intersects(new Microsoft.Xna.Framework.Rectangle((int)Main.gore[i].position.X, (int)Main.gore[i].position.Y, TextureAssets.Gore[Main.gore[i].type].Width(), TextureAssets.Gore[Main.gore[i].type].Height()))) {
-                    Main.instance.LoadGore(Main.gore[i].type);
-
-                    Microsoft.Xna.Framework.Color alpha2 = Main.gore[i].GetAlpha(Lighting.GetColor((int)((double)Main.gore[i].position.X + (double)TextureAssets.Gore[gore[i].type].Width() * 0.5) / 16, (int)(((double)gore[i].position.Y + (double)TextureAssets.Gore[gore[i].type].Height() * 0.5) / 16.0)));
-                    alpha2 *= 0.875f;
-                    spriteBatch.Draw(TextureAssets.Gore[Main.gore[i].type].Value, new Vector2(Main.gore[i].position.X - Main.screenPosition.X + (float)(TextureAssets.Gore[gore[i].type].Width() / 2), gore[i].position.Y - screenPosition.Y + (float)(TextureAssets.Gore[gore[i].type].Height() / 2)) + gore[i].drawOffset, new Microsoft.Xna.Framework.Rectangle(0, 0, TextureAssets.Gore[gore[i].type].Width(), TextureAssets.Gore[gore[i].type].Height()), alpha2, gore[i].rotation, new Vector2(TextureAssets.Gore[gore[i].type].Width() / 2, TextureAssets.Gore[gore[i].type].Height() / 2), gore[i].scale, SpriteEffects.None, 0f);
-                }
+        if (found) {
+            EternalHorror boss_modNPC = boss.As<EternalHorror>();
+            if (!boss_modNPC.IsInSecondPhase_Base) {
+                CanDrawOnTopOfBlinking = true;
             }
-        }
-        void drawNPCs() {
-            bool behindTiles = false;
+            else {
 
-            bool flag = false;
-            for (int num = 199; num >= 0; num--) {
-                try {
-                    if (npc[num].active && npc[num].type > 0 && !npc[num].hide && npc[num].ModNPC is not null && npc[num].ModNPC is EternalServant) {
-                        npc[num].position += npc[num].netOffset;
-                        if (npc[num].behindTiles == behindTiles) {
+                CanDrawOnTopOfBlinking = true;
 
-                            if (NPCID.Sets.MustAlwaysDraw[npc[num].type] || rectangle.Intersects(new Microsoft.Xna.Framework.Rectangle((int)npc[num].position.X, (int)npc[num].position.Y, npc[num].width, npc[num].height))) {
-                                Main.instance.DrawNPCCheckAlt(npc[num]);
-                                Main.instance.DrawNPC(num, behindTiles);
-                            }
+                Color drawColor = Lighting.GetColor(boss.Center.ToTileCoordinates());
+                drawColor = boss.GetNPCColorTintedByBuffs(npcColor: drawColor);
+                drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+
+                drawColor *= boss_modNPC.SecondPhaseOpacity;
+
+                Vector2 screenPos = Main.screenPosition;
+
+                float cloneStateOpacity = Utils.Remap(boss_modNPC._cloneStateEffectOpacity, 0f, 1f, 1f, 0.75f, true);
+                DrawRays(boss, spriteBatch, opacity: 0.25f * boss_modNPC.SecondPhaseOpacity * cloneStateOpacity);
+
+                var gore = Main.gore;
+                var screenPosition = Main.screenPosition;
+
+                var npc = Main.npc;
+
+                Microsoft.Xna.Framework.Rectangle rectangle = new Microsoft.Xna.Framework.Rectangle((int)screenPosition.X - 800, (int)screenPosition.Y - 800, Main.screenWidth + 1600, Main.screenHeight + 1600);
+
+                void drawGores() {
+                    for (int i = 0; i < 600; i++) {
+                        if (!Main.gore[i].active || Main.gore[i].type <= 0)
+                            continue;
+
+
+                        if (Main.gore[i].type != ModContent.GoreType<EternalHorrorGore1>() &&
+                            Main.gore[i].type != ModContent.GoreType<EternalHorrorGore2>() &&
+                            Main.gore[i].type != ModContent.GoreType<EternalHorrorGore3>() &&
+                            Main.gore[i].type != ModContent.GoreType<EternalServant_Gore>()) {
+                            continue;
                         }
 
-                        npc[num].position -= npc[num].netOffset;
+                        if (rectangle.Intersects(new Microsoft.Xna.Framework.Rectangle((int)Main.gore[i].position.X, (int)Main.gore[i].position.Y, TextureAssets.Gore[Main.gore[i].type].Width(), TextureAssets.Gore[Main.gore[i].type].Height()))) {
+                            Main.instance.LoadGore(Main.gore[i].type);
+
+                            Microsoft.Xna.Framework.Color alpha2 = Main.gore[i].GetAlpha(Lighting.GetColor((int)((double)Main.gore[i].position.X + (double)TextureAssets.Gore[gore[i].type].Width() * 0.5) / 16, (int)(((double)gore[i].position.Y + (double)TextureAssets.Gore[gore[i].type].Height() * 0.5) / 16.0)));
+                            alpha2 *= 0.875f;
+                            spriteBatch.Draw(TextureAssets.Gore[Main.gore[i].type].Value, new Vector2(Main.gore[i].position.X - Main.screenPosition.X + (float)(TextureAssets.Gore[gore[i].type].Width() / 2), gore[i].position.Y - screenPosition.Y + (float)(TextureAssets.Gore[gore[i].type].Height() / 2)) + gore[i].drawOffset, new Microsoft.Xna.Framework.Rectangle(0, 0, TextureAssets.Gore[gore[i].type].Width(), TextureAssets.Gore[gore[i].type].Height()), alpha2, gore[i].rotation, new Vector2(TextureAssets.Gore[gore[i].type].Width() / 2, TextureAssets.Gore[gore[i].type].Height() / 2), gore[i].scale, SpriteEffects.None, 0f);
+                        }
                     }
                 }
-                catch {
-                    npc[num].active = false;
+                void drawNPCs() {
+                    bool behindTiles = false;
+
+                    bool flag = false;
+                    for (int num = 199; num >= 0; num--) {
+                        try {
+                            if (npc[num].active && npc[num].type > 0 && !npc[num].hide && npc[num].ModNPC is not null && npc[num].ModNPC is EternalServant) {
+                                npc[num].position += npc[num].netOffset;
+                                if (npc[num].behindTiles == behindTiles) {
+
+                                    if (NPCID.Sets.MustAlwaysDraw[npc[num].type] || rectangle.Intersects(new Microsoft.Xna.Framework.Rectangle((int)npc[num].position.X, (int)npc[num].position.Y, npc[num].width, npc[num].height))) {
+                                        Main.instance.DrawNPCCheckAlt(npc[num]);
+                                        Main.instance.DrawNPC(num, behindTiles);
+                                    }
+                                }
+
+                                npc[num].position -= npc[num].netOffset;
+                            }
+                        }
+                        catch {
+                            npc[num].active = false;
+                        }
+                    }
                 }
-            }
-        }
 
-        Color drawColor2 = Color.Lerp(drawColor, boss_modNPC.CloneStateEffectColor, boss_modNPC.СloneStateEffectOpacity) * MathHelper.Lerp(0.125f, 0.25f, 0.5f);
-        boss_modNPC.Draw(spriteBatch, screenPos, drawColor2 * boss.Opacity, drawColor2, rayOpacity: 0f);
+                Color drawColor2 = Color.Lerp(drawColor, boss_modNPC.CloneStateEffectColor, boss_modNPC.СloneStateEffectOpacity) * MathHelper.Lerp(0.125f, 0.25f, 0.5f);
+                boss_modNPC.Draw(spriteBatch, screenPos, drawColor2 * boss.Opacity, drawColor2, rayOpacity: 0f);
 
-        DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor * boss.Opacity);
-        Texture2D eyeTexture = _secondPhaseEyeTexture.Value;
-        Rectangle eyeClip = eyeTexture.Bounds;
+                DrawContext drawContext = GetBasicDrawContext(boss, spriteBatch, screenPos, drawColor * boss.Opacity);
+                Texture2D eyeTexture = _secondPhaseEyeTexture.Value;
+                Rectangle eyeClip = eyeTexture.Bounds;
 
-        drawGores();
+                drawGores();
 
-        float eyeAngle = -10f;
+                float eyeAngle = -10f;
 
-        void drawRayWarning() {
-            if (boss_modNPC.HasActiveState<Phase2ScytheAttack>()) {
-                float attackPreparation = boss_modNPC.Phase2ScytheAttackAngle / MathHelper.Pi;
-                attackPreparation = MathF.Abs(attackPreparation);
-                float attackPreparation2 = attackPreparation;
-                attackPreparation = Utils.GetLerpValue(0f, 0.25f, attackPreparation, true) * Utils.GetLerpValue(1f, 0.75f, attackPreparation, true);
-                attackPreparation2 = Utils.GetLerpValue(0f, 0.5f, attackPreparation2, true) * Utils.GetLerpValue(1f, 0.5f, attackPreparation2, true);
+                void drawRayWarning() {
+                    if (boss_modNPC.HasActiveState<Phase2ScytheAttack>()) {
+                        float attackPreparation = boss_modNPC.Phase2ScytheAttackAngle / MathHelper.Pi;
+                        attackPreparation = MathF.Abs(attackPreparation);
+                        float attackPreparation2 = attackPreparation;
+                        attackPreparation = Utils.GetLerpValue(0f, 0.25f, attackPreparation, true) * Utils.GetLerpValue(1f, 0.75f, attackPreparation, true);
+                        attackPreparation2 = Utils.GetLerpValue(0f, 0.5f, attackPreparation2, true) * Utils.GetLerpValue(1f, 0.5f, attackPreparation2, true);
 
-                Texture2D texture_ray = RayTexture.Value;
-                Rectangle clip_ray = texture_ray.Frame(2, 1, 1);
-                Vector2 origin_ray = clip_ray.Centered();
-                Color color_ray = MainPurpleColor;
-                color_ray *= Helper.Wave(0.75f, 1f, 15f, boss_modNPC.WaveOffset);
-                color_ray *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
-                float rotation_ray = boss_modNPC.Phase2ScytheAttackAngle - MathHelper.PiOver2 * MathF.Sign(boss_modNPC.Phase2ScytheAttackDirection);
-                float time = Main.GlobalTimeWrappedHourly * 8f;
-                float squish = MathF.Sin(time) * 0.5f;
-                Vector2 scale_ray = new(1f + squish, 1f - squish);
-                scale_ray.X *= 2.5f;
-                scale_ray.Y *= 5f;
-                scale_ray.Y *= 1.125f;
-                scale_ray.Y *= 1.25f;
-                scale_ray *= 1.5f;
-                scale_ray *= Ease.SineOut(attackPreparation2);
-                Helper.DrawInfo drawInfo = new() {
-                    Clip = clip_ray,
-                    Origin = origin_ray,
-                    Rotation = rotation_ray,
-                    Color = color_ray,
-                    Scale = scale_ray
+                        Texture2D texture_ray = RayTexture.Value;
+                        Rectangle clip_ray = texture_ray.Frame(2, 1, 1);
+                        Vector2 origin_ray = clip_ray.Centered();
+                        Color color_ray = MainPurpleColor;
+                        color_ray *= Helper.Wave(0.75f, 1f, 15f, boss_modNPC.WaveOffset);
+                        color_ray *= MathHelper.Lerp(0.25f, 0.375f, 0.5f);
+                        float rotation_ray = boss_modNPC.Phase2ScytheAttackAngle - MathHelper.PiOver2 * MathF.Sign(boss_modNPC.Phase2ScytheAttackDirection);
+                        float time = Main.GlobalTimeWrappedHourly * 8f;
+                        float squish = MathF.Sin(time) * 0.5f;
+                        Vector2 scale_ray = new(1f + squish, 1f - squish);
+                        scale_ray.X *= 2.5f;
+                        scale_ray.Y *= 5f;
+                        scale_ray.Y *= 1.125f;
+                        scale_ray.Y *= 1.25f;
+                        scale_ray *= 1.5f;
+                        scale_ray *= Ease.SineOut(attackPreparation2);
+                        Helper.DrawInfo drawInfo = new() {
+                            Clip = clip_ray,
+                            Origin = origin_ray,
+                            Rotation = rotation_ray,
+                            Color = color_ray,
+                            Scale = scale_ray
+                        };
+
+                        boss_modNPC._eyeDirectionChangeTime = 10f * attackPreparation2;
+                        boss_modNPC._eyeAngle = Utils.AngleLerp(boss_modNPC._eyeAngle, rotation_ray + MathHelper.PiOver4 * Main.rand.NextFloatDirection(), 0.5f);
+                        //eyeAngle = boss_modNPC._eyeAngle;
+
+                        float opacity_ray = 0.5f * attackPreparation;
+                        Vector2 position2 = boss_modNPC.GetEyePosition();
+                        Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation_ray);
+                        //angleDirection *= origin_ray.Y / 3f;
+                        position2 += angleDirection;
+
+                        ShaderLoader.DistortShader.SetDefault(texture_ray.Width * 2, texture_ray.Height * 2);
+                        ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
+                            int drawCount = 3;
+                            for (int k = 0; k < drawCount; k++) {
+                                float progress = k / (float)drawCount;
+                                progress -= 0.5f;
+                                spriteBatch.Draw(texture_ray, position2,
+                                    drawInfo
+                                    .WithRotation(progress * 0.125f * 0.5f)
+                                    .WithColorOverride(
+                                        Color.Lerp(color_ray,
+                                        Main.hslToRgb(0.5f, 1f, 0.5f), 0f)
+                                        .MultiplyAlpha(0f) * opacity_ray));
+                            }
+                        });
+                    }
+                }
+
+                Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true, angle: eyeAngle, laser: false);
+
+                Color eyeEffectColor = drawContext.DrawColor;
+
+                float blink = MathF.Sin(boss_modNPC.AICounter / 4) / 2 + 0.5f;
+                eyeEffectColor = new Color(0.875f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
+
+                drawContext = drawContext with {
+                    Texture = eyeTexture,
+                    Clip = eyeClip,
+                    Position = eyePosition,
                 };
 
-                boss_modNPC._eyeDirectionChangeTime = 10f * attackPreparation2;
-                boss_modNPC._eyeAngle = Utils.AngleLerp(boss_modNPC._eyeAngle, rotation_ray + MathHelper.PiOver4 * Main.rand.NextFloatDirection(), 0.5f);
-                //eyeAngle = boss_modNPC._eyeAngle;
+                float eyeScale = boss_modNPC._eyeScale;
 
-                float opacity_ray = 0.5f * attackPreparation;
-                Vector2 position2 = boss_modNPC.GetEyePosition();
-                Vector2 angleDirection = Vector2.UnitY.RotatedBy(rotation_ray);
-                //angleDirection *= origin_ray.Y / 3f;
-                position2 += angleDirection;
-
-                ShaderLoader.DistortShader.SetDefault(texture_ray.Width * 2, texture_ray.Height * 2);
+                ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
+                float anxietyFactor = 0.125f;
+                ShaderLoader.DistortShader.Anxiety = anxietyFactor + anxietyFactor * boss_modNPC.SecondPhaseOpacity;
                 ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-                    int drawCount = 3;
-                    for (int k = 0; k < drawCount; k++) {
-                        float progress = k / (float)drawCount;
-                        progress -= 0.5f;
-                        spriteBatch.Draw(texture_ray, position2,
-                            drawInfo
-                            .WithRotation(progress * 0.125f * 0.5f)
-                            .WithColorOverride(
-                                Color.Lerp(color_ray,
-                                Main.hslToRgb(0.5f, 1f, 0.5f), 0f)
-                                .MultiplyAlpha(0f) * opacity_ray));
-                    }
+                    Draw_Inner(boss, drawContext, scale: eyeScale);
+
+                    Draw_Inner(boss, drawContext with {
+                        Texture = _secondPhaseEyeTexture_Glow.Value,
+                        DrawColor = eyeEffectColor * boss.Opacity
+                    }, scale: eyeScale);
                 });
+
+                boss_modNPC.drawLaserSpamWarning(Main.screenPosition);
+
+                drawNPCs();
+
+                Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
+
+                for (int j = 0; j < 1000; j++) {
+                    if (Main.projectile[j].active && Main.projectile[j].ModProjectile is IEternalHorrorProjectile) {
+                        Main.instance.DrawProj(j);
+                    }
+                }
+
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+                Main.ParticleSystem_World_OverPlayers.Settings.AnchorPosition = -Main.screenPosition;
+                Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
+
+                spriteBatch.Begin(in snapshot, end: true);
+
+                drawRayWarning();
+
+                CanDrawOnTopOfBlinking = false;
             }
         }
 
-        Vector2 eyePosition = boss_modNPC.GetEyePosition(forDrawing: true, angle: eyeAngle, laser: false);
-
-        Color eyeEffectColor = drawContext.DrawColor;
-
-        float blink = MathF.Sin(boss_modNPC.AICounter / 4) / 2 + 0.5f;
-        eyeEffectColor = new Color(0.875f - blink, 0.5f * blink, 2.5f * blink, 0) * boss_modNPC._eyeEffectOpacity;
-
-        drawContext = drawContext with {
-            Texture = eyeTexture,
-            Clip = eyeClip,
-            Position = eyePosition,
-        };
-
-        float eyeScale = boss_modNPC._eyeScale;
-
-        ShaderLoader.DistortShader.SetDefault(eyeTexture.Width * 1, eyeTexture.Height * 1);
-        float anxietyFactor = 0.125f;
-        ShaderLoader.DistortShader.Anxiety = anxietyFactor + anxietyFactor * boss_modNPC.SecondPhaseOpacity;
-        ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
-            Draw_Inner(boss, drawContext, scale: eyeScale);
-
-            Draw_Inner(boss, drawContext with {
-                Texture = _secondPhaseEyeTexture_Glow.Value,
-                DrawColor = eyeEffectColor * boss.Opacity
-            }, scale: eyeScale);
-        });
-
-        boss_modNPC.drawLaserSpamWarning(Main.screenPosition);
-
-        drawNPCs();
-
-        Helper.SpriteBatchSnapshot snapshot = spriteBatch.CaptureSnapshot();
-
-        for (int j = 0; j < 1000; j++) {
-            if (Main.projectile[j].active && Main.projectile[j].ModProjectile is IEternalHorrorProjectile) {
-                Main.instance.DrawProj(j);
-            }
-        }
-
-        spriteBatch.End();
-        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
-        Main.ParticleSystem_World_OverPlayers.Settings.AnchorPosition = -Main.screenPosition;
-        Main.ParticleSystem_World_OverPlayers.Draw(spriteBatch);
-
-        spriteBatch.Begin(in snapshot, end: true);
-
-        drawRayWarning();
-
-        CanDrawOnTopOfBlinking = false;
+        //ShaderLoader.HorrorDeathShader.uColor = Color.White;
+        //ShaderLoader.HorrorDeathShader.uTime = 1f;
+        //ShaderLoader.HorrorDeathShader.uScreenResolution = new Vector2(1f, 1f);
+        //ShaderLoader.ApplyEffect(ShaderLoader.HorrorDeathShader.Effect, spriteBatch,
+        //() => {
+            Color color = Color.Lerp(Color.Black, MainPurpleColor, 0.25f) * Ease.CubeOut(Whitening_ForDeath);
+            spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
+        //});
     }
 }

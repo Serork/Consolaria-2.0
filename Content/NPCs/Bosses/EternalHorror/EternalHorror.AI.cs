@@ -163,7 +163,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public bool IsInSecondPhase => EternalHorrorSummonHandler.BlinkProgress_Out >= 1f && IsInSecondPhase_Base;
-    public bool IsInSecondPhase_Base => NPC.life < NPC.lifeMax * 0.666f;
+    public bool IsInSecondPhase_Base => HasActiveState<DeathState>() || NPC.life < NPC.lifeMax * 0.666f;
 
     public bool Phase1CloneSpawn_ShouldDashAfter {
         get => Phase1CloneSpawn_ShouldDashAfterValue != 0f;
@@ -228,6 +228,23 @@ sealed partial class EternalHorror : ModNPC {
 
         SomeSecondPhaseShitCode();
         UpdateCustomImmunityFrames();
+    }
+
+    public override bool CheckDead() {
+        if (!HasActiveState<DeathState>()) {
+            DeactivateAllStates();
+            ActivateState<DeathState>();
+
+            NPC.dontTakeDamage = true;
+            NPC.life = NPC.lifeMax;
+
+            return false;
+        }
+        else if (_ai4 != 0f) {
+            return true;
+        }
+
+        return false;
     }
 
     private void OnSpawn() {

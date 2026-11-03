@@ -7,6 +7,8 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 [AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
+    private static byte IMMUNETIMEINTICKS => 1;
+
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
     private ushort[] _customImmunityFrames;
@@ -24,7 +26,7 @@ sealed partial class EternalHorror : ModNPC {
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
         if (Init && player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
-                _customImmunityFrames[player.whoAmI] = 10;
+                _customImmunityFrames[player.whoAmI] = IMMUNETIMEINTICKS;
             }
         }
     }
@@ -32,7 +34,7 @@ sealed partial class EternalHorror : ModNPC {
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
         if (Init && projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
-                _customImmunityFrames[projectile.owner] = 10;
+                _customImmunityFrames[projectile.owner] = IMMUNETIMEINTICKS;
             }
         }
     }

@@ -19,6 +19,28 @@ using static Terraria.ModLoader.Core.TmodFile;
 namespace Consolaria;
 
 sealed class ShaderLoader : ModSystem {
+    public static class HorrorDeathShader {
+        public static Effect Effect => HorrorDeath.Value;
+
+        private static float _uTime;
+        public static float uTime {
+            get => _uTime;
+            set => Effect?.Parameters["uTime"].SetValue(_uTime = value);
+        }
+
+        private static Vector2 _uScreenResolution;
+        public static Vector2 uScreenResolution {
+            get => _uScreenResolution;
+            set => Effect?.Parameters["uScreenResolution"].SetValue(_uScreenResolution = value);
+        }
+
+        private static Color _uColor;
+        public static Color uColor {
+            get => _uColor;
+            set => Effect?.Parameters["uColor"].SetValue((_uColor = value).ToVector3());
+        }
+    }
+
     public static class HorrorLaserShader {
         public static Effect Effect => HorrorLaser.Value;
 
@@ -226,6 +248,7 @@ sealed class ShaderLoader : ModSystem {
     public static Asset<Effect> WavyCircle => _loadedShaders["WavyCircle"];
     public static Asset<Effect> HorrorZone => _loadedShaders["HorrorZone"];
     public static Asset<Effect> HorrorLaser => _loadedShaders["HorrorLaser"];
+    public static Asset<Effect> HorrorDeath => _loadedShaders["HorrorDeath"];
 
     public static string HorrorZoneFilterName => nameof(Consolaria) + "EternalHorrorHorrorZone";
     public static Filter HorrorZoneFilter => Filters.Scene[HorrorZoneFilterName];
