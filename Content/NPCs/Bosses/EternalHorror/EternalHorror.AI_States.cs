@@ -1629,7 +1629,6 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, attackProgress2, 1f / 60f);
 
-
                 float preparationSlowDown2 = Ease.CubeIn(1f - preparationSlowDown);
                 npc.position.Y -= preparationSlowDown2 * 15f;
                 npc.Opacity = Ease.SineOut(1f - preparationSlowDown2);
@@ -1658,8 +1657,6 @@ sealed partial class EternalHorror : ModNPC {
                 npc.dontTakeDamage = npc.Opacity < 0.75f;
             }
             else if (boss.Phase2ScytheAttackDirection != 0f) {
-                npc.dontTakeDamage = npc.Opacity < 0.5f;
-
                 float to = -1f;
                 boss.AICounter = Helper.Approach(boss.AICounter, to, 1f);
 
@@ -1737,6 +1734,8 @@ sealed partial class EternalHorror : ModNPC {
                         }
                     }
                 }
+
+                npc.dontTakeDamage = npc.Opacity < 0.5f;
             }
         }
 
