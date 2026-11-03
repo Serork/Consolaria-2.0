@@ -303,7 +303,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
 
         if (_segment <= 3f) {
-            float scaleFactor = MathHelper.Lerp(0.125f, 1f, _segment / 3f);
+            float scaleFactor = MathHelper.Lerp(0.25f, 1f, _segment / 3f);
             color *= scaleFactor;
         }
 
