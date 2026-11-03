@@ -56,7 +56,7 @@ sealed class EternalServant : ModNPC {
 
         if (player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
-                _customImmunityFrames[player.whoAmI] = 10;
+                _customImmunityFrames[player.whoAmI] = EternalHorror.IMMUNETIMEINTICKS;
             }
         }
     }
@@ -68,7 +68,7 @@ sealed class EternalServant : ModNPC {
 
         if (projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
-                _customImmunityFrames[projectile.owner] = 10;
+                _customImmunityFrames[projectile.owner] = EternalHorror.IMMUNETIMEINTICKS;
             }
         }
     }
