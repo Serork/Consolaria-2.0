@@ -4,13 +4,58 @@ using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
+public class TrailParticle : IParticle {
+    public Vector2 AccelerationPerFrame;
+    public Vector2 Velocity;
+    public Vector2 LocalPosition;
+    public float ScaleOffsetPerFrame;
+    public float StopWhenBelowXScale;
+    private Asset<Texture2D> _texture;
+    private Rectangle _frame;
+    private Vector2 _origin;
+    private float _scale;
+
+    public float Opacity = 1f;
+
+    public bool ShouldBeRemovedFromRenderer { get; private set; }
+
+    public TrailParticle(Asset<Texture2D> textureAsset, Rectangle? frame, Vector2 initialVelocity, Vector2 initialLocalPosition) {
+        _texture = textureAsset;
+        _frame = (frame.HasValue ? frame.Value : _texture.Frame());
+        _origin = _frame.Size() / 2f;
+        Velocity = initialVelocity;
+        LocalPosition = initialLocalPosition;
+        StopWhenBelowXScale = 0f;
+        ShouldBeRemovedFromRenderer = false;
+        _scale = 0.6f * Main.rand.NextFloat(0.75f, 1f);
+    }
+
+    public void Update(ref ParticleRendererSettings settings) {
+        Velocity += AccelerationPerFrame;
+        LocalPosition += Velocity;
+        _scale += ScaleOffsetPerFrame;
+        if (_scale <= StopWhenBelowXScale)
+            ShouldBeRemovedFromRenderer = true;
+    }
+
+    public void Draw(ref ParticleRendererSettings settings, SpriteBatch spritebatch) {
+        Color baseColor = EternalHorror.MainPurpleColor;
+        Color color = Color.Lerp(baseColor, baseColor.MultiplyAlpha(0f), Utils.GetLerpValue(0.1f, 0.5f, _scale));
+        spritebatch.Draw(_texture.Value, settings.AnchorPosition + LocalPosition, _frame, color * Opacity, 0f, _origin, _scale, SpriteEffects.None, 0f);
+        spritebatch.Draw(_texture.Value, settings.AnchorPosition + LocalPosition, _frame, color.MultiplyAlpha(0f) * Opacity, 0f, _origin, _scale * 0.625f, SpriteEffects.None, 0f);
+        spritebatch.Draw(_texture.Value, settings.AnchorPosition + LocalPosition, _frame, color.MultiplyAlpha(0f) * Opacity, 0f, _origin, _scale * 0.375f, SpriteEffects.None, 0f);
+    }
+}
+
 sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
-    private static Asset<Texture2D> _laser = null!;
+    private static Asset<Texture2D> _laser = null!,
+                                    _trailParticle = null!;
 
     private float _scaleX;
 
@@ -19,6 +64,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
         if (!Main.dedServ) {
             _laser = ModContent.Request<Texture2D>(Texture + "2");
+            _trailParticle = ModContent.Request<Texture2D>(Texture + "_TrailParticle");
         }
     }
 
@@ -34,6 +80,23 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         Projectile.penetrate = -1;
         Projectile.Opacity = 0f;
         Projectile.tileCollide = false;
+    }
+    
+    private void MakeTrailDust(Vector2 position, Vector2 velocity, Vector2 velocity2, float opacity) {
+        Vector2 accelerationPerFrame = new Vector2(0f, 0.16350001f) + velocity2;
+        Asset<Texture2D> textureAsset = _trailParticle;
+        for (int i = 0; i < 1; i++) {
+            //Vector2 vector = Main.rand.NextVector2Circular(3f, 4f);
+            //if (vector.Y > 0f) {
+            //    vector.Y = 0f - vector.Y;
+            //}
+            //vector.Y -= 2f;
+            Main.ParticleSystem_World_OverPlayers.Add(new TrailParticle(textureAsset, null, velocity, position) {
+                AccelerationPerFrame = accelerationPerFrame,
+                ScaleOffsetPerFrame = -1f / 60f,
+                Opacity = opacity * 1.5f
+            });
+        }
     }
 
     public override void CutTiles() {
@@ -175,7 +238,35 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
             Projectile.localAI[2] = 256f;
         }
 
-        DelegateMethods.v3_1 = EternalHorror.MainPurpleColor.ModifyRGB(0.5f).ToVector3() * 1f * Projectile.Opacity * Ease.QuartOut(_scaleX);
+        Vector2 vector = new Vector2(Main.screenWidth, Main.screenHeight);
+
+        float opacityFactor = Projectile.Opacity * Ease.QuartOut(_scaleX);
+
+        float targetSpeed = (projectile2.ModProjectile as EternalHorrorLaser_Holdout).Target.velocity.Length();
+        targetSpeed /= EternalHorror.Phase2DashAttack.DASHSTRENGTH;
+        targetSpeed = Utils.Remap(targetSpeed, 0f, 1f, 0.375f, 0.75f);
+
+        float chance = (/*0.5f + 0.5f * */targetSpeed) * opacityFactor;
+        if (Main.rand.NextChance(chance)) {
+            Vector2 center = Vector2.Lerp(Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], Main.rand.NextFloat(0.125f * 0.125f, 1f));
+
+            if (Utils.CenteredRectangle(Main.screenPosition + vector / 2f, vector + new Vector2(400f)).Contains(center.ToPoint())) {
+                MakeTrailDust(center,
+                    Projectile.velocity.RotatedBy(MathHelper.PiOver2 * -Projectile.direction) * 5f * Main.rand.NextFloat(0.5f, 1f) + Projectile.velocity * Main.rand.NextFloat(),
+                    Projectile.velocity * Main.rand.NextFloat(0f, 0.5f), opacityFactor);
+            }
+        }
+        if (Main.rand.NextChance(chance)) {
+            Vector2 center = Vector2.Lerp(Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], Main.rand.NextFloat(0.125f * 0.125f, 1f));
+
+            if (Utils.CenteredRectangle(Main.screenPosition + vector / 2f, vector + new Vector2(400f)).Contains(center.ToPoint())) {
+                MakeTrailDust(center,
+                    Projectile.velocity.RotatedBy(MathHelper.PiOver2 * Projectile.direction) * 5f * Main.rand.NextFloat(0.5f, 1f) + Projectile.velocity * Main.rand.NextFloat(),
+                    Projectile.velocity * Main.rand.NextFloat(0f, 0.5f), opacityFactor);
+            }
+        }
+
+        DelegateMethods.v3_1 = EternalHorror.MainPurpleColor.ModifyRGB(0.5f).ToVector3() * 1f * opacityFactor;
         Utils.PlotTileLine(Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], (float)Projectile.width * Projectile.scale, DelegateMethods.CastLight);
     }
 

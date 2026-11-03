@@ -25,7 +25,7 @@ sealed partial class EternalHorror : ModNPC {
         public void OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase1MoveToPlayer : IAIState {
+    public readonly struct Phase1MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.TargetPlayer();
             npc.FaceTarget_New();
@@ -123,7 +123,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase1BurstLaserAttack : IAIState {
+    public readonly struct Phase1BurstLaserAttack : IAIState {
         public static float LASERATTACKTIME => Helper.SecondsToFrames(1);
         public static byte LASERATTACKCOUNT => 3;
 
@@ -186,7 +186,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase1CloneSpawn : IAIState {
+    public readonly struct Phase1CloneSpawn : IAIState {
         public static float SHADOWSPAWNTIME => Helper.SecondsToFrames(1);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
@@ -229,7 +229,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase1DashAttack : IAIState {
+    public readonly struct Phase1DashAttack : IAIState {
         public static float DASHTIME => Helper.SecondsToFrames(0.75f * 0.75f);
         public static float LASERATTACKCOUNTNEEDED => 5;
         public static float DASHATTACKCOUNT => 5;
@@ -447,7 +447,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase1LaserSpamAttack : IAIState {
+    public readonly struct Phase1LaserSpamAttack : IAIState {
         public static float BEFORESPAMTIME => Helper.SecondsToFrames(1.5f);
         public static float SPAMATTACKTIME => Helper.SecondsToFrames(2f);
 
@@ -515,7 +515,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase1SummonSpawnAttack : IAIState {
+    public readonly struct Phase1SummonSpawnAttack : IAIState {
         public static float MOVETOPLAYERTIME => Helper.SecondsToFrames(1f * 0.75f);
         public static float SLOWDOWNTIME => Helper.SecondsToFrames(1f * 0.875f);
         public static float ATTACKTIME => Helper.SecondsToFrames(1.5f * 0.875f);
@@ -706,7 +706,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2Transition : IAIState {
+    public readonly struct Phase2Transition : IAIState {
         private static ushort PREPARATIONTIME => Helper.SecondsToFrames(2);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
@@ -925,7 +925,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2MoveToPlayer : IAIState {
+    public readonly struct Phase2MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             boss.TargetPlayer();
             npc.FaceTarget_New();
@@ -1032,7 +1032,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2BurstLaserAttack : IAIState {
+    public readonly struct Phase2BurstLaserAttack : IAIState {
         public static float LASERATTACKTIME => Helper.SecondsToFrames(1.5f);
         public static byte LASERATTACKCOUNT => (byte)(Phase2DashAttack.LASERATTACKCOUNTNEEDED + 1);
 
@@ -1132,7 +1132,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2DashAttack : IAIState {
+    public readonly struct Phase2DashAttack : IAIState {
         public static float DASHTIME => Helper.SecondsToFrames(0.75f * 0.75f * 0.75f);
         public static float DASHTIME_FIRSTDASH => Helper.SecondsToFrames(0.75f);
         public static float LASERATTACKCOUNTNEEDED => 1;
@@ -1434,7 +1434,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2LaserSpamAttack : IAIState {
+    public readonly struct Phase2LaserSpamAttack : IAIState {
         public static float BEFORESPAMTIME => Helper.SecondsToFrames(1.5f * 1.5f);
         public static float SPAMATTACKTIME => Helper.SecondsToFrames(2f * 2f);
 
@@ -1515,7 +1515,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2CloneSpawn : IAIState {
+    public readonly struct Phase2CloneSpawn : IAIState {
         public static float SHADOWSPAWNTIME => Helper.SecondsToFrames(1);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
@@ -1593,7 +1593,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2ScytheAttack : IAIState {
+    public readonly struct Phase2ScytheAttack : IAIState {
         public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(1.5f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
@@ -1744,7 +1744,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2SpiralAttack : IAIState {
+    public readonly struct Phase2SpiralAttack : IAIState {
         public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(0.75f);
         public static float ATTACKTIME => Helper.SecondsToFrames(3f);
 
@@ -1875,7 +1875,7 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
-    private readonly struct Phase2BigLaserAttack : IAIState {
+    public readonly struct Phase2BigLaserAttack : IAIState {
         public static float ATTACKTIME => Helper.SecondsToFrames(1.5f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
@@ -1889,9 +1889,15 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (boss.AICounter == 0f) {
-                if (!Helper.IsClient()) {
-                    boss._ai5 = Main.rand.NextBool().ToDirectionInt();
-                    npc.netUpdate = true;
+                //if (!Helper.IsClient()) {
+                //    boss._ai5 = Main.rand.NextBool().ToDirectionInt();
+                //    npc.netUpdate = true;
+                //}
+                if (boss._ai5 == 0f) {
+                    boss._ai5 = 1f;
+                }
+                else {
+                    boss._ai5 *= -1f;
                 }
             }
 
@@ -2019,6 +2025,8 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss.LaserRotation = 0f;
 
+                boss._ai5 *= -1f;
+
                 boss.AICounter = -ATTACKTIME;
                 boss._ai4 = 0f;
                 boss._tempPosition = default;
@@ -2070,6 +2078,8 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             boss.LaserRotation = 0f;
             boss._tempPosition = default;
+
+            boss._ai5 = 0f;
 
             boss.Phase2DashAttackCount = -1;
 

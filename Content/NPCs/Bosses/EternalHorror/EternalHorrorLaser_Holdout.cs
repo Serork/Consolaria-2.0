@@ -67,8 +67,6 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
 
         Vector2 eyePosition = target.GetEyePosition(true, laser: true);
 
-        Helper.SpawnDebugDusts(eyePosition);
-
         if (Projectile.localAI[2] >= 1f) {
             Projectile.localAI[2] = 0f;
             flag9 = true;
