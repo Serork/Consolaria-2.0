@@ -172,7 +172,7 @@ sealed partial class EternalHorror : ModNPC {
         if (boss is not null && boss.As<EternalHorror>().HasActiveState<EternalHorror.DeathState>()) {
             value = 0f;
             amount = 1 / 60f;
-            amount /= 5f * 1.5f;
+            amount /= 5f * 1.125f;
         }
 
         amount /= 1f;
