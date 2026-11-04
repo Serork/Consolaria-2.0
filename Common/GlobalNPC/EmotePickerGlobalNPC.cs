@@ -22,6 +22,10 @@ namespace Consolaria.Common.GlobalNPCs {
                 emoteList.Add(ModContent.EmoteBubbleType<TurkorEmote>());
             }
 
+            if (Main.rand.NextBool(3) && DownedBossSystem.downedEternalHorror) {
+                emoteList.Add(ModContent.EmoteBubbleType<OcramEmote>());
+            }
+
             return base.PickEmote(npc, closestPlayer, emoteList, otherAnchor);
         }
     }

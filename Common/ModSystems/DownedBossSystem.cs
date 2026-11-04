@@ -18,29 +18,34 @@ namespace Consolaria.Common.ModSystems {
         public static bool downedLepus = false;
         public static bool downedTurkor = false;
         public static bool downedOcram = false;
+        public static bool downedEternalHorror = false;
 
         public override void OnWorldLoad() {
             downedLepus = false;
             downedTurkor = false;
             downedOcram = false;
+            downedEternalHorror = false;
         }
 
         public override void OnWorldUnload() {
             downedLepus = false;
             downedTurkor = false;
             downedOcram = false;
+            downedEternalHorror = false;
         }
 
         public override void SaveWorldData(TagCompound tag) {
             if (downedLepus) tag["downedLepus"] = true;
             if (downedTurkor) tag["downedTurkor"] = true;
             if (downedOcram) tag["downedOcram"] = true;
+            if (downedEternalHorror) tag["downedEternalHorror"] = true;
         }
 
         public override void LoadWorldData(TagCompound tag) {
             downedLepus = tag.ContainsKey("downedLepus");
             downedTurkor = tag.ContainsKey("downedTurkor");
             downedOcram = tag.ContainsKey("downedOcram");
+            downedEternalHorror = tag.ContainsKey("downedEternalHorror");
         }
 
         public override void NetSend(BinaryWriter writer) {
@@ -48,6 +53,7 @@ namespace Consolaria.Common.ModSystems {
             flags[0] = downedLepus;
             flags[1] = downedTurkor;
             flags[2] = downedOcram;
+            flags[3] = downedEternalHorror;
             writer.Write(flags);
         }
 
@@ -56,6 +62,7 @@ namespace Consolaria.Common.ModSystems {
             downedLepus = flags[0];
             downedTurkor = flags[1];
             downedOcram = flags[2];
+            downedEternalHorror = flags[3];
         }
 
         public override void PostUpdateWorld() {

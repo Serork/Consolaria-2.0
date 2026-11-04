@@ -12,7 +12,7 @@ namespace Consolaria.Common {
         public static Condition isMaleCondition = new Condition("Mods.Consolaria.Conditions.SellingIfMale", () => Main.LocalPlayer.Male & Main.bloodMoon);
         public static Condition womanMoment = new Condition("Mods.Consolaria.Conditions.SellingWhenWoman", () => !Main.LocalPlayer.Male & Main.bloodMoon);
         public static Condition wishboneCooldown = new Condition("Mods.Consolaria.Conditions.SellingDuringWishboneCooldown", () => !WishbonePlayer.purchasedWishbone);
-        public static Condition ocramDownedCondition = new Condition("Mods.Consolaria.Conditions.OcramDowned", () => DownedBossSystem.downedOcram);
+        public static Condition ocramDownedCondition = new Condition("Mods.Consolaria.Conditions.OcramDowned", () => DownedBossSystem.downedOcram || DownedBossSystem.downedEternalHorror);
         public static Condition turkorDownedCondition = new Condition("Mods.Consolaria.Conditions.TurkorDowned", () => DownedBossSystem.downedTurkor);
 
         public override void ModifyShop(NPCShop shop) {

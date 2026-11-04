@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Consolaria.Common.ModSystems;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -63,6 +65,8 @@ sealed partial class EternalHorror : ModNPC {
 
     public EternalHorror Self => NPC.As<EternalHorror>();
 
+    public static bool CanEternalHorrorExistInAWorld => Main.getGoodWorld;
+
     public override void Load() {
         Load_BackgroundHooks();
 
@@ -73,6 +77,17 @@ sealed partial class EternalHorror : ModNPC {
         Load_ApplyShaderEffects();
 
         Load_BlinkingDrawing();
+
+        On_NPC.OnGameEventClearedForTheFirstTime += On_NPC_OnGameEventClearedForTheFirstTime;
+    }
+
+    private void On_NPC_OnGameEventClearedForTheFirstTime(On_NPC.orig_OnGameEventClearedForTheFirstTime orig, int gameEventId) {
+        if (gameEventId == 10 && Main.getGoodWorld) {
+            LanternNight.NextNightIsLanternNight = true;
+
+            return;
+        }
+        orig(gameEventId);
     }
 
     public override void Unload() {
@@ -135,6 +150,13 @@ sealed partial class EternalHorror : ModNPC {
 
     private void SetMusic() {
         Music = MusicLoader.GetMusicSlot(Mod, EERIEOCRAM_MUSICPATH);
+    }
+
+    public override void OnKill() {
+        if (!DownedBossSystem.downedEternalHorror) {
+            CreditsRollEvent.TryStartingCreditsRoll();
+        }
+        NPC.SetEventFlagCleared(ref DownedBossSystem.downedEternalHorror, -1);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit) {

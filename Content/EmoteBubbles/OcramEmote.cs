@@ -10,7 +10,7 @@ namespace Consolaria.Content.EmoteBubbles {
         }
 
         public override bool IsUnlocked() {
-            return DownedBossSystem.downedOcram;
+            return DownedBossSystem.downedOcram || DownedBossSystem.downedEternalHorror;
         }
     }
 }
