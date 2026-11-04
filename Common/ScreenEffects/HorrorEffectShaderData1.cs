@@ -8,7 +8,7 @@ using Terraria.Graphics.Shaders;
 
 namespace RoA.Common.ScreenEffects;
 
-sealed class HorrorDeathShaderData(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
+sealed class HorrorEffectShaderData1(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
     public override void Update(GameTime gameTime) {
         //UseImage(ResourceManager.Noise, 1);
 

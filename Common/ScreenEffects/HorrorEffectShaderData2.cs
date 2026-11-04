@@ -7,7 +7,7 @@ using Terraria.Graphics.Shaders;
 
 namespace RoA.Common.ScreenEffects;
 
-sealed class HorrorZoneShaderData(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
+sealed class HorrorEffectShaderData2(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
     public static float Time { get; internal set; }
 
     public static float TimeFactor { get; internal set; } = 1 / 60f;

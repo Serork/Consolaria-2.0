@@ -171,7 +171,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             bool any2 = EternalHorrorSummonEnded;
 
             void applyFilter(EternalHorror npc) {
-                string filterName = ShaderLoader.HorrorZoneFilterName;
+                string filterName = ShaderLoader.HorrorEffectFilterName2;
 
                 var filter = Filters.Scene[filterName];
                 var shader = filter.GetShader();
@@ -204,7 +204,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 //shader.Shader.Parameters["waveOffset"].SetValue((index + 1) * 2f);
             }
 
-            string filterName = ShaderLoader.HorrorZoneFilterName;
+            string filterName = ShaderLoader.HorrorEffectFilterName2;
 
             var filter = Filters.Scene[filterName];
 

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using ReLogic.Content;
+using RoA.Common.ScreenEffects;
 using System;
 using Terraria;
 using Terraria.GameContent;
@@ -41,6 +42,9 @@ sealed partial class EternalHorror : ModNPC {
 
     public static float ShakeStrength;
     public static float Whitening_ForDeath;
+
+    public static Vector2 ChromaPosition;
+    public static float ChromaOpacity;
 
     private float _seed;
     private float _raySpeed;
@@ -213,32 +217,60 @@ sealed partial class EternalHorror : ModNPC {
         orig();
 
         if (!Main.gameMenu && !Main.dedServ) {
-            string filterName = ShaderLoader.HorrorDeathFilterName;
-            var filter = Filters.Scene[filterName];
+            {
+                string filterName = ShaderLoader.HorrorEffectFilterName1;
+                var filter = Filters.Scene[filterName];
 
-            if (filter.IsActive()) {
-                Filters.Scene.Deactivate(filterName);
-            }
-
-            foreach (NPC npc in Main.ActiveNPCs) {
-                if (npc.type != SelfType) {
-                    continue;
+                if (filter.IsActive()) {
+                    Filters.Scene.Deactivate(filterName);
                 }
 
-                var modNPC = npc.As<EternalHorror>();
+                foreach (NPC npc in Main.ActiveNPCs) {
+                    if (npc.type != SelfType) {
+                        continue;
+                    }
 
-                if (modNPC.HasActiveState<DeathState>()) {
+                    var modNPC = npc.As<EternalHorror>();
+
+                    if (modNPC.HasActiveState<DeathState>()) {
+                        if (!filter.IsActive()) {
+                            Filters.Scene.Activate(filterName);
+                        }
+
+                        var shader = filter.GetShader();
+
+                        shader.UseTargetPosition(modNPC.GetEyePosition());
+                    }
+                    else {
+                        Whitening_ForDeath = 0f;
+                    }
+                }
+            }
+
+            //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+            //    ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
+            //    ChromaPosition = Main.MouseWorld;
+            //}
+
+            {
+                string filterName = ShaderLoader.HorrorChromaFilterName;
+                var filter = Filters.Scene[filterName];
+
+                if (filter.IsActive()) {
+                    Filters.Scene.Deactivate(filterName);
+                }
+
+                if (ChromaOpacity > 0f) {
+                    ChromaOpacity = Helper.Approach(ChromaOpacity, 0f, 1 / 60f * 2f);
+
                     if (!filter.IsActive()) {
                         Filters.Scene.Activate(filterName);
                     }
 
                     var shader = filter.GetShader();
 
-                    shader.UseTargetPosition(modNPC.GetEyePosition());
+                    shader.UseTargetPosition(ChromaPosition + new Vector2(-515, -550 / 2));
                     shader.UseColor(MainPurpleColor);
-                }
-                else {
-                    Whitening_ForDeath = 0f;
                 }
             }
         }

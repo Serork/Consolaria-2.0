@@ -59,7 +59,7 @@ sealed partial class EternalHorror : ModNPC {
             //EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, 1 / 60f * 1f);
 
             EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f + attackProgress2 * 2f, 1f / 60f * 2.5f * 2f);
-            HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * (1f + attackProgress2), 1 / 60f * 0.25f);
+            HorrorEffectShaderData2.TimeFactor = Helper.Approach(HorrorEffectShaderData2.TimeFactor, 1 / 60f * (1f + attackProgress2), 1 / 60f * 0.25f);
 
             if (boss._ai4 == 0f) {
                 Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, attackProgress2, 0.125f);
@@ -68,6 +68,39 @@ sealed partial class EternalHorror : ModNPC {
                 boss._ai4++;
 
                 if (boss._ai4 >= 1f) {
+                    NPC NPC = npc;
+                    for (int num164 = 0; num164 < 50; num164++) {
+                        if (Main.rand.NextBool()) {
+                            continue;
+                        }
+
+                        int dust2 = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.CorruptTorch, boss._hitDirection, -1f);
+                        Main.dust[dust2].noLightEmittence = true;
+                        Main.dust[dust2].position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                        Dust dust44 = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Shadowflame)];
+                        dust44.color = EternalHorror.MainPurpleColor;
+                        dust44.position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) / 3f;
+                        dust44.noGravity = true;
+                        dust44.scale = 1.5f;
+                        dust44.fadeIn = 1f;
+                        dust44.noLightEmittence = true;
+                        Dust dust = dust44;
+                        dust.velocity *= 3f;
+                    }
+
+                    if (!Main.dedServ) {
+                        for (int i = 0; i < 5; i++) {
+                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(1f, 1.4f));
+                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(1.2f, 1.6f));
+                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(1f, 1.4f));
+                        }
+                    }
+                    SoundEngine.PlaySound(SoundID.Item14, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.Roar with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) + 0.25f, MaxInstances = 0 }, NPC.position);
+
+                    ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
+                    ChromaPosition = boss.GetEyePosition();
+
                     npc.dontTakeDamage = false;
                     npc.life = 0;
                     npc.checkDead();
@@ -1205,7 +1238,7 @@ sealed partial class EternalHorror : ModNPC {
         public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f, 1 / 60f * 0.125f);
+            HorrorEffectShaderData2.TimeFactor = Helper.Approach(HorrorEffectShaderData2.TimeFactor, 1 / 60f, 1 / 60f * 0.125f);
 
             Player target = npc.GetTargetPlayer();
             Vector2 targetCenter = target.Center;
@@ -1919,7 +1952,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, Ease.SineOut(1f - attackProgress3) * 2f, 1f / 60f * 2.5f * 2f);
-                HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 0.5f, 1 / 60f * 0.125f);
+                HorrorEffectShaderData2.TimeFactor = Helper.Approach(HorrorEffectShaderData2.TimeFactor, 1 / 60f * 0.5f, 1 / 60f * 0.125f);
             }
 
             if (boss._tempPosition != default) {

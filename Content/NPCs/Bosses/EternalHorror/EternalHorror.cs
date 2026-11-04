@@ -1,6 +1,7 @@
 ﻿using Consolaria.Common.ModSystems;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,6 +15,7 @@ sealed partial class EternalHorror : ModNPC {
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
     private ushort[] _customImmunityFrames;
+    private float _hitDirection;
 
     private void InitializeCustomImmunityFrames() {
         _customImmunityFrames = new ushort[Main.player.Length];
@@ -131,7 +133,7 @@ sealed partial class EternalHorror : ModNPC {
     public override void SetDefaults() {
         NPC.SetHitboxSizeValues(width: 314, height: 216);
 
-        NPC.SetDefaultsToEnemy(lifeMax: 54000,
+        NPC.SetDefaultsToEnemy(lifeMax: 1000/*54000*/,
                                damage: 55, 
                                defense: 36, 
                                spawnSlots: 10f,
@@ -165,6 +167,9 @@ sealed partial class EternalHorror : ModNPC {
 
     public override void HitEffect(NPC.HitInfo hit) {
         float hitDirection = hit.HitDirection;
+
+        _hitDirection = hitDirection;
+
         int lifeMax = NPC.lifeMax;
         float dmg = hit.Damage;
         if (NPC.life > 0) {
@@ -190,7 +195,8 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
         else {
-
+            //for (int k = 0; k < 30; k++)
+            //    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.SeaSnail, 2.5f * hit.HitDirection, -2.5f, 0, default, 0.7f);
         }
     }
 }
