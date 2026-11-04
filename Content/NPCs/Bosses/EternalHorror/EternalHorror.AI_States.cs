@@ -52,11 +52,11 @@ sealed partial class EternalHorror : ModNPC {
 
             Main.musicFade[Main.curMusic] = Helper.Approach(Main.musicFade[Main.curMusic], Utils.Remap(Ease.CubeOut(1f - attackProgress2), 0f, 1f, 0.5f, 1f, true), 1 / 60f);
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 1; i++) {
                 boss.SpawnPreparationDust_Shadow(Helper.YoYo(attackProgress2));
             }
 
-            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, attackProgress2 * 2f, 1f / 60f * 2.5f * 2f);
+            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f + attackProgress2, 1f / 60f * 2.5f * 2f);
             HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 0.5f, 1 / 60f * 0.125f);
 
             if (boss._ai4 == 0f) {
