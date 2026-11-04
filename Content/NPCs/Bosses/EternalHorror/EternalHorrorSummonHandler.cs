@@ -223,6 +223,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             if (!filter.IsActive()) {
                 FilterPosition = Vector2.Zero;
                 FilterMoveFactor = 0f;
+
+                FilterOpacity = Helper.Approach(FilterOpacity, 1f, 1 / 60f);
             }
 
             foreach (NPC npc in Main.ActiveNPCs) {

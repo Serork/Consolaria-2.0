@@ -56,8 +56,10 @@ sealed partial class EternalHorror : ModNPC {
                 boss.SpawnPreparationDust_Shadow(Helper.YoYo(attackProgress2));
             }
 
-            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f + attackProgress2, 1f / 60f * 2.5f * 2f);
-            HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 0.5f, 1 / 60f * 0.125f);
+            //EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, 1 / 60f * 1f);
+
+            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f + attackProgress2 * 2f, 1f / 60f * 2.5f * 2f);
+            HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * (1f + attackProgress2), 1 / 60f * 0.25f);
 
             if (boss._ai4 == 0f) {
                 Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, attackProgress2, 0.125f);
@@ -2168,7 +2170,7 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase2ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase2CloneSpawn.SHADOWSPAWNTIME);
     public float Phase2ScythePreparationProgress => Helper.Clamp01(AICounter / Phase2ScytheAttack.ATTACKPREPARATIONTIME);
 
-    public bool ShouldUpdateFilterPosition => !HasActiveState<Phase2SpiralAttack>();
+    public bool ShouldUpdateFilterPosition => /*!HasActiveState<DeathState>() && */!HasActiveState<Phase2SpiralAttack>();
 
     private partial void InitializeStates() {
         _states = [];
