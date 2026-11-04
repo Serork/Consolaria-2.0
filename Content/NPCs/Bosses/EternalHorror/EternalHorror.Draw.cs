@@ -247,10 +247,10 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
 
-            //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
-            //    ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
-            //    ChromaPosition = Main.MouseWorld;
-            //}
+            if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+                ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
+                ChromaPosition = Main.MouseWorld;
+            }
 
             {
                 string filterName = ShaderLoader.HorrorChromaFilterName;

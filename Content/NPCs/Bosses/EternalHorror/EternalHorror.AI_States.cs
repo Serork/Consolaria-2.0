@@ -90,12 +90,13 @@ sealed partial class EternalHorror : ModNPC {
 
                     if (!Main.dedServ) {
                         for (int i = 0; i < 5; i++) {
-                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(1f, 1.4f));
-                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(1.2f, 1.6f));
-                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(1f, 1.4f));
+                            Vector2 getVelocity() => Vector2.UnitY.RotatedByRandom(MathHelper.TwoPi) * 5f * Main.rand.NextFloat(0.875f, 1.125f);
+                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, getVelocity(), ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(1f, 1.4f));
+                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, getVelocity(), ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(1.2f, 1.6f));
+                            Gore.NewGore(NPC.GetSource_Death(), NPC.Center, getVelocity(), ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(1f, 1.4f));
                         }
                     }
-                    SoundEngine.PlaySound(SoundID.Item14, NPC.Center);
+                    //SoundEngine.PlaySound(SoundID.Item14, NPC.Center);
                     SoundEngine.PlaySound(SoundID.Roar with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) + 0.25f, MaxInstances = 0 }, NPC.position);
 
                     ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
@@ -1013,7 +1014,7 @@ sealed partial class EternalHorror : ModNPC {
                 //cloneInfo.Velocity *= 0f;
                 //cloneInfo.DashOpacity *= 0f;
                 cloneInfo.ShouldFade = true;
-                cloneInfo.ForceFade();
+                //cloneInfo.ForceFade();
             });
 
             //boss.SpawnRays(startRaySpeed: 0.5f);

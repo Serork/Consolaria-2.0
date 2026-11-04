@@ -133,7 +133,7 @@ sealed partial class EternalHorror : ModNPC {
     public override void SetDefaults() {
         NPC.SetHitboxSizeValues(width: 314, height: 216);
 
-        NPC.SetDefaultsToEnemy(lifeMax: 1000/*54000*/,
+        NPC.SetDefaultsToEnemy(lifeMax: 54000,
                                damage: 55, 
                                defense: 36, 
                                spawnSlots: 10f,

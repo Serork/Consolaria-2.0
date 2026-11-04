@@ -20,7 +20,7 @@ sealed class HorrorEffectShaderData3(Asset<Effect> effect, string pass) : Screen
         //UseColor(color);
 
         UseColor(EternalHorror.MainPurpleColor);
-        UseOpacity(Helper.Clamp01(EternalHorror.ChromaOpacity) * 1.5f);
+        UseOpacity(Helper.Clamp01(EternalHorror.ChromaOpacity) * 1f);
 
         Shader.Parameters["strength"].SetValue(10.0f);
         Shader.Parameters["depth"].SetValue(0f);
