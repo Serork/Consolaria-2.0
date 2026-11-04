@@ -19,28 +19,6 @@ using static Terraria.ModLoader.Core.TmodFile;
 namespace Consolaria;
 
 sealed class ShaderLoader : ModSystem {
-    public static class HorrorDeathShader {
-        public static Effect Effect => HorrorDeath.Value;
-
-        private static float _uTime;
-        public static float uTime {
-            get => _uTime;
-            set => Effect?.Parameters["uTime"].SetValue(_uTime = value);
-        }
-
-        private static Vector2 _uScreenResolution;
-        public static Vector2 uScreenResolution {
-            get => _uScreenResolution;
-            set => Effect?.Parameters["uScreenResolution"].SetValue(_uScreenResolution = value);
-        }
-
-        private static Color _uColor;
-        public static Color uColor {
-            get => _uColor;
-            set => Effect?.Parameters["uColor"].SetValue((_uColor = value).ToVector3());
-        }
-    }
-
     public static class HorrorLaserShader {
         public static Effect Effect => HorrorLaser.Value;
 
@@ -241,6 +219,7 @@ sealed class ShaderLoader : ModSystem {
     }
 
     public static Effect HorrorZoneEffectData { get; private set; } = null!;
+    public static Effect HorrorDeathEffectData { get; private set; } = null!;
 
     public static Asset<Effect> Distort => _loadedShaders["Distort"];
     public static Asset<Effect> Primitive => _loadedShaders["Primitive"];
@@ -252,6 +231,9 @@ sealed class ShaderLoader : ModSystem {
 
     public static string HorrorZoneFilterName => nameof(Consolaria) + "EternalHorrorHorrorZone";
     public static Filter HorrorZoneFilter => Filters.Scene[HorrorZoneFilterName];
+
+    public static string HorrorDeathFilterName => nameof(Consolaria) + "EternalHorrorDeath";
+    public static Filter HorrorDeathFilter => Filters.Scene[HorrorDeathFilterName];
 
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
@@ -270,9 +252,14 @@ sealed class ShaderLoader : ModSystem {
             return;
         }
 
+        Asset<Effect> horrorDeathShader = ModContent.Request<Effect>("Consolaria/Assets/Effects/HorrorDeath", AssetRequestMode.ImmediateLoad);
+        HorrorDeathEffectData = horrorDeathShader.Value;
+        Filters.Scene[HorrorDeathFilterName] = new Filter(new HorrorDeathShaderData(horrorDeathShader, "HorrorDeathPass"), (EffectPriority)100);
+        Filters.Scene[HorrorDeathFilterName].Load();
+
         Asset<Effect> horrorZoneShader = ModContent.Request<Effect>("Consolaria/Assets/Effects/HorrorZone", AssetRequestMode.ImmediateLoad);
         HorrorZoneEffectData = horrorZoneShader.Value;
-        Filters.Scene[HorrorZoneFilterName] = new Filter(new HorrorZoneShaderData(horrorZoneShader, "HorrorZonePass"), (EffectPriority)100);
+        Filters.Scene[HorrorZoneFilterName] = new Filter(new HorrorZoneShaderData(horrorZoneShader, "HorrorZonePass"), (EffectPriority)101);
         Filters.Scene[HorrorZoneFilterName].Load();
 
         Filters.Scene[EternalHorrorShakeFilterName] = new Filter(new EternalHorrorScreenShaderData("FilterMoonLordShake", aimAtPlayer: false), EffectPriority.VeryHigh);

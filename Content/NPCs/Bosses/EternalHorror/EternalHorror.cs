@@ -7,7 +7,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 [AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
-    public static byte IMMUNETIMEINTICKS => 10;
+    public static byte IMMUNETIMEINTICKS => 1;
 
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 

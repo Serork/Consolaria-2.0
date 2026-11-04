@@ -169,6 +169,12 @@ sealed partial class EternalHorror : ModNPC {
             FrontColor = new Color(22, 21, 18) * 0.3f;
         }
 
+        if (boss is not null && boss.As<EternalHorror>().HasActiveState<EternalHorror.DeathState>()) {
+            value = 0f;
+            amount = 1 / 60f;
+            amount /= 5f;
+        }
+
         amount /= 1f;
 
         ScreenObstruction = Helper.Approach(ScreenObstruction, value, amount);

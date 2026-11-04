@@ -12,6 +12,7 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -26,6 +27,7 @@ sealed partial class EternalHorror : ModNPC {
     private static Asset<Texture2D> _eyesTexture = null,
                                     _glowTexture = null,
                                     _shadowTexture = null,
+                                    _shadowTexture2 = null,
                                     _backgroundTexture = null,
                                     _secondPhaseEyeTexture = null,
                                     _secondPhaseEyeTexture_Glow = null,
@@ -191,6 +193,7 @@ sealed partial class EternalHorror : ModNPC {
         _eyesTexture = Helper.RequestTexture(Texture + "_Eyes");
         _glowTexture = Helper.RequestTexture(Texture + "_Glow");
         _shadowTexture = Helper.RequestTexture(Texture + "_Shadow");
+        _shadowTexture2 = Helper.RequestTexture(Texture + "_Shadow2");
         _backgroundTexture = Helper.RequestTexture(Texture + "_Background");
         RayTexture = Helper.RequestTexture(Texture + "_Ray");
 
@@ -209,7 +212,36 @@ sealed partial class EternalHorror : ModNPC {
     private void On_MoonlordDeathDrama_Update(On_MoonlordDeathDrama.orig_Update orig) {
         orig();
 
-        Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, 0f, 1 / 60f * 0.125f);
+        if (!Main.gameMenu && !Main.dedServ) {
+            string filterName = ShaderLoader.HorrorDeathFilterName;
+            var filter = Filters.Scene[filterName];
+
+            if (filter.IsActive()) {
+                Filters.Scene.Deactivate(filterName);
+            }
+
+            foreach (NPC npc in Main.ActiveNPCs) {
+                if (npc.type != SelfType) {
+                    continue;
+                }
+
+                var modNPC = npc.As<EternalHorror>();
+
+                if (modNPC.HasActiveState<DeathState>()) {
+                    if (!filter.IsActive()) {
+                        Filters.Scene.Activate(filterName);
+                    }
+
+                    var shader = filter.GetShader();
+
+                    shader.UseTargetPosition(modNPC.GetEyePosition());
+                    shader.UseColor(MainPurpleColor);
+                }
+                else {
+                    Whitening_ForDeath = 0f;
+                }
+            }
+        }
     }
 
     private void On_MoonlordDeathDrama_DrawWhite(On_MoonlordDeathDrama.orig_DrawWhite orig, SpriteBatch spriteBatch) {
@@ -292,8 +324,8 @@ sealed partial class EternalHorror : ModNPC {
         return drawContext;
     }
 
-    private void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor, Color drawColor2, float rayOpacity = 1f) {
-        Texture2D texture = NPC.GetTexture(),
+    private void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor, Color drawColor2, float rayOpacity = 1f, bool solid = false) {
+        Texture2D texture = solid ? _shadowTexture2.Value : NPC.GetTexture(),
                   glowTexture = _glowTexture.Value,
                   shadowTexture = _shadowTexture.Value;
         Rectangle glowClip = glowTexture.Frame(1, 2, frameY: IsInSecondPhase ? 1 : 0);
@@ -680,6 +712,12 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
+        if (solid) {
+            drawSelf();
+
+            return;
+        }
+
         drawTrails();
         DrawRays(NPC, spriteBatch, rayOpacity);
         drawShadows();
@@ -927,6 +965,13 @@ sealed partial class EternalHorror : ModNPC {
             shadowOpacity = Phase2ScytheAttackAngle > 0f ? Helper.Clamp01(Phase2ScytheAttackProgress + 1f) : Phase2ScythePreparationProgress;
             hasShadow = true;
         }
+        //if (HasActiveState<DeathState>()) {
+        //    float attackProgress = AICounter / DeathState.SLOWTIME;
+        //    float attackProgress2 = Helper.Clamp01(attackProgress);
+
+        //    shadowOpacity = /*Helper.YoYo*/(attackProgress2);
+        //    hasShadow = true;
+        //}
         if (HasActiveState<Phase2SpiralAttack>()) {
             float attackProgress = AICounter / Phase2SpiralAttack.ATTACKPREPARATIONTIME;
             float attackProgress2 = Helper.Clamp01(attackProgress);
@@ -1303,13 +1348,35 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
+        float whiteningOpacity = Ease.CubeOut(Whitening_ForDeath);
+
         //ShaderLoader.HorrorDeathShader.uColor = Color.White;
         //ShaderLoader.HorrorDeathShader.uTime = 1f;
         //ShaderLoader.HorrorDeathShader.uScreenResolution = new Vector2(1f, 1f);
         //ShaderLoader.ApplyEffect(ShaderLoader.HorrorDeathShader.Effect, spriteBatch,
         //() => {
-            Color color = Color.Lerp(Color.Black, MainPurpleColor, 0.25f) * Ease.CubeOut(Whitening_ForDeath);
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
+            //Color color = Color.Lerp(Color.Black, MainPurpleColor, 0.25f) * whiteningOpacity;
+            //spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
         //});
+        
+        //if (found) {
+        //    EternalHorror boss_modNPC = boss.As<EternalHorror>();
+
+        //    Color drawColor = Lighting.GetColor(boss.Center.ToTileCoordinates());
+        //    drawColor = boss.GetNPCColorTintedByBuffs(npcColor: drawColor);
+        //    drawColor = Color.Lerp(drawColor, Color.White, 0.5f);
+
+        //    drawColor *= boss_modNPC.SecondPhaseOpacity;
+
+        //    Vector2 screenPos = Main.screenPosition;
+
+        //    Color drawColor2 = Color.Lerp(drawColor, boss_modNPC.CloneStateEffectColor, boss_modNPC.СloneStateEffectOpacity) * MathHelper.Lerp(0.125f, 0.25f, 0.5f);
+
+        //    drawColor2 *= whiteningOpacity;
+
+        //    drawColor2 *= 0.5f;
+
+        //    boss_modNPC.Draw(spriteBatch, screenPos, drawColor2 * boss.Opacity, drawColor2, rayOpacity: 0f, solid: true);
+        //}
     }
 }

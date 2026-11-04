@@ -38,16 +38,34 @@ sealed partial class EternalHorror : ModNPC {
             float preparationSlowDown = Utils.Remap(1f - attackProgress2, 0f, 1f, 0.5f, 1f, true);
             float preparationSlowDown2 = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
 
+            boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, attackProgress2, 1f / 60f * 5f);
+
+            ShakeStrength = Helper.Approach(ShakeStrength, attackProgress2, 0.125f * 2f);
+
+            boss._eyeEffectOpacity = Ease.CubeIn(attackProgress2);
+
             npc.velocity *= preparationSlowDown2;
-            npc.rotation *= preparationSlowDown2;
+            npc.rotation *= Ease.CubeOut(preparationSlowDown2);
+
+            boss._tempPosition = Vector2.Lerp(boss._tempPosition, Main.rand.NextVector2Circular(10f, 10f) * 1f * Whitening_ForDeath, 0.375f);
+            npc.Center += boss._tempPosition;
+
+            Main.musicFade[Main.curMusic] = Helper.Approach(Main.musicFade[Main.curMusic], Utils.Remap(Ease.CubeOut(1f - attackProgress2), 0f, 1f, 0.5f, 1f, true), 1 / 60f);
+
+            for (int i = 0; i < 2; i++) {
+                boss.SpawnPreparationDust_Shadow(Helper.YoYo(attackProgress2));
+            }
+
+            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, attackProgress2 * 2f, 1f / 60f * 2.5f * 2f);
+            HorrorZoneShaderData.TimeFactor = Helper.Approach(HorrorZoneShaderData.TimeFactor, 1 / 60f * 0.5f, 1 / 60f * 0.125f);
 
             if (boss._ai4 == 0f) {
-                Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, 1f, 1 / 60f * 0.375f);
+                Whitening_ForDeath = Helper.Approach(Whitening_ForDeath, attackProgress2, 0.125f);
             }
             else {
                 boss._ai4++;
 
-                if (boss._ai4 >= 60f) {
+                if (boss._ai4 >= 1f) {
                     npc.dontTakeDamage = false;
                     npc.life = 0;
                     npc.checkDead();
@@ -63,6 +81,7 @@ sealed partial class EternalHorror : ModNPC {
             boss.ActivateState<Phase2MoveToPlayer>();
             boss.ResetCounters();
             boss._ai4 = 0f;
+            boss._tempPosition = default;
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
