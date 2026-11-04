@@ -39,6 +39,7 @@ sealed partial class EternalHorror : ModNPC {
             float preparationSlowDown2 = Utils.Remap(1f - attackProgress2, 0f, 1f, 0f, 1f, true);
 
             boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, attackProgress2, 1f / 60f * 5f);
+            npc.Opacity = Helper.Approach(npc.Opacity, Utils.Remap(attackProgress2, 0f, 1f, 0.5f, 1f, true), 1f / 60f * 2.5f);
 
             ShakeStrength = Helper.Approach(ShakeStrength, attackProgress2, 0.125f * 2f);
 
