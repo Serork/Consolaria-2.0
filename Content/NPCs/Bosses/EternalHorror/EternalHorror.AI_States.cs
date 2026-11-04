@@ -44,7 +44,7 @@ sealed partial class EternalHorror : ModNPC {
 
             boss._eyeEffectOpacity = Ease.CubeIn(attackProgress2);
 
-            npc.velocity *= preparationSlowDown2;
+            npc.velocity *= Ease.SineOut(preparationSlowDown2);
             npc.rotation *= Ease.CubeOut(preparationSlowDown2);
 
             boss._tempPosition = Vector2.Lerp(boss._tempPosition, Main.rand.NextVector2Circular(10f, 10f) * 1f * Whitening_ForDeath, 0.375f);
