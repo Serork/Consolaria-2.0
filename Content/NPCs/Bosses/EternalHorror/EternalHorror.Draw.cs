@@ -14,6 +14,7 @@ using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -247,10 +248,20 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
 
-            if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
-                ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
-                ChromaPosition = Main.MouseWorld;
-            }
+            float baseScale = EternalHorrorCloneExplosion.EXPLOSIONSCALEMODIFIER;
+
+            //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+            //    ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
+            //    ChromaPosition = Main.MouseWorld;
+
+            //    DeactivateShockwave();
+            //    ActivateShockwave(rippleCount: 3f * baseScale, rippleSize: 5f * baseScale, rippleSpeed: 10f * baseScale);
+            //}
+
+            float scale = Utils.Remap(EternalHorror.ChromaOpacity, 0f, HorrorEffectShaderData3.STRENGTH, 1f, 0f, true);
+            //scale = Ease.SineIn(scale);
+
+            HandleShockwave(distortStrength: 100f * (1f - scale) * baseScale, progress: scale * baseScale);
 
             {
                 string filterName = ShaderLoader.HorrorChromaFilterName;
@@ -269,10 +280,50 @@ sealed partial class EternalHorror : ModNPC {
 
                     var shader = filter.GetShader();
 
-                    shader.UseTargetPosition(ChromaPosition + new Vector2(-515, -550 / 2));
-                    shader.UseColor(MainPurpleColor);
+                    shader.UseTargetPosition(ChromaPosition + new Vector2(-515, -550 / 2) - new Vector2(30, 30));
+                }
+                else {
+                    DeactivateShockwave();
                 }
             }
+        }
+    }
+
+    void HandleShockwave(float distortStrength, float progress) {
+        if (Helper.IsServer()) {
+            return;
+        }
+
+        if (ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
+            var shaderData = ShaderLoader.EternalHorrorShockwaveFilter.GetShader();
+
+            shaderData
+                .UseProgress(progress)
+                .UseOpacity(distortStrength * (1f - progress / 3f));
+        }
+    }
+
+    void ActivateShockwave(float rippleCount, float rippleSize, float rippleSpeed) {
+        if (Helper.IsServer()) {
+            return;
+        }
+
+        if (!ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
+            var shaderData = Filters.Scene.Activate(ShaderLoader.EternalHorrorShockwaveFilterName, ChromaPosition).GetShader();
+
+            shaderData
+                .UseColor(rippleCount, rippleSize, rippleSpeed)
+                .UseTargetPosition(ChromaPosition);
+        }
+    }
+
+    void DeactivateShockwave() {
+        if (Helper.IsServer()) {
+            return;
+        }
+
+        if (ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
+            ShaderLoader.EternalHorrorShockwaveFilter.Deactivate();
         }
     }
 

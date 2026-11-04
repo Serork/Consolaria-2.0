@@ -17,7 +17,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjectile {
     public static byte SKULLCOUNT => 15;
 
-    private static float EXPLOSIONSCALEMODIFIER => 1.5f;
+    public static float EXPLOSIONSCALEMODIFIER => 1.5f;
 
     public override string Texture => "Consolaria/Assets/Textures/Empty";
 

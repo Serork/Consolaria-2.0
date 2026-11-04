@@ -102,6 +102,11 @@ sealed partial class EternalHorror : ModNPC {
                     ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
                     ChromaPosition = boss.GetEyePosition();
 
+                    float baseScale = EternalHorrorCloneExplosion.EXPLOSIONSCALEMODIFIER;
+
+                    boss.DeactivateShockwave();
+                    boss.ActivateShockwave(rippleCount: 3f * baseScale, rippleSize: 5f * baseScale, rippleSpeed: 10f * baseScale);
+
                     npc.dontTakeDamage = false;
                     npc.life = 0;
                     npc.checkDead();
