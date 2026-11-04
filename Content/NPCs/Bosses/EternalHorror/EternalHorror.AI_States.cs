@@ -89,9 +89,9 @@ sealed partial class EternalHorror : ModNPC {
                         dust.velocity *= 3f;
                     }
 
+                    Vector2 getVelocity() => Vector2.UnitY.RotatedByRandom(MathHelper.TwoPi) * 5f * Main.rand.NextFloat(0.875f, 1.125f);
                     if (!Main.dedServ) {
                         for (int i = 0; i < 5; i++) {
-                            Vector2 getVelocity() => Vector2.UnitY.RotatedByRandom(MathHelper.TwoPi) * 5f * Main.rand.NextFloat(0.875f, 1.125f);
                             Gore.NewGore(NPC.GetSource_Death(), boss.GetEyePosition(), getVelocity(), ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(1f, 1.4f));
                             Gore.NewGore(NPC.GetSource_Death(), boss.GetEyePosition(), getVelocity(), ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(1.2f, 1.6f));
                             Gore.NewGore(NPC.GetSource_Death(), boss.GetEyePosition(), getVelocity(), ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(1f, 1.4f));
@@ -102,6 +102,24 @@ sealed partial class EternalHorror : ModNPC {
 
                     ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
                     ChromaPosition = boss.GetEyePosition();
+
+                    for (int num51 = 0; num51 < 50; num51++) {
+                        Vector2 velocity = getVelocity() * (1f + Main.rand.NextFloat());
+                        Dust dust19 = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, Main.rand.NextBool() ? DustID.Shadowflame : DustID.CorruptTorch, (0f - velocity.X) * 0.2f, (0f - velocity.Y) * 0.2f, 100);
+                        dust19.noGravity = true;
+                        dust19.velocity = Main.rand.NextVector2Circular(1f, 1f) * 6f;
+                        dust19.scale = 1.6f;
+                        dust19.fadeIn = 1.3f + Main.rand.NextFloat() * 1f;
+                        dust19.noLightEmittence = (dust19.noLight = true);
+                        Dust dust2 = dust19;
+                        dust2.velocity += velocity * 0.1f;
+                        dust19 = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, Main.rand.NextBool() ? DustID.Shadowflame : DustID.CorruptTorch, (0f - velocity.X) * 0.2f, (0f - velocity.Y) * 0.2f, 100);
+                        dust2 = dust19;
+                        dust2.velocity *= 2f;
+                        dust19.noLightEmittence = (dust19.noLight = true);
+                        dust2 = dust19;
+                        dust2.velocity += velocity * 0.1f;
+                    }
 
                     float baseScale = EternalHorrorCloneExplosion.EXPLOSIONSCALEMODIFIER;
 
