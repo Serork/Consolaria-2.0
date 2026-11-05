@@ -148,6 +148,8 @@ sealed partial class EternalHorror : ModNPC {
         NPC.SpawnWithHigherTime(timeMult: 30);
 
         SetMusic();
+
+        NPC.BossBar = ModContent.GetInstance<EternalHorrorBossBar>();
     }
 
     private void SetMusic() {

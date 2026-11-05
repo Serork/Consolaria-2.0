@@ -233,7 +233,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     var modNPC = npc.As<EternalHorror>();
 
-                    if (modNPC.HasActiveState<DeathState>()) {
+                    if (modNPC.Dead) {
                         if (!filter.IsActive()) {
                             Filters.Scene.Activate(filterName);
                         }
@@ -1048,7 +1048,7 @@ sealed partial class EternalHorror : ModNPC {
             shadowOpacity = Phase2ScytheAttackAngle > 0f ? Helper.Clamp01(Phase2ScytheAttackProgress + 1f) : Phase2ScythePreparationProgress;
             hasShadow = true;
         }
-        //if (HasActiveState<DeathState>()) {
+        //if (Dead) {
         //    float attackProgress = AICounter / DeathState.SLOWTIME;
         //    float attackProgress2 = Helper.Clamp01(attackProgress);
 

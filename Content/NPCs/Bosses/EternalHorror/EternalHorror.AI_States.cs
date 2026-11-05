@@ -2228,7 +2228,7 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase2ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase2CloneSpawn.SHADOWSPAWNTIME);
     public float Phase2ScythePreparationProgress => Helper.Clamp01(AICounter / Phase2ScytheAttack.ATTACKPREPARATIONTIME);
 
-    public bool ShouldUpdateFilterPosition => /*!HasActiveState<DeathState>() && */!HasActiveState<Phase2SpiralAttack>();
+    public bool ShouldUpdateFilterPosition => /*!Dead && */!HasActiveState<Phase2SpiralAttack>();
 
     private partial void InitializeStates() {
         _states = [];
