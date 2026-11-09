@@ -1354,6 +1354,8 @@ sealed partial class EternalHorror : ModNPC {
 
             ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
 
+            boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, dashProgress, 1f / 60f * MathHelper.Lerp(1f, 2.5f, didAtLeastOneDash2 ? 0f : 0.5f));
+
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 1f / 60f);
             });

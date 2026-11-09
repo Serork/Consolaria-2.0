@@ -61,7 +61,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
     private float _scaleX;
 
     public override void SetStaticDefaults() {
-        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 4000;
 
         if (!Main.dedServ) {
             _laser = ModContent.Request<Texture2D>(Texture + "2");
