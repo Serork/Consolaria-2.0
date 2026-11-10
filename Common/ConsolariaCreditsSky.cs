@@ -317,20 +317,20 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         orig();
         UpdateTime();
 
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
-            //ConsolariaCreditsSky.Reset_Internal();
-            CreditsRollEvent.Reset();
-        }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F2)) {
-            //CreditsRollEvent.Reset();
-            EnsureSegmentsAreMade();
-            ConsolariaCreditsSky.TryStartingCreditsRoll();
-            //CreditsRollEvent.TryStartingCreditsRoll();
-        }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F3)) {
-            ConsolariaCreditsSky.Reset_Internal();
-            CreditsRollEvent.Reset();
-        }
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+        //    //ConsolariaCreditsSky.Reset_Internal();
+        //    CreditsRollEvent.Reset();
+        //}
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F2)) {
+        //    //CreditsRollEvent.Reset();
+        //    EnsureSegmentsAreMade();
+        //    ConsolariaCreditsSky.TryStartingCreditsRoll();
+        //    //CreditsRollEvent.TryStartingCreditsRoll();
+        //}
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F3)) {
+        //    ConsolariaCreditsSky.Reset_Internal();
+        //    CreditsRollEvent.Reset();
+        //}
     }
 
     private void On_CreditsRollEvent_Reset(On_CreditsRollEvent.orig_Reset orig) {
