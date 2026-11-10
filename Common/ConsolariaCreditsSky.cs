@@ -9,6 +9,7 @@ using Terraria.GameContent.Events;
 using Terraria.GameContent.Skies.CreditsRoll;
 using Terraria.GameContent.UI.Chat;
 using Terraria.Graphics.Effects;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
@@ -434,7 +435,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         Vector2 position = Main.ScreenSize.ToVector2() / 2f;
         position.Y = 100;
 
-        string text = "[w/0:" + "Thank you for playing Consolaria!" + "]";
+        string text = Language.GetTextValue("Mods.Consolaria.Ty");
 
         Vector2 origin = FontAssets.DeathText.Value.MeasureString(text);
         origin *= 0.5f;
@@ -568,7 +569,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         if (!Main.mouseText && mouseRectangle.Intersects(value2)) {
             player.cursorItemIconEnabled = false;
 
-            string text2 = "Consolaria Credits";
+            string text2 = Language.GetTextValue("Mods.Consolaria.Credits");
 
             _mouseText = text2;
             //Main.instance.MouseTextHackZoom(text2);

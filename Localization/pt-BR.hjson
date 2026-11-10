@@ -1,5 +1,8 @@
 Mods: {
 	Consolaria: {
+		// Credits: Consolaria Credits
+		// Ty: "[w/0:Thank you for playing Consolaria!]"
+
 		ConsolariaCreditsRollCategory_Creators: {
 			// 1: Developers
 			// 2: has2r
