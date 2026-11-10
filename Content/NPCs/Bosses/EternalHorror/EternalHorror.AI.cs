@@ -335,6 +335,9 @@ sealed partial class EternalHorror : ModNPC {
     public static void MakeMidnight(float speedFactor = 1f, bool secondPhase = false) {
         float expFactor = 0.025f * speedFactor;
 
+        Main.fastForwardTimeToDawn = false;
+        Main.fastForwardTimeToDusk = false;
+
         //if (secondPhase) {
         //    if (!Main.dayTime) {
         //        expFactor *= 4;
