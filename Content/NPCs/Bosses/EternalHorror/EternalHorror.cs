@@ -157,6 +157,10 @@ sealed partial class EternalHorror : ModNPC {
         Music = MusicLoader.GetMusicSlot(Mod, EERIEOCRAM_MUSICPATH);
     }
 
+    public override void BossLoot(ref int potionType) {
+        potionType = ItemID.SuperHealingPotion;
+    }
+
     public override void OnKill() {
         if (!DownedBossSystem.downedEternalHorror)
         {
