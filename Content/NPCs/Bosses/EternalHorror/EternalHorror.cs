@@ -1,4 +1,5 @@
-﻿using Consolaria.Common.ModSystems;
+﻿using Consolaria.Common;
+using Consolaria.Common.ModSystems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
@@ -10,7 +11,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 [AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
-    public static byte IMMUNETIMEINTICKS => 10;
+    public static byte IMMUNETIMEINTICKS => 1/*10*/;
 
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
@@ -133,7 +134,7 @@ sealed partial class EternalHorror : ModNPC {
     public override void SetDefaults() {
         NPC.SetHitboxSizeValues(width: 314, height: 216);
 
-        NPC.SetDefaultsToEnemy(lifeMax: 54000,
+        NPC.SetDefaultsToEnemy(lifeMax: 1000/*54000*/,
                                damage: 55, 
                                defense: 36, 
                                spawnSlots: 10f,
@@ -157,7 +158,9 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void OnKill() {
-        if (!DownedBossSystem.downedEternalHorror) {
+        //if (!DownedBossSystem.downedEternalHorror)
+        {
+            ConsolariaCreditsSky.TryStartingCreditsRoll();
             CreditsRollEvent.TryStartingCreditsRoll();
         }
         NPC.SetEventFlagCleared(ref DownedBossSystem.downedEternalHorror, -1);

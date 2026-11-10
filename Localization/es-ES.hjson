@@ -1,5 +1,46 @@
 Mods: {
 	Consolaria: {
+		ConsolariaCreditsRollCategory_Creators: {
+			// 1: Developers
+			// 2: has2r
+			// 3: peege.on
+			// 4: Serork
+		}
+
+		ConsolariaCreditsRollCategory_Contributors: {
+			// 1: Contributors
+			// 2: KondiU
+			// 3: DrunkenCat
+			// 4: Synoxsis
+			// 5: Jteoh
+			// 6: Fyerow
+			// 7: Croul
+			// 8: EduaRRdo
+			// 9: StrikerRKT
+			// 10: Sparcdoctor
+			// 11: CrezyDud
+			// 12: OnesAndZer0s
+			// 13: CKnight
+			// 14: Heretic
+			// 15: Bripe
+			// 16: Obesedog
+			// 17: Nokilos
+			// 18: MeuRan
+			// 19: OrcaRequiem
+			// 20: minichibis
+			// 21: cleo.
+			// 22: Lion8cake
+			// 23: Gaerzi
+			// 24: kittenchilly
+			// 25: Efromomr
+			// 26: HenryChe
+			// 27: htoya23
+			// 28: alinahvoshch
+			// 29: Auraz
+			// 30: Ningunomas
+			// 31: KaffaZ
+		}
+
 		// EternalHorrorSpawnMessage: Your inner fears begin to reveal themselves...
 		DownloadRoA: ¡Echa un vistazo a Rise of Ages, del equipo detrás de Consolaria!
 		DownloadRoA2: (hide)

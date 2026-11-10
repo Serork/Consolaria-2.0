@@ -1,4 +1,5 @@
-﻿using Consolaria.Common.ScreenEffects;
+﻿using Consolaria.Common;
+using Consolaria.Common.ScreenEffects;
 using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Terraria;
+using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
@@ -256,6 +258,9 @@ sealed class ShaderLoader : ModSystem {
         if (Main.dedServ) {
             return;
         }
+
+        SkyManager.Instance["ConsolariaCreditsRoll"] = new ConsolariaCreditsSky();
+        SkyManager.Instance["ConsolariaCreditsRoll"].Load();
 
         Asset<Effect> horrorShader1 = ModContent.Request<Effect>("Consolaria/Assets/Effects/HorrorDeath", AssetRequestMode.ImmediateLoad);
         HorrorEffectShaderData1 = horrorShader1.Value;
