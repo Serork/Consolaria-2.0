@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Animations;
+using Terraria.GameContent.Skies.CreditsRoll;
 using Terraria.Localization;
 
 namespace Consolaria.Common;
@@ -34,16 +35,42 @@ sealed class ConsolariaCreditsRollComposer {
         }
 
         num += num5;
+        num -= num3;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2).totalTime;
         num += num3;
         num += num3;
+        num += 60;
+
+        vector2.X *= -1f;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2).totalTime;
         num += num3;
-        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors", vector2).totalTime;
         num += num3;
 
+        vector2.X *= -1f;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors2", vector2).totalTime;
         num += num3;
         num += num3;
+
+        vector2.X *= -1f;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors3", vector2).totalTime;
         num += num3;
+        num += num3;
+
+        vector2.X *= -1f;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors4", vector2).totalTime;
+        num += num3;
+        num += num3;
+
+        vector2.X *= -1f;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors5", vector2).totalTime;
+        num += num3;
+        num += num3;
+
+        //num += num3;
+        //num += num3;
+        //num += num3;
+
+        num -= 60;
 
         num += num6;
 

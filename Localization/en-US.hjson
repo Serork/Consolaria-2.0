@@ -7,38 +7,50 @@ Mods: {
 			4: Serork
 		}
 
-		ConsolariaCreditsRollCategory_Contributors: {
+		ConsolariaCreditsRollCategory_Contributors1: {
 			1: Contributors
 			2: KondiU
 			3: DrunkenCat
 			4: Synoxsis
 			5: Jteoh
 			6: Fyerow
-			7: Croul
-			8: EduaRRdo
-			9: StrikerRKT
-			10: Sparcdoctor
-			11: CrezyDud
-			12: OnesAndZer0s
-			13: CKnight
-			14: Heretic
-			15: Bripe
-			16: Obesedog
-			17: Nokilos
-			18: MeuRan
-			19: OrcaRequiem
-			20: minichibis
-			21: cleo.
-			22: Lion8cake
-			23: Gaerzi
-			24: kittenchilly
-			25: Efromomr
-			26: HenryChe
-			27: htoya23
-			28: alinahvoshch
-			29: Auraz
-			30: Ningunomas
-			31: KaffaZ
+		}
+
+		ConsolariaCreditsRollCategory_Contributors2: {
+			1: Croul
+			2: EduaRRdo
+			3: StrikerRKT
+			4: Sparcdoctor
+			5: CrezyDud
+			6: OnesAndZer0s
+		}
+
+		ConsolariaCreditsRollCategory_Contributors3: {
+			1: CKnight
+			2: Heretic
+			3: Bripe
+			4: Obesedog
+			5: Nokilos
+			6: MeuRan
+		}
+
+		ConsolariaCreditsRollCategory_Contributors4: {
+			1: OrcaRequiem
+			2: minichibis
+			3: cleo.
+			4: Lion8cake
+			5: Gaerzi
+			6: kittenchilly
+		}
+
+		ConsolariaCreditsRollCategory_Contributors5: {
+			1: Efromomr
+			2: HenryChe
+			3: htoya23
+			4: alinahvoshch
+			5: Auraz
+			6: Ningunomas
+			7: KaffaZ
 		}
 
 		EternalHorrorSpawnMessage: Your inner fears begin to reveal themselves...

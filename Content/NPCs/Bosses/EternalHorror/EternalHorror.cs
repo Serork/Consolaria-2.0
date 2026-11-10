@@ -161,7 +161,7 @@ sealed partial class EternalHorror : ModNPC {
         if (!DownedBossSystem.downedEternalHorror)
         {
             ConsolariaCreditsSky.TryStartingCreditsRoll();
-            CreditsRollEvent.TryStartingCreditsRoll();
+            //CreditsRollEvent.TryStartingCreditsRoll();
         }
         NPC.SetEventFlagCleared(ref DownedBossSystem.downedEternalHorror, -1);
     }
