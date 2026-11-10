@@ -89,7 +89,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private const int MAX_TIME_FOR_CREDITS_ROLL_IN_FRAMES = 28800;
     private static int _creditsRollRemainingTime;
 
-    internal static int _preparationTime;
+    internal static int _preparationTime, _allTime;
 
     private int _endTime;
     private int _currentTime;
@@ -437,10 +437,22 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         Vector2 position = Main.ScreenSize.ToVector2() / 2f;
         position.Y = 100;
 
+        float lastPosY = Main.ScreenSize.Y / 2f - 100;
+
         string text = Language.GetTextValue("Mods.Consolaria.Ty");
 
         Vector2 origin = FontAssets.DeathText.Value.MeasureString(text);
         origin *= 0.5f;
+
+        float lerp = Utils.GetLerpValue(_allTime - 120, _allTime, _currentTime, true);
+        lerp = Ease.CubeInOut(lerp);
+        //if (_currentTime > _preparationTime) {
+        //    lerp = 1f - Utils.GetLerpValue(0, 120 * 0.375f, _currentTime - _preparationTime, true);
+        //    lerp = Utils.Remap(lerp, 0f, 1f, 0f, 0.375f, true);
+        //    lerp = Ease.CubeInOut(lerp);
+        //}
+
+        position.Y = MathHelper.Lerp(position.Y, lastPosY - 50, lerp);
 
         Vector2 size = new(0.7f);
 
@@ -458,7 +470,9 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
         Vector2 anchorPositionOnScreen2 = Main.ScreenSize.ToVector2() / 2f;
         //anchorPositionOnScreen2.X += 195f;
-        anchorPositionOnScreen2.Y = MathHelper.Lerp(150f, 162.5f, 0.5f);
+        float offsetY = MathHelper.Lerp(150f, 162.5f, 0.5f);
+        anchorPositionOnScreen2.Y = offsetY;
+        anchorPositionOnScreen2.Y = MathHelper.Lerp(anchorPositionOnScreen2.Y, lastPosY, lerp);
         anchorPositionOnScreen2.Y += MathF.Sin(Main.GlobalTimeWrappedHourly * 1.25f) * 5f * GetScale() * GetOpacity();
         //if (Main.gameMenu)
         //    anchorPositionOnScreen2.Y = 300f;

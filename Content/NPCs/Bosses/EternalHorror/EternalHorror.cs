@@ -162,8 +162,17 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void OnKill() {
+        foreach (NPC npc in Main.ActiveNPCs) {
+            if (npc.type == ModContent.NPCType<EternalServant>()) {
+                npc.life = 0;
+                npc.HitEffect(0, 1337.0);
+                npc.checkDead();
+            }
+        }
+
         bool credits = false;
-        if (!DownedBossSystem.downedEternalHorror) {
+        if (!DownedBossSystem.downedEternalHorror)
+        {
             credits = true;
 
             ConsolariaCreditsSky.TryStartingCreditsRoll();
@@ -171,9 +180,9 @@ sealed partial class EternalHorror : ModNPC {
         }
         NPC.SetEventFlagCleared(ref DownedBossSystem.downedEternalHorror, -1);
 
-        if (!credits) {
-            LanternNight.NextNightIsLanternNight = true;
-        }
+        //if (!credits) {
+        //    LanternNight.NextNightIsLanternNight = true;
+        //}
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit) {

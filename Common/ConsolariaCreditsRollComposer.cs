@@ -77,6 +77,8 @@ sealed class ConsolariaCreditsRollComposer {
 
         _endTime = num + 10;
         endTime = _endTime;
+
+        ConsolariaCreditsSky._allTime = _endTime;
     }
 
     private SegmentInforReport PlaySegment_TextRoll(int startTime, string sourceCategory, Vector2 anchorOffset = default(Vector2)) {

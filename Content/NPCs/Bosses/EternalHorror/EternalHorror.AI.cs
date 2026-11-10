@@ -236,10 +236,13 @@ sealed partial class EternalHorror : ModNPC {
         if (!Dead) {
             DeactivateAllStates();
             if (!HasActiveState<DeathState>()) {
-                if (!DownedBossSystem.downedEternalHorror) {
+                if (!DownedBossSystem.downedEternalHorror)
+                {
                     if (!Helper.IsClient()) {
+                        LanternNight.WorldClear();
+                        LanternNight.ManualLanterns = true;
                         LanternNight.NextNightIsLanternNight = false;
-                        LanternNight.GenuineLanterns = true;
+                        LanternNight.GenuineLanterns = false;
                         LanternNight.LanternNightsOnCooldown = Main.rand.Next(5, 11);
                     }
                 }
