@@ -35,7 +35,8 @@ sealed class ConsolariaCreditsRollComposer {
         }
 
         num += num5;
-        num -= num3;
+        num += num3;
+        ConsolariaCreditsSky._preparationTime = num;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2).totalTime;
         num += num3;
         num += num3;

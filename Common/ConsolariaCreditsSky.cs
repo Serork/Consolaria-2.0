@@ -89,6 +89,8 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private const int MAX_TIME_FOR_CREDITS_ROLL_IN_FRAMES = 28800;
     private static int _creditsRollRemainingTime;
 
+    internal static int _preparationTime;
+
     private int _endTime;
     private int _currentTime;
     private ConsolariaCreditsRollComposer _composer = new ConsolariaCreditsRollComposer();
@@ -640,7 +642,9 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         }
 
         _opacity = MathHelper.Clamp(_opacity + num * (float)_wantsToBeSeen.ToDirectionInt(), 0f, 1f);
-        _opacity2 = MathHelper.Clamp(_opacity2 + num2 * (float)_wantsToBeSeen.ToDirectionInt(), 0f, 1f);
+        if (_currentTime > _preparationTime || !_wantsToBeSeen) {
+            _opacity2 = MathHelper.Clamp(_opacity2 + num2 * (float)_wantsToBeSeen.ToDirectionInt(), 0f, 1f);
+        }
         if (_opacity == 0f && _opacity2 == 0f && !_wantsToBeSeen) {
             if (_isActive) {
                 CreditsRollEvent.TryStartingCreditsRoll();
