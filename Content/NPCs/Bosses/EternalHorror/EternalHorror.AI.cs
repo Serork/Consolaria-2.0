@@ -1,4 +1,5 @@
-﻿using Consolaria.Common.Particles;
+﻿using Consolaria.Common.ModSystems;
+using Consolaria.Common.Particles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Events;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -233,6 +235,15 @@ sealed partial class EternalHorror : ModNPC {
     public override bool CheckDead() {
         if (!Dead) {
             DeactivateAllStates();
+            if (!HasActiveState<DeathState>()) {
+                if (!DownedBossSystem.downedEternalHorror) {
+                    if (!Helper.IsClient()) {
+                        LanternNight.NextNightIsLanternNight = false;
+                        LanternNight.GenuineLanterns = true;
+                        LanternNight.LanternNightsOnCooldown = Main.rand.Next(5, 11);
+                    }
+                }
+            }
             ActivateState<DeathState>();
 
             NPC.dontTakeDamage = true;
