@@ -98,7 +98,7 @@ sealed partial class EternalHorror : ModNPC {
                 break;
             }
         }
-        float angle = NPC.rotation + index / (float)SPAWNRAYCOUNTONSPAWN * MathHelper.TwoPi;
+        float angle = (IsInSecondPhase ? NPC.rotation : 0f) + index / (float)SPAWNRAYCOUNTONSPAWN * MathHelper.TwoPi;
         _rayData[index] = new RayInfo(Angle: angle,
                                       Progress: RAYSTARTPROGRESS);
     }
