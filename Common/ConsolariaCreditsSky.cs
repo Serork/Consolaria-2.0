@@ -486,7 +486,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
                 float opacity = _opacity;
 
-                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, _mouseText, new Vector2(X, Y), color * 0.25f, 0f, Vector2.Zero, Vector2.One);
+                ChatManager.DrawColorCodedStringShadow(spriteBatch, FontAssets.MouseText.Value, _mouseText, new Vector2(X, Y), color * 0.25f, 0f, Vector2.Zero, Vector2.One);
                 ChatManager.DrawColorCodedString(spriteBatch, FontAssets.MouseText.Value, _mouseText, new Vector2(X, Y), Color.White, 0f, Vector2.Zero, Vector2.One);
             }
         }
@@ -514,7 +514,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
         float num2 = num;
         if (_wantsToBeSeen) {
-            num2 *= 0.125f;
+            num2 *= 0.25f;
         }
 
         _opacity = MathHelper.Clamp(_opacity + num * (float)_wantsToBeSeen.ToDirectionInt(), 0f, 1f);
