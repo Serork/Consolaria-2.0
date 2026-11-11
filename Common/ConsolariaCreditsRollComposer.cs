@@ -311,12 +311,18 @@ sealed class ConsolariaCreditsRollComposer {
                     _player.inventory[_player.selectedItem].SetDefaults(ModContent.ItemType<ConfettiGun_UI>());
 
                     Main.mouseX = (int)(_player.Center.X + 100);
-                    Main.mouseY = (int)(_player.Center.Y - 0);
+                    Main.mouseY = (int)(_player.Center.Y - 100);
 
                     _cannonShootTime++;
                     if (_cannonShootTime == 500) {
                         _player.controlUseItem = true;
                         _player.releaseUseItem = true;
+
+                        float heightOffsetHitboxCenter = _player.HeightOffsetHitboxCenter;
+                        Rectangle drawHitbox = Item.GetDrawHitbox(_player.inventory[_player.selectedItem].type, _player);
+                        _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
+
+                        //_player.SetDummyItemTime(_player.inventory[_player.selectedItem].useAnimation);
 
                         //if (_player.whoAmI == Main.myPlayer && Main.netMode != 2) {
                         //    Main.NewText(1);
