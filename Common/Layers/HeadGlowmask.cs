@@ -1,5 +1,5 @@
 ﻿using Consolaria.Content.Items.Armor.Ranged;
-
+using Consolaria.Content.Items.Vanity.Developer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -37,6 +37,12 @@ namespace Consolaria {
             Player drawPlayer = drawInfo.drawPlayer;
             if (!HeadLayerData.TryGetValue(drawPlayer.head, out DrawLayerData data))
                 return;
+            if ((drawPlayer.head == EquipLoader.GetEquipSlot(Consolaria.Instance, nameof(Has2rMask), EquipType.Head) ||
+                 drawPlayer.head == EquipLoader.GetEquipSlot(Consolaria.Instance, nameof(Has2rShades), EquipType.Head))) {
+                if (drawPlayer.hair != 26) {
+                    return;
+                }
+            }
             Color color = drawPlayer.GetImmuneAlphaPure(data.Color(), drawInfo.shadow);
             if (drawPlayer.head == EquipLoader.GetEquipSlot(Mod, nameof(TitanHelmet), EquipType.Head) &&
                 drawPlayer.GetModPlayer<TitanPlayer>().titanPower2) {

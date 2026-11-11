@@ -1,5 +1,6 @@
 Mods: {
 	Consolaria: {
+		// ConsolariaDev: "'Great for impersonating Consolaria devs? Sure!'"
 		// Credits: Consolaria Credits
 		// Ty: "[w/0:Thank you for playing!]"
 
@@ -1541,6 +1542,99 @@ Mods: {
 			SuspiciousLookingSkull_EternalHorror: {
 				// DisplayName: Suspicious Looking Skull_ Eternal Horror
 				// Tooltip: ""
+			}
+
+			SerorkBreastplate: {
+				// DisplayName: Serork's Breastplate
+				// Tooltip: "{$Mods.Consolaria.ConsolariaDev}"
+			}
+
+			SerorkGreaves: {
+				// DisplayName: Serork's Greaves
+				// Tooltip: "{$Mods.Consolaria.ConsolariaDev}"
+			}
+
+			SerorkHelmet: {
+				// DisplayName: Serork's Helmet
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					'Everything leads to the better'
+					''' */
+			}
+
+			SerorkMask: {
+				// DisplayName: Serork's Mask
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					'Or to the worse'
+					''' */
+			}
+
+			PeegeonCape: {
+				// DisplayName: Peege.On's Cape
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					{$CommonItemTooltip.FlightAndSlowfall}
+					''' */
+			}
+
+			PeegeonChestguard: {
+				// DisplayName: Peege.On's Chestguard
+				// Tooltip: "{$Mods.Consolaria.ConsolariaDev}"
+			}
+
+			PeegeonGreaves: {
+				// DisplayName: Peege.On's Greaves
+				// Tooltip: "{$Mods.Consolaria.ConsolariaDev}"
+			}
+
+			PeegeonHood: {
+				// DisplayName: Peege.On's Hood
+				// Tooltip: "{$Mods.Consolaria.ConsolariaDev}"
+			}
+
+			EldritchRing: {
+				// DisplayName: Eldritch Ring
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					{$CommonItemTooltip.FlightAndSlowfall}
+					''' */
+			}
+
+			Has2rJacket: {
+				// DisplayName: The Unspeakable One's Jacket
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					'...And strange moons circle through the skies...'
+					''' */
+			}
+
+			Has2rMask: {
+				// DisplayName: The Unspeakable One's Mask
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					'Strange is the night where black stars rise...'
+					''' */
+			}
+
+			Has2rPants: {
+				// DisplayName: The Unspeakable One's Pants
+				/* Tooltip:
+					'''
+					{$Mods.Consolaria.ConsolariaDev}
+					'...But stranger still is lost Carcosa.'
+					''' */
+			}
+
+			Has2rShades: {
+				// DisplayName: The Unspeakable One's Shades
+				// Tooltip: "{$Mods.Consolaria.ConsolariaDev}"
 			}
 		}
 

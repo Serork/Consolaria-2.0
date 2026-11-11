@@ -20,6 +20,47 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static Vector2 MovementOffset(this Player player) {
+        Vector2[] positions = [
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, -2f),
+            new Vector2(0f, -2f),
+            new Vector2(0f, -2f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, -2f),
+            new Vector2(0f, -2f),
+            new Vector2(0f, -2f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+            new Vector2(0f, 0f),
+        ];
+
+        return new Vector2(positions[player.bodyFrame.Y / 56].X * player.direction, positions[player.bodyFrame.Y / 56].Y * player.gravDir);
+    }
+
+    public static bool IsEmpty(this Item item) => item == null || item.stack <= 0 || item.type <= ItemID.None || item.IsAir;
+
+    public static bool IsGrounded(this Player player) => player.velocity.Y == 0f || player.sliding || (player.autoJump && player.justJumped);
+
+    public static void BeginWorld(this SpriteBatch spriteBatch, bool shader = false, Matrix? overrideMatrix = null, BlendState state = null) {
+        var matrix = overrideMatrix ?? Main.Transform;
+        if (!shader) {
+            spriteBatch.Begin(SpriteSortMode.Deferred, state ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, matrix);
+        }
+        else {
+            spriteBatch.Begin(SpriteSortMode.Immediate, state ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.Default, Main.Rasterizer, null, matrix);
+        }
+    }
+
     public static float YoYo(float value) {
         if (value <= 0.5f) {
             return value * 2f;
