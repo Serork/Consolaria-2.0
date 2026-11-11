@@ -1,4 +1,5 @@
 ﻿using Consolaria.Content.Items.Vanity.Developer;
+using Consolaria.Content.NPCs.Bosses.Lepus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -8,6 +9,9 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Animations;
+using Terraria.GameContent.Skies;
+using Terraria.GameContent.Skies.CreditsRoll;
+using Terraria.GameContent.UI;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -46,8 +50,8 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
         ConsolariaCreditsSky._preparationTime = num;
 
-        // test remove later
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
+        //// test remove later
+        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
 
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2).totalTime;
         num += num3;
@@ -63,7 +67,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // something else
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors2", vector2).totalTime;
@@ -71,7 +75,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // andryuha
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors3", vector2).totalTime;
@@ -79,7 +83,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // something else
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors4", vector2).totalTime;
@@ -87,7 +91,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // serega
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors5", vector2).totalTime;
@@ -162,11 +166,24 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.Players.Fade(0f))
             .Then(new Actions.Players.LookAt(1))
             .With(new Actions.Players.Fade(1f, num8))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(num6, 0), new Vector2(num7, 0f), 280))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(num6, 0), new Vector2(num7, 0f), 180))
             .Then(new Actions.Players.Wait(20))
             .Then(new Actions.Players.LookAt(-1))
-            .Then(new Actions.Players.Wait(300))
-            .Then(new Actions.Players.Fade(0f, 120));
+            .Then(new Actions.Players.Wait(200 + 30))
+            .Then(new Actions.Players.LookAt(1))
+            .Then(new Actions.Players.Wait(120))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 75))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 100))
+            .With(new Actions.Players.Fade(0f, 100));
+
+        Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
+            .Then(new Actions.NPCs.Wait(60 + 60 + 30))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
 
         num += 102;
 
@@ -175,9 +192,24 @@ sealed class ConsolariaCreditsRollComposer {
         animationSegmentWithActions.Then(new Actions.Sprites.Wait(num - startTime - 180)).Then(new Actions.Sprites.Fade(0f, 120));
         _segments.Add(animationSegmentWithActions);
         _segments.Add(item2);
+        _segments.Add(item3);
+
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f, 0), startTime + 160, 60, 0, 15, -1);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 30f, 0), startTime + 400, 60, 0, EmoteID.EmoteSilly, 1, time: 60);
+
         SegmentInforReport result = default(SegmentInforReport);
         result.totalTime = num - startTime;
         return result;
+    }
+
+    private void AddEmote(Vector2 sceneAnchoePosition, int fromTime, int duration, int blinkTime, int emoteId, int direction) {
+        Segments.EmoteSegment item = new Segments.EmoteSegment(emoteId, fromTime + duration - blinkTime, 120, sceneAnchoePosition + _emoteBubbleOffsetWhenOnRight, (direction == 1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+        _segments.Add(item);
+    }
+
+    private void AddEmote(Vector2 sceneAnchoePosition, int fromTime, int duration, int blinkTime, int emoteId, int direction, int time = 120) {
+        Segments.EmoteSegment item = new Segments.EmoteSegment(emoteId, fromTime + duration - blinkTime, time, sceneAnchoePosition + _emoteBubbleOffsetWhenOnRight, (direction == 1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+        _segments.Add(item);
     }
 
     public class CustomPlayerSegment : AnimationSegmentWithActions<Player> {
@@ -211,6 +243,7 @@ sealed class ConsolariaCreditsRollComposer {
         private Vector2 _normalizedOriginForHitbox;
         private IShaderEffect _shaderEffect;
         private static Item _blankItem = new Item();
+        private int _cannonShootTime;
 
         public CustomPlayerSegment(int targetTime, Vector2 anchorOffset, Vector2 normalizedHitboxOrigin, DevType devType)
             : base(targetTime) {
@@ -265,10 +298,38 @@ sealed class ConsolariaCreditsRollComposer {
 
                 _player.UpdateDyes();
                 _player.PlayerFrame();
-                _player.socialIgnoreLight = true;
+
                 _player.position += Main.screenPosition;
                 _player.position -= new Vector2(_player.width / 2, _player.height);
+
+                int mouseX = Main.mouseX;
+                int mouseY = Main.mouseY;
+
+                // has2r
+                {
+                    _player.inventory[_player.selectedItem].SetDefaults(ItemID.ConfettiGun);
+
+                    Main.mouseX = (int)(_player.Center.X + 100);
+                    Main.mouseY = (int)(_player.Center.Y + 0);
+
+                    _cannonShootTime++;
+                    if (_cannonShootTime == 500) {
+                        _player.controlUseItem = true;
+                        _player.releaseUseItem = true;
+
+                        //if (_player.whoAmI == Main.myPlayer && Main.netMode != 2) {
+                        //    Main.NewText(1);
+                        //    Projectile.NewProjectile(_player.GetSource_FromThis(), _player.Center, Vector2.UnitY.RotatedBy(-MathHelper.PiOver2) * 5f, 178, 0, 0f, _player.whoAmI);
+                        //}
+                    }
+                }
+
+                _player.ItemCheck();
+
+                _player.socialIgnoreLight = true;
+
                 _player.opacityForAnimation *= info.DisplayOpacity;
+
                 Item item = _player.inventory[_player.selectedItem];
                 _player.inventory[_player.selectedItem] = _blankItem;
 
@@ -282,6 +343,9 @@ sealed class ConsolariaCreditsRollComposer {
                     _shaderEffect.AfterDrawing(ref info);
 
                 _player.inventory[_player.selectedItem] = item;
+
+                Main.mouseX = mouseX;
+                Main.mouseY = mouseY;
             }
         }
 

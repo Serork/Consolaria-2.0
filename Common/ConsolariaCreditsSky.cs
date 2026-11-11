@@ -92,9 +92,9 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
     private static int _endTime;
     private static int _currentTime;
-    private ConsolariaCreditsRollComposer _composer = new ConsolariaCreditsRollComposer();
-    private List<IAnimationSegment> _segmentsInGame = new List<IAnimationSegment>();
-    private List<IAnimationSegment> _segmentsInMainMenu = new List<IAnimationSegment>();
+    private static ConsolariaCreditsRollComposer _composer = new ConsolariaCreditsRollComposer();
+    private static List<IAnimationSegment> _segmentsInGame = new List<IAnimationSegment>();
+    private static List<IAnimationSegment> _segmentsInMainMenu = new List<IAnimationSegment>();
     private bool _isActive;
     private static bool _wantsToBeSeen;
     private static float _opacity, _opacity2;
@@ -102,7 +102,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     public int AmountOfTimeNeededForFullPlay => _endTime;
 
     public ConsolariaCreditsSky() {
-        EnsureSegmentsAreMade();
+        //EnsureSegmentsAreMade();
     }
 
     void ILoadable.Load(Mod mod) {
@@ -319,30 +319,29 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         orig();
         UpdateTime();
 
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
-            //ConsolariaCreditsSky.Reset_Internal();
-            CreditsRollEvent.Reset();
-        }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad2)) {
-            //CreditsRollEvent.Reset();
-            EnsureSegmentsAreMade();
-            ConsolariaCreditsSky.TryStartingCreditsRoll();
-            //CreditsRollEvent.TryStartingCreditsRoll();
-        }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad3)) {
-            ConsolariaCreditsSky.Reset_Internal();
-            CreditsRollEvent.Reset();
-        }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad4)) {
-            EnsureSegmentsAreMade();
-            ConsolariaCreditsSky.TryStartingCreditsRoll();
-            ConsolariaCreditsSky.ForcedStart();
-        }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad5)) {
-            ConsolariaCreditsSky.Reset_Internal();
-            CreditsRollEvent.Reset();
-            ConsolariaCreditsSky.ForcedEnd();
-        }
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
+        //    //ConsolariaCreditsSky.Reset_Internal();
+        //    CreditsRollEvent.Reset();
+        //}
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad2)) {
+        //    //CreditsRollEvent.Reset();
+        //    EnsureSegmentsAreMade();
+        //    ConsolariaCreditsSky.TryStartingCreditsRoll();
+        //    //CreditsRollEvent.TryStartingCreditsRoll();
+        //}
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad3)) {
+        //    ConsolariaCreditsSky.Reset_Internal();
+        //    CreditsRollEvent.Reset();
+        //}
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad4)) {
+        //    ConsolariaCreditsSky.TryStartingCreditsRoll();
+        //    ConsolariaCreditsSky.ForcedStart();
+        //}
+        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad5)) {
+        //    ConsolariaCreditsSky.Reset_Internal();
+        //    CreditsRollEvent.Reset();
+        //    ConsolariaCreditsSky.ForcedEnd();
+        //}
     }
 
     private void On_CreditsRollEvent_Reset(On_CreditsRollEvent.orig_Reset orig) {
@@ -358,6 +357,8 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         //}
 
         CreditsRollEvent.Reset();
+
+        EnsureSegmentsAreMade();
 
         _creditsRollRemainingTime = 28800;
         if (SkyManager.Instance["ConsolariaCreditsRoll"] is ConsolariaCreditsSky creditsRollSky)
@@ -384,7 +385,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         _creditsRollRemainingTime = Utils.Clamp(time, 0, 28800);
     }
 
-    private void EnsureSegmentsAreMade() {
+    public static void EnsureSegmentsAreMade() {
         //if (_segmentsInMainMenu.Count <= 0 || _segmentsInGame.Count <= 0)
         {
             _segmentsInGame.Clear();
