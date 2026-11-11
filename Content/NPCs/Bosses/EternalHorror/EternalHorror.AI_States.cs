@@ -461,7 +461,7 @@ sealed partial class EternalHorror : ModNPC {
                         return;
                     }
 
-                    //npc.ResetTrails();
+                    npc.ResetTrails();
 
                     SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
