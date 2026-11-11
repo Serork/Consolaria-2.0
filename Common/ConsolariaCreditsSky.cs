@@ -137,7 +137,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private void On_Main_UpdateAudio_DecideOnNewMusic(On_Main.orig_UpdateAudio_DecideOnNewMusic orig, Main self) {
         orig(self);
 
-        if (ConsolariaCreditsSky.IsEventOngoing) {
+        if (SkyManager.Instance["ConsolariaCreditsRoll"].IsActive()) {
             Main.newMusic = MusicLoader.GetMusicSlot(Consolaria.Instance, "Assets/Music/BlightofSpring");
         }
     }
@@ -145,7 +145,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private void On_Main_UpdateAudio_DecideOnTOWMusic(On_Main.orig_UpdateAudio_DecideOnTOWMusic orig, Main self) {
         orig(self);
 
-        if (ConsolariaCreditsSky.IsEventOngoing) {
+        if (SkyManager.Instance["ConsolariaCreditsRoll"].IsActive()) {
             Main.newMusic = MusicLoader.GetMusicSlot(Consolaria.Instance, "Assets/Music/BlightofSpring");
         }
     }
@@ -319,20 +319,20 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         orig();
         UpdateTime();
 
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
-        //    //ConsolariaCreditsSky.Reset_Internal();
-        //    CreditsRollEvent.Reset();
-        //}
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F2)) {
-        //    //CreditsRollEvent.Reset();
-        //    EnsureSegmentsAreMade();
-        //    ConsolariaCreditsSky.TryStartingCreditsRoll();
-        //    //CreditsRollEvent.TryStartingCreditsRoll();
-        //}
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F3)) {
-        //    ConsolariaCreditsSky.Reset_Internal();
-        //    CreditsRollEvent.Reset();
-        //}
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+            //ConsolariaCreditsSky.Reset_Internal();
+            CreditsRollEvent.Reset();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F2)) {
+            //CreditsRollEvent.Reset();
+            EnsureSegmentsAreMade();
+            ConsolariaCreditsSky.TryStartingCreditsRoll();
+            //CreditsRollEvent.TryStartingCreditsRoll();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F3)) {
+            ConsolariaCreditsSky.Reset_Internal();
+            CreditsRollEvent.Reset();
+        }
     }
 
     private void On_CreditsRollEvent_Reset(On_CreditsRollEvent.orig_Reset orig) {
@@ -584,7 +584,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
             for (int k = -num2; k <= num2; k += num) {
                 for (int l = -num2; l <= num2; l += num) {
                     if (Math.Abs(k) + Math.Abs(l) == num2) {
-                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * opacity, 0f, clip.Centered(), scale, default, 0f);
+                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * MathHelper.Lerp(1f, opacity, 0.5f), 0f, clip.Centered(), scale, default, 0f);
                     }
                 }
             }
@@ -592,7 +592,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         spriteBatch.Draw(consolariaIcon.Value, position, clip, Color.White * opacity, 0f, clip.Centered(), scale, default, 0f);
         // adapted vanilla
         value2 = new Microsoft.Xna.Framework.Rectangle((int)((double)position.X - clip.Width / 2/* + Main.screenPosition.X*/), (int)(position.Y - clip.Height / 2/* + Main.screenPosition.Y*/), (int)(clip.Width/* * Main.UIScale*/), (int)(clip.Height/* * Main.UIScale*/));
-        if (!Main.mouseText && mouseRectangle.Intersects(value2)) {
+        if (GetScale() * GetOpacity() > 0.5f && !Main.mouseText && mouseRectangle.Intersects(value2)) {
             player.cursorItemIconEnabled = false;
 
             string text2 = Language.GetTextValue("Mods.Consolaria.Credits");
