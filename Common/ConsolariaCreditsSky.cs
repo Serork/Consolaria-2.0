@@ -602,7 +602,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
             for (int k = -num2; k <= num2; k += num) {
                 for (int l = -num2; l <= num2; l += num) {
                     if (Math.Abs(k) + Math.Abs(l) == num2) {
-                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * MathHelper.Lerp(1f, opacity, MathHelper.Lerp(0.125f, 0.25f, 0.5f)), 0f, clip.Centered(), scale, default, 0f);
+                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * MathHelper.Lerp(1f, opacity, MathHelper.Lerp(0.125f, 0.25f, 0.25f)), 0f, clip.Centered(), scale, default, 0f);
                     }
                 }
             }
