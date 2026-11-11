@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -99,6 +100,8 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private static bool _wantsToBeSeen;
     private static float _opacity, _opacity2;
 
+    public static Asset<Texture2D> Has2rCutsceneArea { get; private set; }
+
     public int AmountOfTimeNeededForFullPlay => _endTime;
 
     public ConsolariaCreditsSky() {
@@ -111,6 +114,10 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         On_Main.TryPlayingCreditsRoll += On_Main_TryPlayingCreditsRoll;
 
         ChatManager.Register<WavyText>(["w", "wavy"]);
+
+        if (!Main.dedServ) {
+            Has2rCutsceneArea = Helper.RequestTexture("Consolaria/Assets/Textures/Has2rCutsceneArea");
+        }
 
         //On_CreditsRollComposer.PlaySegment_TextRoll += On_CreditsRollComposer_PlaySegment_TextRoll;
         //On_CreditsRollComposer.PlaySegment_Grox_GuideRunningFromZombie += On_CreditsRollComposer_PlaySegment_Grox_GuideRunningFromZombie;
@@ -595,7 +602,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
             for (int k = -num2; k <= num2; k += num) {
                 for (int l = -num2; l <= num2; l += num) {
                     if (Math.Abs(k) + Math.Abs(l) == num2) {
-                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * MathHelper.Lerp(1f, opacity, 0.5f), 0f, clip.Centered(), scale, default, 0f);
+                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * MathHelper.Lerp(1f, opacity, 0f), 0f, clip.Centered(), scale, default, 0f);
                     }
                 }
             }

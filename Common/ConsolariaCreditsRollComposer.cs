@@ -1,4 +1,5 @@
-﻿using Consolaria.Content.Items.Vanity.Developer;
+﻿using Consolaria.Content.Items.Consumables;
+using Consolaria.Content.Items.Vanity.Developer;
 using Consolaria.Content.NPCs.Bosses.Lepus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -152,7 +153,7 @@ sealed class ConsolariaCreditsRollComposer {
     private SegmentInforReport PlaySegment_Has2rLaughing(int startTime, Vector2 sceneAnchorPosition) {
         sceneAnchorPosition += GetSceneFixVector();
         int num = startTime;
-        Asset<Texture2D> asset = TextureAssets.Extra[217];
+        Asset<Texture2D> asset = ConsolariaCreditsSky.Has2rCutsceneArea;
         Rectangle rectangle = asset.Frame();
         DrawData data = new DrawData(asset.Value, Vector2.Zero, rectangle, Color.White, 0f, rectangle.Size() * new Vector2(0.5f, 1f) + new Vector2(0f, -42f), 1f, SpriteEffects.None);
         Segments.AnimationSegmentWithActions<Segments.LooseSprite> animationSegmentWithActions = new Segments.SpriteSegment(asset, num, data, sceneAnchorPosition + _backgroundOffset).UseShaderEffect(new Segments.SpriteSegment.MaskedFadeEffect()).Then(new Actions.Sprites.Fade(0f)).With(new Actions.Sprites.Fade(1f, 60));
@@ -307,10 +308,10 @@ sealed class ConsolariaCreditsRollComposer {
 
                 // has2r
                 {
-                    _player.inventory[_player.selectedItem].SetDefaults(ItemID.ConfettiGun);
+                    _player.inventory[_player.selectedItem].SetDefaults(ModContent.ItemType<ConfettiGun_UI>());
 
                     Main.mouseX = (int)(_player.Center.X + 100);
-                    Main.mouseY = (int)(_player.Center.Y + 0);
+                    Main.mouseY = (int)(_player.Center.Y - 0);
 
                     _cannonShootTime++;
                     if (_cannonShootTime == 500) {
