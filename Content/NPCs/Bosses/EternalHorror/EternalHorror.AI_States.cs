@@ -1351,7 +1351,7 @@ sealed partial class EternalHorror : ModNPC {
 
             ShakeStrength = Helper.Approach(ShakeStrength, dashProgress, 0.125f);
 
-            boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, dashProgress, 1f / 60f * MathHelper.Lerp(1f, 2.5f, didAtLeastOneDash2 ? 0f : 0.5f));
+            boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, dashProgress, 1f / 60f * MathHelper.Lerp(1f, 2.5f, 0f));
 
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 cloneInfo.DashOpacity = Helper.Approach(cloneInfo.DashOpacity, 0f, 1f / 60f);
@@ -2111,7 +2111,9 @@ sealed partial class EternalHorror : ModNPC {
 
                 npc.velocity *= Ease.CubeOut(preparationSlowDown);
 
-                setRotation();
+                if (attackProgress < 0.875f) {
+                    setRotation();
+                }
             }
 
             if (attackProgress >= 1.5f) {
@@ -2204,7 +2206,7 @@ sealed partial class EternalHorror : ModNPC {
 
             boss.Phase2DashAttackCount = -1;
 
-            boss.AICounter = -ATTACKTIME;
+            boss.AICounter = -ATTACKTIME * 2f;
         }
 
         void IAIState.OnEnd(NPC npc, EternalHorror boss) {
