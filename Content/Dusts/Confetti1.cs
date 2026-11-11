@@ -15,7 +15,7 @@ class Confetti1 : ModDust {
     }
 
     public override bool Update(Dust dust) {
-        dust.customData = Helper.Approach((float)dust.customData, 0f, 1 / 60f * 0.125f * 0.5f);
+        dust.customData = Helper.Approach((float)dust.customData, 0f, 1 / 60f * 0.125f * 0.575f);
 
         dust.BasicDust(applyGravity: false);
 
