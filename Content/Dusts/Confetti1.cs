@@ -8,10 +8,16 @@ class Confetti4 : Confetti1 { }
 class Confetti3 : Confetti1 { }
 class Confetti2 : Confetti1 { }
 class Confetti1 : ModDust {
-    public override Color? GetAlpha(Dust dust, Color lightColor) => Color.White;
+    public override Color? GetAlpha(Dust dust, Color lightColor) => Color.Lerp(Color.White, lightColor, Ease.CubeOut(1f - (float)dust.customData));
+
+    public override void OnSpawn(Dust dust) {
+        dust.customData = 1f;
+    }
 
     public override bool Update(Dust dust) {
-        dust.BasicDust();
+        dust.customData = Helper.Approach((float)dust.customData, 0f, 1 / 60f * 0.125f * 0.5f);
+
+        dust.BasicDust(applyGravity: false);
 
         dust.velocity.X *= 0.98f;
         dust.velocity.Y *= 0.98f;

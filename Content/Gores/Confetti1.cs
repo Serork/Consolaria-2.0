@@ -10,7 +10,7 @@ class Confetti4 : Confetti1 { }
 class Confetti3 : Confetti1 { }
 class Confetti2 : Confetti1 { }
 class Confetti1 : ModGore {
-    public override Color? GetAlpha(Gore gore, Color lightColor) => Color.White * (1f - gore.alpha / 255f);
+    public override Color? GetAlpha(Gore gore, Color lightColor) => Color.Lerp(Color.White, lightColor, Ease.CubeOut(1f - gore.timeLeft / (float)Gore.goreTime)) * (1f - gore.alpha / 255f);
 
     public override bool Update(Gore gore) {
         gore.velocity.X *= 0.98f;
