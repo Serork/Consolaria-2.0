@@ -449,7 +449,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         //double easeOutExpo(double t) => t >= 1.0 ? 1.0 : 1.0 - Math.Pow(2, -10 * t);
 
         float lerp = Utils.GetLerpValue(_allTime - 120, _allTime, _currentTime, true);
-        lerp = Ease.SineInOut(lerp);
+        lerp = Ease.QuadOut(Ease.SineIn(lerp));
         //if (_currentTime > _preparationTime) {
         //    lerp = 1f - Utils.GetLerpValue(0, 120 * 0.375f, _currentTime - _preparationTime, true);
         //    lerp = Utils.Remap(lerp, 0f, 1f, 0f, 0.375f, true);
