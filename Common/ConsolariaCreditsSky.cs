@@ -97,7 +97,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private List<IAnimationSegment> _segmentsInGame = new List<IAnimationSegment>();
     private List<IAnimationSegment> _segmentsInMainMenu = new List<IAnimationSegment>();
     private bool _isActive;
-    private bool _wantsToBeSeen;
+    private static bool _wantsToBeSeen;
     private static float _opacity, _opacity2;
 
     public int AmountOfTimeNeededForFullPlay => _endTime;
@@ -435,7 +435,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         Color color = Main.hslToRgb(num5, 1f, 0.5f);
 
         Vector2 position = Main.ScreenSize.ToVector2() / 2f;
-        position.Y = 100;
+        position.Y = 200;
 
         float lastPosY = Main.ScreenSize.Y / 2f - 100;
 
@@ -444,8 +444,12 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         Vector2 origin = FontAssets.DeathText.Value.MeasureString(text);
         origin *= 0.5f;
 
+        origin = Vector2.Zero;
+
+        //double easeOutExpo(double t) => t >= 1.0 ? 1.0 : 1.0 - Math.Pow(2, -10 * t);
+
         float lerp = Utils.GetLerpValue(_allTime - 120, _allTime, _currentTime, true);
-        lerp = Ease.CubeInOut(lerp);
+        lerp = Ease.SineInOut(lerp);
         //if (_currentTime > _preparationTime) {
         //    lerp = 1f - Utils.GetLerpValue(0, 120 * 0.375f, _currentTime - _preparationTime, true);
         //    lerp = Utils.Remap(lerp, 0f, 1f, 0f, 0.375f, true);
@@ -461,6 +465,9 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
         size *= scale;
 
+        position.X -= 11.5f * (1f - scale);
+        position.Y -= 127.5f * (1f - scale);
+
         TextSnippet[] snippets = ChatManager.ParseMessage(text, Color.White).ToArray();
         ChatManager.ConvertNormalSnippets(snippets);
 
@@ -469,10 +476,9 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         ChatManager.DrawColorCodedString(spriteBatch, FontAssets.DeathText.Value, snippets, position, Color.White * opacity, 0f, origin, size, out int hoveredSnipper, origin.X * 2f, true);
 
         Vector2 anchorPositionOnScreen2 = Main.ScreenSize.ToVector2() / 2f;
-        //anchorPositionOnScreen2.X += 195f;
         float offsetY = MathHelper.Lerp(150f, 162.5f, 0.5f);
-        anchorPositionOnScreen2.Y = offsetY;
-        anchorPositionOnScreen2.Y = MathHelper.Lerp(anchorPositionOnScreen2.Y, lastPosY, lerp);
+        anchorPositionOnScreen2.Y = offsetY - 50;
+        anchorPositionOnScreen2.Y = MathHelper.Lerp(anchorPositionOnScreen2.Y, lastPosY - 145f, lerp);
         anchorPositionOnScreen2.Y += MathF.Sin(Main.GlobalTimeWrappedHourly * 1.25f) * 5f * GetScale() * GetOpacity();
         //if (Main.gameMenu)
         //    anchorPositionOnScreen2.Y = 300f;
@@ -482,6 +488,9 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
     private static float GetScale() {
         float opacity = _opacity2;
+        if (!_wantsToBeSeen) {
+            opacity = 1f;
+        }
         opacity = Utils.GetLerpValue(0f, 0.5f, opacity, true);
         opacity = Ease.CubeOut(opacity);
         float scale = opacity;
@@ -555,9 +564,11 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
         Color color = Main.hslToRgb(num5, 1f, 0.5f);
 
-        var consolariaIcon = ModContent.Request<Texture2D>("Consolaria/icon_small");
-        clip = consolariaIcon.Frame(1, 1);
+        var consolariaIcon = ModContent.Request<Texture2D>("Consolaria/Assets/Textures/ConsolariaLogo");
+        clip = consolariaIcon.Value.Bounds;
         //position.X -= 370f + 20f;
+
+        scale *= 0.5f;
 
         spriteBatch.DrawWithSnapshot(() => {
             pixelShader.CurrentTechnique.Passes["ColorOnly"].Apply();
@@ -574,7 +585,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
             for (int k = -num2; k <= num2; k += num) {
                 for (int l = -num2; l <= num2; l += num) {
                     if (Math.Abs(k) + Math.Abs(l) == num2) {
-                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.5f) * opacity, 0f, clip.Centered(), scale, default, 0f);
+                        spriteBatch.Draw(consolariaIcon.Value, position + new Vector2((float)k, (float)l), clip, color * opacity * 0.25f * MathHelper.Lerp(0.25f, 1f, 0.125f) * opacity * opacity, 0f, clip.Centered(), scale, default, 0f);
                     }
                 }
             }
@@ -651,7 +662,8 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
             num = 1f / 15f;
 
         float num2 = num;
-        if (_wantsToBeSeen) {
+        //if (_wantsToBeSeen)
+        {
             num2 *= 0.25f;
         }
 
