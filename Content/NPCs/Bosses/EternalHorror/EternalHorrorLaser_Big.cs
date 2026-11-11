@@ -4,7 +4,6 @@ using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.Events;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -82,7 +81,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         Projectile.Opacity = 0f;
         Projectile.tileCollide = false;
     }
-    
+
     private void MakeTrailDust(Vector2 position, Vector2 velocity, Vector2 velocity2, float opacity) {
         Vector2 accelerationPerFrame = new Vector2(0f, 0.16350001f) + velocity2;
         Asset<Texture2D> textureAsset = _trailParticle;

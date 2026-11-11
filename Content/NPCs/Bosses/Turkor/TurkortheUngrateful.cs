@@ -512,8 +512,8 @@ namespace Consolaria.Content.NPCs.Bosses.Turkor {
                 AddThoriumLoot(notExpertRule);
             }
             else {
-                notExpertRule.OnSuccess(new OneFromOptionsDropRule(1, 1, 
-                    ModContent.ItemType<FeatherStorm>(), 
+                notExpertRule.OnSuccess(new OneFromOptionsDropRule(1, 1,
+                    ModContent.ItemType<FeatherStorm>(),
                     ModContent.ItemType<GreatDrumstick>(),
                     ModContent.ItemType<TurkeyStuff>()));
             }

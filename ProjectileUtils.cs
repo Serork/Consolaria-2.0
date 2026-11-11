@@ -1,8 +1,5 @@
-﻿using Consolaria;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using System;
 
 using Terraria;
@@ -12,7 +9,7 @@ using Terraria.GameContent.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace RoA.Core.Utility.Vanilla;
+namespace Consolaria;
 
 static class ProjectileUtils {
     public static void QuickDraw(this Projectile projectile, Color lightColor, float exRot = 0f, Texture2D? texture = null, SpriteEffects? spriteEffects = null, Rectangle? sourceRectangle = null, Vector2? origin = null, Vector2? scale = null) {

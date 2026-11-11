@@ -1,6 +1,6 @@
 ﻿using Consolaria.Common.Particles;
+using Consolaria.Common.ScreenEffects;
 using Microsoft.Xna.Framework;
-using RoA.Common.ScreenEffects;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -1221,8 +1221,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     //    boss.ActivateState<Phase2ScytheAttack>();
                     //}
-                    else 
-                    {
+                    else {
                         boss.ActivateState<Phase2DashAttack>();
                     }
 
@@ -1279,7 +1278,7 @@ sealed partial class EternalHorror : ModNPC {
                     dashTime = DASHTIME_FIRSTDASH;
                 }
             }
-            if (didAtLeastOneDash || boss.Phase2ShouldDoSpiralAttack)  {
+            if (didAtLeastOneDash || boss.Phase2ShouldDoSpiralAttack) {
                 boss._ai5 = Helper.Approach(boss._ai5, 1f, 1 / 60f);
             }
 
@@ -1783,7 +1782,7 @@ sealed partial class EternalHorror : ModNPC {
                 float progress = 1f - MathF.Abs(boss.AICounter / preparationTime2);
 
                 float maxAttacks = 5f;
- 
+
                 if (MathF.Abs(boss.Phase2ScytheAttackDirection) < maxAttacks - 1f) {
                     boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.125f);
                 }
@@ -2052,7 +2051,7 @@ sealed partial class EternalHorror : ModNPC {
             var laser = ModContent.ProjectileType<EternalHorrorLaser_Holdout>();
 
             boss._copiesIntensity = attackProgress2;
-            
+
             if (boss.Phase2DashAttackCount == 0) {
                 boss.Phase2DashAttackCount = -1;
             }

@@ -8,7 +8,6 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using ThoriumMod.Items.Donate;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 

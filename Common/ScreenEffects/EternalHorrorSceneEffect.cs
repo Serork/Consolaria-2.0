@@ -1,5 +1,4 @@
 ﻿using Consolaria.Content.NPCs.Bosses.EternalHorror;
-using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 

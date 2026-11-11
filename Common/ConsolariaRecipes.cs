@@ -19,8 +19,6 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-using ThoriumMod;
-
 namespace Consolaria.Common;
 
 sealed class ConsolariaRecipes : ModSystem {

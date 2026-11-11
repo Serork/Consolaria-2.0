@@ -269,58 +269,58 @@ sealed class SerorkMask : ModItem {
                 case CompositePlayerDrawContext.BackArm:
                 case CompositePlayerDrawContext.FrontArm:
                 case CompositePlayerDrawContext.FrontShoulder: {
-                    DrawData item2 = data;
-                    item2.texture = _bodyGlowTexture.Value;
-                    Color glowMaskColor = Color.White;
-                    glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
-                    item2.color = glowMaskColor * 0.25f;
-                    item2.color = Color.Lerp(item2.color, EffectGlowColor, 0.5f);
-                    item2.color.A = (byte)((float)(int)item2.color.A * 0.375f);
-                    var handler = drawPlayer.GetModPlayer<SerorkVisualsStorage>();
-                    float num2 = handler.ghostFade;
-                    for (int l = 0; l < 4; l++) {
-                        float num3;
-                        float num4;
-                        switch (l) {
-                            default:
-                                num3 = num2;
-                                num4 = 0f;
-                                break;
-                            case 1:
-                                num3 = 0f - num2;
-                                num4 = 0f;
-                                break;
-                            case 2:
-                                num3 = 0f;
-                                num4 = num2;
-                                break;
-                            case 3:
-                                num3 = 0f;
-                                num4 = 0f - num2;
-                                break;
+                        DrawData item2 = data;
+                        item2.texture = _bodyGlowTexture.Value;
+                        Color glowMaskColor = Color.White;
+                        glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
+                        item2.color = glowMaskColor * 0.25f;
+                        item2.color = Color.Lerp(item2.color, EffectGlowColor, 0.5f);
+                        item2.color.A = (byte)((float)(int)item2.color.A * 0.375f);
+                        var handler = drawPlayer.GetModPlayer<SerorkVisualsStorage>();
+                        float num2 = handler.ghostFade;
+                        for (int l = 0; l < 4; l++) {
+                            float num3;
+                            float num4;
+                            switch (l) {
+                                default:
+                                    num3 = num2;
+                                    num4 = 0f;
+                                    break;
+                                case 1:
+                                    num3 = 0f - num2;
+                                    num4 = 0f;
+                                    break;
+                                case 2:
+                                    num3 = 0f;
+                                    num4 = num2;
+                                    break;
+                                case 3:
+                                    num3 = 0f;
+                                    num4 = 0f - num2;
+                                    break;
+                            }
+                            item2.position = new Vector2(item2.position.X + num3, item2.position.Y + num4);
+                            Rectangle value2 = item2.sourceRect.Value;
+                            item2.sourceRect = value2;
+                            item2.shader = drawinfo.cBody;
+                            item2.color = drawinfo.drawPlayer.GetImmuneAlphaPure(item2.color, (float)drawinfo.shadow);
+                            drawinfo.DrawDataCache.Add(item2);
                         }
-                        item2.position = new Vector2(item2.position.X + num3, item2.position.Y + num4);
-                        Rectangle value2 = item2.sourceRect.Value;
-                        item2.sourceRect = value2;
-                        item2.shader = drawinfo.cBody;
-                        item2.color = drawinfo.drawPlayer.GetImmuneAlphaPure(item2.color, (float)drawinfo.shadow);
-                        drawinfo.DrawDataCache.Add(item2);
+                        break;
                     }
-                    break;
-                }
 
                 case CompositePlayerDrawContext.Torso: {
-                    DrawData item = data;
-                    item.texture = _bodyGlowTexture2.Value;
-                    Color glowMaskColor = Color.White * 0.9f;
-                    glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
-                    item.color = glowMaskColor;
-                    Rectangle value = item.sourceRect.Value;
-                    item.sourceRect = value;
-                    item.shader = drawinfo.cBody;
-                    drawinfo.DrawDataCache.Add(item);
-                    break;
-                }
+                        DrawData item = data;
+                        item.texture = _bodyGlowTexture2.Value;
+                        Color glowMaskColor = Color.White * 0.9f;
+                        glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
+                        item.color = glowMaskColor;
+                        Rectangle value = item.sourceRect.Value;
+                        item.sourceRect = value;
+                        item.shader = drawinfo.cBody;
+                        drawinfo.DrawDataCache.Add(item);
+                        break;
+                    }
             }
         }
 

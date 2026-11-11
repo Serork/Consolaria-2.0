@@ -27,7 +27,6 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace Consolaria.Content.NPCs.Bosses.Lepus {
     [AutoloadBossHead]

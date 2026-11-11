@@ -156,7 +156,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     public override void PostUpdateNPCs() {
         if (_spawnSoundSlotID is not null && SoundEngine.TryGetActiveSound(_spawnSoundSlotID.Value, out ActiveSound result)) {
             result.Position = Main.LocalPlayer.Center;
-        } 
+        }
 
         HandleBlinking();
         HandleEyes();
@@ -248,7 +248,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                         var shader = filter.GetShader();
                         shader.Shader.Parameters["uSaturation"].SetValue(2f * Ease.CubeOut(screenObstructionFactor) * FilterOpacity);
                     }
-                }      
+                }
             }
         }
 
@@ -758,9 +758,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 float maxRotation = 0.25f * 0.75f;
                 eyeInfo.EyeRotation = Helper.Wave(-maxRotation, maxRotation, 3.75f, i);
 
-                eyeInfo.PupilVelocity = 
-                    Vector2.Lerp(eyeInfo.PupilVelocity, 
-                    position.DirectionTo(bossSpawned ? bossCenter : playerCenter) * 5f, 
+                eyeInfo.PupilVelocity =
+                    Vector2.Lerp(eyeInfo.PupilVelocity,
+                    position.DirectionTo(bossSpawned ? bossCenter : playerCenter) * 5f,
                     0.25f) + Main.rand.NextVector2Circular(1f, 1f);
             }
 

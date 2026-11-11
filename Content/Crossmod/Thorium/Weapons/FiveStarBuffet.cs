@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 using ReLogic.Content;
 
-using RoA.Core.Utility.Vanilla;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,9 +89,9 @@ public sealed class FiveStarBuffet : ThoriumItem_HealerBase {
                         foreach (Player target in Main.ActivePlayers) {
                             if (target.IsAlive() && ThoriumUtils.CanBeHealed(Projectile, player, target) && !target.InOpposingTeam(player) && target.statLife < player.statLife) {
                                 if (target.Distance(Projectile.Center) > 16f * 30f) {
-									continue;
-								}
-								playerWhoAmIToHeal = target.whoAmI;
+                                    continue;
+                                }
+                                playerWhoAmIToHeal = target.whoAmI;
                             }
                         }
                         if (player.statLife == player.statLifeMax2 && playerWhoAmIToHeal == player.whoAmI) {
@@ -101,9 +99,9 @@ public sealed class FiveStarBuffet : ThoriumItem_HealerBase {
                             for (int u = 0; u < Main.maxNPCs; u++) {
                                 NPC dummy = Main.npc[u];
                                 if (((Entity)dummy).active && dummy.type == dummyType) {
-									if (dummy.Distance(Projectile.Center) > 16f * 30f) {
-										continue;
-									}
+                                    if (dummy.Distance(Projectile.Center) > 16f * 30f) {
+                                        continue;
+                                    }
                                     playerWhoAmIToHeal = -(u + 200);
                                 }
                             }

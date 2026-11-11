@@ -1,10 +1,9 @@
 ﻿using Consolaria.Common.Particles;
+using Consolaria.Common.ScreenEffects;
 using Consolaria.Content.Gores;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json.Linq;
 using ReLogic.Content;
-using RoA.Common.ScreenEffects;
 using System;
 using Terraria;
 using Terraria.GameContent;
@@ -13,8 +12,6 @@ using Terraria.Graphics.Effects;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static Terraria.GameContent.Animations.Actions.Sprites;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -125,7 +122,7 @@ sealed partial class EternalHorror : ModNPC {
             float rayProgress = rayInfo.Progress;
             rayProgress = Helper.Clamp01(rayProgress);
             int direction = (i % 2 == 0).ToDirectionInt();
-            rayInfo.Angle += _raySpeed * rayProgress * direction 
+            rayInfo.Angle += _raySpeed * rayProgress * direction
                 * MathHelper.Lerp(0.1f, 0.25f, 0.5f) * 1f * 0.25f
                 * Utils.Remap(getRandomValue(), 0f, 1f, 1f, 0.25f, true) * angleFactor;
 
@@ -461,7 +458,7 @@ sealed partial class EternalHorror : ModNPC {
                 value67 = rCurrentNPC.GetAlpha(value67);
                 value67 *= 1f - num247;
                 value67 *= 0.375f;
-                Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2() 
+                Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2()
                     * num248 * num247;
                 if (СloneStateEffectOpacity < 1f) {
                     Draw_Inner(NPC, drawContext with {
@@ -563,7 +560,7 @@ sealed partial class EternalHorror : ModNPC {
             //spriteBatch.Draw(value2, vector, null, color4, rotation, origin2, num3, SpriteEffects.None, 0f);
         }
         void drawLaserGlow() {
-            drawContext = drawContext with { 
+            drawContext = drawContext with {
                 Texture = glowTexture,
                 Clip = glowClip
             };
@@ -625,7 +622,7 @@ sealed partial class EternalHorror : ModNPC {
                         circleColor *= progress2;
 
                         Vector2 baseScale = Vector2.One;
-                        baseScale *= 2f * 1.5f; 
+                        baseScale *= 2f * 1.5f;
                         //baseScale.Y *= 0.875f;
 
                         Vector2 scaleFinal = baseScale * Ease.CircOut(circleScale);
@@ -1127,10 +1124,10 @@ sealed partial class EternalHorror : ModNPC {
 
     private static void Draw_Inner(NPC npc, DrawContext drawContext, float scale = 1f) {
         npc.QuickDraw(drawContext.SpriteBatch, drawContext.ScreenPosition, drawContext.DrawColor, scale: scale,
-                                                                                                  frameBox: drawContext.Clip, 
-                                                                                                  rotation: drawContext.Rotation, 
-                                                                                                  position: drawContext.Position, 
-                                                                                                  texture: drawContext.Texture, 
+                                                                                                  frameBox: drawContext.Clip,
+                                                                                                  rotation: drawContext.Rotation,
+                                                                                                  position: drawContext.Position,
+                                                                                                  texture: drawContext.Texture,
                                                                                                   effect: drawContext.Flip);
     }
 
@@ -1168,8 +1165,8 @@ sealed partial class EternalHorror : ModNPC {
         }
     }
 
-    public static void DrawUnderGlowEffect(DrawContext drawContext, Action<Vector2, Color> draw, float sinWaveOffset = 0f, 
-                                                                                                 bool applyInnerOpacity = true, 
+    public static void DrawUnderGlowEffect(DrawContext drawContext, Action<Vector2, Color> draw, float sinWaveOffset = 0f,
+                                                                                                 bool applyInnerOpacity = true,
                                                                                                  float forcedOpacity = 1f,
                                                                                                  bool drawXEffect = true,
                                                                                                  bool drawYEffect = true,
@@ -1438,10 +1435,10 @@ sealed partial class EternalHorror : ModNPC {
         //ShaderLoader.HorrorDeathShader.uScreenResolution = new Vector2(1f, 1f);
         //ShaderLoader.ApplyEffect(ShaderLoader.HorrorDeathShader.Effect, spriteBatch,
         //() => {
-            //Color color = Color.Lerp(Color.Black, MainPurpleColor, 0.25f) * whiteningOpacity;
-            //spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
+        //Color color = Color.Lerp(Color.Black, MainPurpleColor, 0.25f) * whiteningOpacity;
+        //spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
         //});
-        
+
         //if (found) {
         //    EternalHorror boss_modNPC = boss.As<EternalHorror>();
 

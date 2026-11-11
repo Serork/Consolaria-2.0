@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 
-using RoA.Core.Utility.Vanilla;
-
 using Terraria;
 using Terraria.Audio;
 

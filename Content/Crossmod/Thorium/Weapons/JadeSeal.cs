@@ -6,8 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 using ReLogic.Content;
 
-using RoA.Core.Utility.Vanilla;
-
 using System;
 using System.IO;
 

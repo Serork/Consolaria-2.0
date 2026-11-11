@@ -22,7 +22,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
     public override string Texture => "Consolaria/Assets/Textures/Empty";
 
     public override void SetStaticDefaults() {
-        
+
     }
 
     public override void SetDefaults() {

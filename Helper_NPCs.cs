@@ -84,11 +84,11 @@ public static class Helper_NPCs {
 
     public static T As<T>(this NPC npc) where T : ModNPC => npc.ModNPC as T;
 
-    public static void SetDefaultsToEnemy(this NPC npc, ushort lifeMax, 
-                                                        ushort damage, 
-                                                        ushort defense, 
+    public static void SetDefaultsToEnemy(this NPC npc, ushort lifeMax,
+                                                        ushort damage,
+                                                        ushort defense,
                                                         float knockBackResist = 0f,
-                                                        float spawnSlots = 0f, 
+                                                        float spawnSlots = 0f,
                                                         int aiStyle = -1,
                                                         bool boss = false) {
         npc.aiStyle = aiStyle;
@@ -123,7 +123,7 @@ public static class Helper_NPCs {
         npc.lavaImmune = lavaImmune;
     }
 
-    public static void SetHitboxSizeValues(this NPC npc, ushort width, 
+    public static void SetHitboxSizeValues(this NPC npc, ushort width,
                                                          ushort height = 0) {
         npc.width = width;
         npc.height = height == 0 ? width : height;

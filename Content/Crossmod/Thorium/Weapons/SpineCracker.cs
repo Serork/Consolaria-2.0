@@ -3,8 +3,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-using RoA.Core.Utility.Vanilla;
-
 using System;
 
 using Terraria;

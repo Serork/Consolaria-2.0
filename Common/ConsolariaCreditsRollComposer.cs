@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Animations;
-using Terraria.GameContent.Skies.CreditsRoll;
 using Terraria.Localization;
 
 namespace Consolaria.Common;

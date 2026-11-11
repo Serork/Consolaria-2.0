@@ -5,7 +5,7 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.Graphics.Shaders;
 
-namespace RoA.Common.ScreenEffects;
+namespace Consolaria.Common.ScreenEffects;
 
 sealed class HorrorEffectShaderData2(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
     public static float Time { get; internal set; }

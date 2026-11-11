@@ -2,8 +2,6 @@
 
 using Microsoft.Xna.Framework;
 
-using RoA.Core.Utility.Vanilla;
-
 using System;
 
 using Terraria;

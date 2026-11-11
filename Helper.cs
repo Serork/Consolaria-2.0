@@ -76,16 +76,16 @@ public static class Helper {
     public static bool IsClient() => Main.netMode == NetmodeID.MultiplayerClient;
 
     public static void DrawPrettyStarSparkle(float opacity,
-                                             SpriteEffects dir, 
+                                             SpriteEffects dir,
                                              Vector2 drawpos,
-                                             Microsoft.Xna.Framework.Color drawColor, 
-                                             Microsoft.Xna.Framework.Color shineColor, 
-                                             float flareCounter, 
-                                             float fadeInStart, 
+                                             Microsoft.Xna.Framework.Color drawColor,
+                                             Microsoft.Xna.Framework.Color shineColor,
+                                             float flareCounter,
+                                             float fadeInStart,
                                              float fadeInEnd,
-                                             float fadeOutStart, 
-                                             float fadeOutEnd, 
-                                             float rotation, 
+                                             float fadeOutStart,
+                                             float fadeOutEnd,
+                                             float rotation,
                                              Vector2 scale,
                                              Vector2 fatness) {
         Texture2D value = TextureAssets.Extra[98].Value;

@@ -7,7 +7,6 @@ using Terraria.GameContent;
 using Terraria.GameContent.Animations;
 using Terraria.GameContent.Events;
 using Terraria.GameContent.Skies.CreditsRoll;
-using Terraria.GameContent.UI.Chat;
 using Terraria.Graphics.Effects;
 using Terraria.Localization;
 using Terraria.ModLoader;

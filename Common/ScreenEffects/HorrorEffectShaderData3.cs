@@ -1,12 +1,11 @@
-﻿using Consolaria;
-using Consolaria.Content.NPCs.Bosses.EternalHorror;
+﻿using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.Graphics.Shaders;
 
-namespace RoA.Common.ScreenEffects;
+namespace Consolaria.Common.ScreenEffects;
 
 sealed class HorrorEffectShaderData3(Asset<Effect> effect, string pass) : ScreenShaderData(effect, pass) {
     public static float STRENGTH => 3f;

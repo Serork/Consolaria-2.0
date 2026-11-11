@@ -833,13 +833,13 @@ namespace Consolaria.Content.NPCs.Bosses.Ocram {
                                 if (Main.netMode != NetmodeID.Server) {
                                     int num23 = 36;
                                     if (isExpert) for (int index1 = 0; index1 < num23; ++index1) {
-                                            Vector2 vector2_3 = (Vector2.Normalize(NPC.velocity) * new Vector2(NPC.width / 2f, NPC.height) * 0.75f * 0.5f).RotatedBy((index1 - (num23 / 2 - 1)) * 6.25 / num23, new Vector2()) + NPC.Center;
-                                            Vector2 vector2_4 = vector2_3 - NPC.Center;
-                                            int index2 = Dust.NewDust(vector2_3 + vector2_4, 0, 0, DustID.Shadowflame, vector2_4.X * 2f, vector2_4.Y * 2f, 100, new Color(), 1.4f);
-                                            Main.dust[index2].noGravity = true;
-                                            Main.dust[index2].noLight = true;
-                                            Main.dust[index2].velocity = Vector2.Normalize(vector2_4) * 3f;
-                                        }
+                                        Vector2 vector2_3 = (Vector2.Normalize(NPC.velocity) * new Vector2(NPC.width / 2f, NPC.height) * 0.75f * 0.5f).RotatedBy((index1 - (num23 / 2 - 1)) * 6.25 / num23, new Vector2()) + NPC.Center;
+                                        Vector2 vector2_4 = vector2_3 - NPC.Center;
+                                        int index2 = Dust.NewDust(vector2_3 + vector2_4, 0, 0, DustID.Shadowflame, vector2_4.X * 2f, vector2_4.Y * 2f, 100, new Color(), 1.4f);
+                                        Main.dust[index2].noGravity = true;
+                                        Main.dust[index2].noLight = true;
+                                        Main.dust[index2].velocity = Vector2.Normalize(vector2_4) * 3f;
+                                    }
                                 }
                             }
                             if (isExpert && NPC.ai[2] > 600f && NPC.ai[2] <= 660 && NPC.ai[2] % 5 == 0) {
@@ -1129,10 +1129,10 @@ namespace Consolaria.Content.NPCs.Bosses.Ocram {
                 AddThoriumLoot(notExpertRule);
             }
             else {
-                notExpertRule.OnSuccess(new OneFromOptionsDropRule(1, 1, 
+                notExpertRule.OnSuccess(new OneFromOptionsDropRule(1, 1,
                     ModContent.ItemType<EternityStaff>(),
                     ModContent.ItemType<DragonBreath>(),
-                    ModContent.ItemType<OcramsEye>(), 
+                    ModContent.ItemType<OcramsEye>(),
                     ModContent.ItemType<Tizona>()));
             }
 
