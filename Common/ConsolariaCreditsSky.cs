@@ -90,8 +90,8 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
     internal static int _preparationTime, _allTime;
 
-    private int _endTime;
-    private int _currentTime;
+    private static int _endTime;
+    private static int _currentTime;
     private ConsolariaCreditsRollComposer _composer = new ConsolariaCreditsRollComposer();
     private List<IAnimationSegment> _segmentsInGame = new List<IAnimationSegment>();
     private List<IAnimationSegment> _segmentsInMainMenu = new List<IAnimationSegment>();
@@ -137,7 +137,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private void On_Main_UpdateAudio_DecideOnNewMusic(On_Main.orig_UpdateAudio_DecideOnNewMusic orig, Main self) {
         orig(self);
 
-        if (SkyManager.Instance["ConsolariaCreditsRoll"].IsActive()) {
+        if (!Main.gameMenu && SkyManager.Instance["ConsolariaCreditsRoll"].IsActive()) {
             Main.newMusic = MusicLoader.GetMusicSlot(Consolaria.Instance, "Assets/Music/BlightofSpring");
         }
     }
@@ -145,7 +145,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private void On_Main_UpdateAudio_DecideOnTOWMusic(On_Main.orig_UpdateAudio_DecideOnTOWMusic orig, Main self) {
         orig(self);
 
-        if (SkyManager.Instance["ConsolariaCreditsRoll"].IsActive()) {
+        if (!Main.gameMenu && SkyManager.Instance["ConsolariaCreditsRoll"].IsActive()) {
             Main.newMusic = MusicLoader.GetMusicSlot(Consolaria.Instance, "Assets/Music/BlightofSpring");
         }
     }
@@ -319,19 +319,29 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         orig();
         UpdateTime();
 
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
             //ConsolariaCreditsSky.Reset_Internal();
             CreditsRollEvent.Reset();
         }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F2)) {
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad2)) {
             //CreditsRollEvent.Reset();
             EnsureSegmentsAreMade();
             ConsolariaCreditsSky.TryStartingCreditsRoll();
             //CreditsRollEvent.TryStartingCreditsRoll();
         }
-        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F3)) {
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad3)) {
             ConsolariaCreditsSky.Reset_Internal();
             CreditsRollEvent.Reset();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad4)) {
+            EnsureSegmentsAreMade();
+            ConsolariaCreditsSky.TryStartingCreditsRoll();
+            ConsolariaCreditsSky.ForcedStart();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad5)) {
+            ConsolariaCreditsSky.Reset_Internal();
+            CreditsRollEvent.Reset();
+            ConsolariaCreditsSky.ForcedEnd();
         }
     }
 
@@ -649,6 +659,18 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         EnsureSegmentsAreMade();
         _isActive = false;
         _wantsToBeSeen = false;
+    }
+
+    public static void ForcedStart() {
+        //_opacity = 1f;
+        //_opacity2 = 1f;
+        _currentTime = _preparationTime;
+    }
+
+    public static void ForcedEnd() {
+        _wantsToBeSeen = false;
+        _currentTime = 0;
+        _opacity = _opacity2 = 0f;
     }
 
     public override void Update(GameTime gameTime) {

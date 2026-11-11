@@ -78,7 +78,7 @@ sealed class Has2rMask : ModItem {
         private void On_PlayerDrawLayers_DrawPlayer_08_Backpacks(On_PlayerDrawLayers.orig_DrawPlayer_08_Backpacks orig, ref PlayerDrawSet drawInfo) {
             Player player = drawInfo.drawPlayer;
             bool flag2 = false;
-            if (drawInfo.shadow == 0 && !player.dead && !player.invis && !player.ShouldNotDraw) {
+            if ((drawInfo.shadow == 0 || player.opacityForAnimation != 1f) && !player.dead && !player.invis && !player.ShouldNotDraw) {
                 int itemType = ModContent.ItemType<Has2rMask>();
                 bool flag = ItemLoader.GetItem(itemType).IsVanitySet(player.head, player.body, player.legs);
                 if (flag) {
@@ -115,7 +115,7 @@ sealed class Has2rMask : ModItem {
                         Color _color = new(255, 215, 0, 140);
                         bool _flag = (i == 0 ? -1f : (float)(i - 1f)) != 0 ? _player.direction * (int)_player.gravDir < 0 : _player.direction * (int)_player.gravDir > 0;
                         SpriteEffects _effect = _flag ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-                        DrawData _drawData = new(_texture, _position2 + player.MovementOffset(), null, _color, rotation[i], _origin, scale[i], _effect, 0);
+                        DrawData _drawData = new(_texture, _position2 + player.MovementOffset(), null, _color * player.opacityForAnimation, rotation[i], _origin, scale[i], _effect, 0);
                         _drawData.shader = shader;
                         drawInfo.DrawDataCache.Add(_drawData);
                     }

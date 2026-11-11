@@ -160,7 +160,7 @@ sealed class EldritchRing : ModItem {
         player.GetModPlayer<EldritchRingDrawLayer.EldritchRingHandler>().shouldDraw = true;
     }
 
-    private class EldritchRingDrawLayer : ILoadable {
+    public class EldritchRingDrawLayer : ILoadable {
         private static Asset<Texture2D> _yellowSignRune = null!;
 
         internal class EldritchRingHandler : ModPlayer {
@@ -198,7 +198,8 @@ sealed class EldritchRing : ModItem {
         private void On_PlayerDrawLayers_DrawPlayer_08_Backpacks(On_PlayerDrawLayers.orig_DrawPlayer_08_Backpacks orig, ref PlayerDrawSet drawInfo) {
             Player player = drawInfo.drawPlayer;
             var handler = player.GetModPlayer<EldritchRingHandler>();
-            if (handler.shouldDraw) {
+            if (handler.shouldDraw)
+            {
                 if (drawInfo.shadow == 0) {
                     if (!drawInfo.hideEntirePlayer && !player.dead && !player.invis && !player.ShouldNotDraw) {
                         Vector2 position2 = handler.runePosition;

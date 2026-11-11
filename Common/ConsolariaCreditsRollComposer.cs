@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Consolaria.Content.Items.Vanity.Developer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
@@ -9,6 +10,8 @@ using Terraria.GameContent;
 using Terraria.GameContent.Animations;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.ModLoader;
+using static Terraria.GameContent.Animations.Segments;
 
 namespace Consolaria.Common;
 
@@ -42,13 +45,17 @@ sealed class ConsolariaCreditsRollComposer {
         num += num5;
         num += num3;
         ConsolariaCreditsSky._preparationTime = num;
+
+        // test remove later
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
+
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2).totalTime;
         num += num3;
         num += num3;
         num += 60;
 
         // bodya
-        PlaySegment_DryadTurningToTree(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2).totalTime;
@@ -56,7 +63,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // something else
-        PlaySegment_DryadTurningToTree(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors2", vector2).totalTime;
@@ -64,7 +71,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // andryuha
-        PlaySegment_DryadTurningToTree(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors3", vector2).totalTime;
@@ -72,7 +79,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // something else
-        PlaySegment_DryadTurningToTree(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors4", vector2).totalTime;
@@ -80,7 +87,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // serega
-        PlaySegment_DryadTurningToTree(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors5", vector2).totalTime;
@@ -138,76 +145,151 @@ sealed class ConsolariaCreditsRollComposer {
 
     private delegate void AddNPCMethod(int npcType, Vector2 sceneAnchoePosition, int lookDirection, int fromTime, int duration, int timeToJumpAt);
 
-    private SegmentInforReport PlaySegment_DryadTurningToTree(int startTime, Vector2 sceneAnchorPosition) {
+    private SegmentInforReport PlaySegment_Has2rLaughing(int startTime, Vector2 sceneAnchorPosition) {
         sceneAnchorPosition += GetSceneFixVector();
         int num = startTime;
         Asset<Texture2D> asset = TextureAssets.Extra[217];
         Rectangle rectangle = asset.Frame();
         DrawData data = new DrawData(asset.Value, Vector2.Zero, rectangle, Color.White, 0f, rectangle.Size() * new Vector2(0.5f, 1f) + new Vector2(0f, -42f), 1f, SpriteEffects.None);
         Segments.AnimationSegmentWithActions<Segments.LooseSprite> animationSegmentWithActions = new Segments.SpriteSegment(asset, num, data, sceneAnchorPosition + _backgroundOffset).UseShaderEffect(new Segments.SpriteSegment.MaskedFadeEffect()).Then(new Actions.Sprites.Fade(0f)).With(new Actions.Sprites.Fade(1f, 60));
-        Segments.AnimationSegmentWithActions<NPC> animationSegmentWithActions2 = new Segments.NPCSegment(startTime, 20, sceneAnchorPosition, _originAtBottom).Then(new Actions.NPCs.Fade(255)).With(new Actions.NPCs.Fade(-5, 51)).Then(new Actions.NPCs.Move(new Vector2(1f, 0f), 60))
-            .Then(new Actions.NPCs.Wait(10))
-            .Then(new Actions.NPCs.Fade(0));
 
-        num += (int)animationSegmentWithActions2.DedicatedTimeNeeded;
-        Asset<Texture2D> asset2 = TextureAssets.Extra[215];
-        Rectangle rectangle2 = asset2.Frame(1, 9);
-        DrawData data2 = new DrawData(asset2.Value, Vector2.Zero, rectangle2, Color.White, 0f, rectangle2.Size() * new Vector2(0.5f, 1f), 1f, SpriteEffects.FlipHorizontally);
-        Vector2 vector = new Vector2(1f, 0f) * 60f + new Vector2(2f, 4f);
-        Segments.AnimationSegmentWithActions<Segments.LooseSprite> animationSegmentWithActions3 = new Segments.SpriteSegment(asset2, num, data2, sceneAnchorPosition + vector).Then(new Actions.Sprites.SetFrameSequence(new Point[9] {
-            new Point(0, 0),
-            new Point(0, 1),
-            new Point(0, 2),
-            new Point(0, 3),
-            new Point(0, 4),
-            new Point(0, 5),
-            new Point(0, 6),
-            new Point(0, 7),
-            new Point(0, 8)
-        }, 8, 0, 0)).Then(new Actions.Sprites.Wait(30));
+        num += 70;
 
-        num += (int)animationSegmentWithActions3.DedicatedTimeNeeded;
-        Segments.AnimationSegmentWithActions<NPC> item = new Segments.NPCSegment(num, 46, sceneAnchorPosition + new Vector2(-100f, 0f), _originAtBottom).Then(new Actions.NPCs.Fade(255)).With(new Actions.NPCs.Fade(-5, 51)).Then(new Actions.NPCs.Move(new Vector2(1f, 0f), 60))
-            .Then(new Actions.NPCs.Wait(90))
-            .Then(new Actions.NPCs.Move(new Vector2(1f, 0f), 120))
-            .With(new Actions.NPCs.Fade(3, 85));
+        float num6 = 1f;
+        float num7 = 0f;
+        int num8 = 60;
+        Segments.AnimationSegmentWithActions<Player> item2 = new CustomPlayerSegment(startTime, sceneAnchorPosition + new Vector2(-100f, 0f), _originAtBottom, CustomPlayerSegment.DevType.Has2r).UseShaderEffect(new CustomPlayerSegment.ImmediateSpritebatchForPlayerDyesEffect())
+            .Then(new Actions.Players.Fade(0f))
+            .Then(new Actions.Players.LookAt(1))
+            .With(new Actions.Players.Fade(1f, num8))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(num6, 0), new Vector2(num7, 0f), 280))
+            .Then(new Actions.Players.Wait(20))
+            .Then(new Actions.Players.LookAt(-1))
+            .Then(new Actions.Players.Wait(300))
+            .Then(new Actions.Players.Fade(0f, 120));
 
-        Segments.AnimationSegmentWithActions<NPC> item2 = new Segments.NPCSegment(num + 60, 299, sceneAnchorPosition + new Vector2(170f, 0f), _originAtBottom).Then(new Actions.NPCs.Fade(255)).With(new Actions.NPCs.Fade(-5, 51)).Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
-            .Then(new Actions.NPCs.Wait(60))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 85))
-            .With(new Actions.NPCs.Fade(3, 85));
+        num += 102;
 
-        float x = 1.5f;
-        Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(num + 45, 74, sceneAnchorPosition + new Vector2(-80f, -70f), _originAtBottom).Then(new Actions.NPCs.Fade(255)).With(new Actions.NPCs.Fade(-5, 51)).Then(new Actions.NPCs.Move(new Vector2(x, 0f), 85))
-            .With(new Actions.NPCs.MoveWithRotor(new Vector2(10f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
-            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 85))
-            .With(new Actions.NPCs.MoveWithRotor(new Vector2(4f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
-            .With(new Actions.NPCs.Fade(3, 85));
-
-        Segments.AnimationSegmentWithActions<NPC> item4 = new Segments.NPCSegment(num + 180, 656, sceneAnchorPosition + new Vector2(20f, 0f), _originAtBottom).Then(new Actions.NPCs.Variant(1)).Then(new Actions.NPCs.LookAt(1)).Then(new Actions.NPCs.Fade(255))
-            .With(new Actions.NPCs.Fade(-5, 51))
-            .Then(new Actions.NPCs.Wait(60))
-            .Then(new Actions.NPCs.Move(new Vector2(0.5f, 0f), 60))
-            .Then(new Actions.NPCs.Wait(60))
-            .Then(new Actions.NPCs.DoBunnyRestAnimation(90))
-            .Then(new Actions.NPCs.Wait(90))
-            .With(new Actions.NPCs.Fade(3, 120));
-
-        Segments.EmoteSegment item5 = new Segments.EmoteSegment(0, num + 360, 60, sceneAnchorPosition + new Vector2(36f, -10f), SpriteEffects.FlipHorizontally, Vector2.Zero);
-        animationSegmentWithActions3.Then(new Actions.Sprites.Wait(420)).Then(new Actions.Sprites.Fade(0f, 120));
         num += 620;
+
         animationSegmentWithActions.Then(new Actions.Sprites.Wait(num - startTime - 180)).Then(new Actions.Sprites.Fade(0f, 120));
         _segments.Add(animationSegmentWithActions);
-        _segments.Add(animationSegmentWithActions2);
-        _segments.Add(animationSegmentWithActions3);
-        _segments.Add(item);
         _segments.Add(item2);
-        _segments.Add(item3);
-        _segments.Add(item4);
-        _segments.Add(item5);
         SegmentInforReport result = default(SegmentInforReport);
         result.totalTime = num - startTime;
         return result;
+    }
+
+    public class CustomPlayerSegment : AnimationSegmentWithActions<Player> {
+        public enum DevType : byte {
+            Has2r,
+            PeegeOn,
+            Serork
+        }
+
+        public interface IShaderEffect {
+            void BeforeDrawing(ref GameAnimationSegment info);
+
+            void AfterDrawing(ref GameAnimationSegment info);
+        }
+
+        public class ImmediateSpritebatchForPlayerDyesEffect : IShaderEffect {
+            public void BeforeDrawing(ref GameAnimationSegment info) {
+                info.SpriteBatch.End();
+                info.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.CurrentFrameFlags.Hacks.CurrentBackgroundMatrixForCreditsRoll);
+            }
+
+            public void AfterDrawing(ref GameAnimationSegment info) {
+                info.SpriteBatch.End();
+                info.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.CurrentFrameFlags.Hacks.CurrentBackgroundMatrixForCreditsRoll);
+            }
+        }
+
+        private DevType _devType;
+        private Player _player;
+        private Vector2 _anchorOffset;
+        private Vector2 _normalizedOriginForHitbox;
+        private IShaderEffect _shaderEffect;
+        private static Item _blankItem = new Item();
+
+        public CustomPlayerSegment(int targetTime, Vector2 anchorOffset, Vector2 normalizedHitboxOrigin, DevType devType)
+            : base(targetTime) {
+            _player = new Player();
+            _anchorOffset = anchorOffset;
+            _normalizedOriginForHitbox = normalizedHitboxOrigin;
+            _devType = devType;
+        }
+
+        public CustomPlayerSegment UseShaderEffect(IShaderEffect shaderEffect) {
+            _shaderEffect = shaderEffect;
+            return this;
+        }
+
+        protected override void Bind(IAnimationSegmentAction<Player> act) {
+            act.BindTo(_player);
+        }
+
+        public override void Draw(ref GameAnimationSegment info) {
+            if ((float)info.TimeInAnimation > (float)_targetTime + base.DedicatedTimeNeeded || info.TimeInAnimation < _targetTime)
+                return;
+
+            ResetPlayerAnimation(ref info);
+            float localTimeForObject = info.TimeInAnimation - _targetTime;
+            ProcessActions(_player, localTimeForObject);
+            if (info.DisplayOpacity != 0f) {
+                _player.ResetEffects();
+                _player.ResetVisibleAccessories();
+                _player.UpdateMiscCounter();
+
+                switch (_devType) {
+                    case DevType.Has2r:
+                        _player.hair = 26;
+                        _player.GetModPlayer<EldritchRing.EldritchRingDrawLayer.EldritchRingHandler>().shouldDraw = true;
+                        _player.armor[0].SetDefaults(ModContent.ItemType<Has2rMask>());
+                        _player.armor[1].SetDefaults(ModContent.ItemType<Has2rJacket>());
+                        _player.armor[2].SetDefaults(ModContent.ItemType<Has2rPants>());
+                        _player.armor[3].SetDefaults(ModContent.ItemType<EldritchRing>());
+                        break;
+                    case DevType.PeegeOn:
+                        _player.armor[0].SetDefaults(ModContent.ItemType<SerorkHelmet>());
+                        _player.armor[1].SetDefaults(ModContent.ItemType<SerorkBreastplate>());
+                        _player.armor[2].SetDefaults(ModContent.ItemType<SerorkGreaves>());
+                        break;
+                    case DevType.Serork:
+                        _player.armor[0].SetDefaults(ModContent.ItemType<PeegeonHood>());
+                        _player.armor[1].SetDefaults(ModContent.ItemType<PeegeonChestguard>());
+                        _player.armor[2].SetDefaults(ModContent.ItemType<PeegeonGreaves>());
+                        _player.armor[3].SetDefaults(ModContent.ItemType<PeegeonCape>());
+                        break;
+                }
+
+                _player.UpdateDyes();
+                _player.PlayerFrame();
+                _player.socialIgnoreLight = true;
+                _player.position += Main.screenPosition;
+                _player.position -= new Vector2(_player.width / 2, _player.height);
+                _player.opacityForAnimation *= info.DisplayOpacity;
+                Item item = _player.inventory[_player.selectedItem];
+                _player.inventory[_player.selectedItem] = _blankItem;
+
+                float num = 1f - _player.opacityForAnimation;
+                num = 0f;
+                if (_shaderEffect != null)
+                    _shaderEffect.BeforeDrawing(ref info);
+
+                Main.PlayerRenderer.DrawPlayer(Main.Camera, _player, _player.position, 0f, _player.fullRotationOrigin, num);
+                if (_shaderEffect != null)
+                    _shaderEffect.AfterDrawing(ref info);
+
+                _player.inventory[_player.selectedItem] = item;
+            }
+        }
+
+        private void ResetPlayerAnimation(ref GameAnimationSegment info) {
+            _player.CopyVisuals(Main.LocalPlayer);
+
+            _player.position = info.AnchorPositionOnScreen + _anchorOffset;
+            _player.opacityForAnimation = 1f;
+        }
     }
 }
