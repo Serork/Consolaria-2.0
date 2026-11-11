@@ -54,7 +54,7 @@ sealed class ConfettiGun_UI_Shot : ModProjectile {
         }
 
         for (int num515 = 0; num515 < 40; num515++) {
-            int num516 = Main.rand.NextFromList([ModContent.GoreType<Gores.Confetti1>(), ModContent.GoreType<Gores.Confetti2>(), ModContent.GoreType<Gores.Confetti3>(), ModContent.GoreType<Gores.Confetti4>(), ModContent.GoreType<Gores.Confetti5>(), ModContent.GoreType<Gores.Confetti6>()]);
+            int num516 = Main.rand.NextFromList([ModContent.GoreType<Gores.Confetti1>(), ModContent.GoreType<Gores.Confetti2>(), ModContent.GoreType<Gores.Confetti3>(), ModContent.GoreType<Gores.Confetti4>(), ModContent.GoreType<Gores.Confetti5>(), ModContent.GoreType<Gores.Confetti6>(), ModContent.GoreType<Gores.Confetti7>()]);
             if (!Main.dedServ) {
                 int num517 = Gore.NewGore(Projectile.GetSource_FromAI(), Projectile.position, Projectile.velocity, num516);
                 Main.gore[num517].velocity.X += (float)Main.rand.Next(-50, 51) * 0.01f;

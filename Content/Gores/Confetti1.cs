@@ -4,6 +4,7 @@ using Terraria.ModLoader;
 
 namespace Consolaria.Content.Gores;
 
+class Confetti7 : Confetti1 { }
 class Confetti6 : Confetti1 { }
 class Confetti5 : Confetti1 { }
 class Confetti4 : Confetti1 { }
