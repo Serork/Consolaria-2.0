@@ -921,7 +921,7 @@ sealed partial class EternalHorror : ModNPC {
                 int num29 = 20;
                 //if (Main.getGoodWorld && life < lifeMax / 3)
                 num29 = 6;
-                if (Main.netMode != 1 && NPC.CountNPCS(ModContent.NPCType<EternalServant>()) < num29) {
+                if (Main.netMode != 1 && NPC.CountNPCS(ModContent.NPCType<EternalServant>()) < num29 * 2) {
                     if (boss._ai5 % (float)num29 == 0f) {
                         float num30 = 5f;
                         Vector2 vector5 = boss.GetEyePosition();
