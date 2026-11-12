@@ -197,7 +197,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.Players.LookAt(1))
             .With(new Actions.Players.Fade(1f, num8))
             .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-1f, 0), new Vector2(num7, 0f), 60 - 7))
-            .Then(new Actions.Players.Wait(373 - 1))
+            .Then(new Actions.Players.Wait(373))
             .Then(new Actions.Players.Wait(100))
             .With(new Actions.Players.Fade(0f, 100));
 
@@ -330,7 +330,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.Players.LookAt(-1))
             .Then(new Actions.Players.Wait(60))
             .Then(new Actions.Players.LookAt(1))
-            .Then(new Actions.Players.Wait(140 - 1))
+            .Then(new Actions.Players.Wait(140))
             .Then(new Actions.Players.Wait(100))
             .With(new Actions.Players.Fade(0f, 100));
 
