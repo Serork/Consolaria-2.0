@@ -465,6 +465,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
             .Then(new Actions.NPCs.Wait(60 + 60 + 30))
             .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
+            .Then(new Actions.NPCs.Wait(1))
             .Then(new Actions.NPCs.Move(new Vector2(-1f * 0.625f, 0f), 85))
             .With(new Actions.NPCs.Fade(3, 85));
 
