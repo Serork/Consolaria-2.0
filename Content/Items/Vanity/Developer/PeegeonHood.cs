@@ -226,7 +226,7 @@ sealed class PeegeonHood : ModItem {
                 Color color = Lighting.GetColor((int)(x / 16f), (int)(y / 16f));
                 color *= (handler.trailPos.Length - i) / alpha;
 
-                Color color2 = new Color(120, 171, 207);
+                Color color2 = player.socialIgnoreLight ? new Color(0, 219, 201) : Color.White;
                 color2 *= (handler.trailPos.Length - i) / alpha;
                 DrawData drawData = new DrawData(texture, new Vector2((float)x - Main.screenPosition.X, (float)y - Main.screenPosition.Y) + new Vector2(0f, player.gfxOffY), new Rectangle?(bodyFrame), color2 * player.opacityForAnimation, 0f, new Vector2((float)texture.Width / 2f, (float)height / 2f), 1f, effect, 0);
                 drawInfo.DrawDataCache.Add(drawData);

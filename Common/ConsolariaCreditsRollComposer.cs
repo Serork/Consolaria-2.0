@@ -1,6 +1,7 @@
 ﻿using Consolaria.Content.Items.Consumables;
 using Consolaria.Content.Items.Vanity.Developer;
 using Consolaria.Content.NPCs.Bosses.Lepus;
+using Consolaria.Content.NPCs.Friendly.McMoneypants;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -53,7 +54,7 @@ sealed class ConsolariaCreditsRollComposer {
         ConsolariaCreditsSky._preparationTime = num;
 
         // test remove later
-        PlaySegment_SerorkAndMoneypants(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
+        //PlaySegment_SerorkAndMoneypants(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
 
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2).totalTime;
         num += num3;
@@ -161,43 +162,64 @@ sealed class ConsolariaCreditsRollComposer {
 
         num += 70;
 
-        float num6 = 1f;
+        float num6 = -1f;
         float num7 = 0f;
         int num8 = 60;
-        Segments.AnimationSegmentWithActions<Player> item2 = new CustomPlayerSegment(startTime, sceneAnchorPosition + new Vector2(-100f, 0f), _originAtBottom, CustomPlayerSegment.DevType.Serork).UseShaderEffect(new CustomPlayerSegment.ImmediateSpritebatchForPlayerDyesEffect())
+
+        //Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
+        //    .Then(new Actions.NPCs.Fade(255))
+        //    .With(new Actions.NPCs.Fade(-5, 51))
+        //    .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
+        //    .Then(new Actions.NPCs.Wait(60 + 60 + 30))
+        //    .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
+        //    .Then(new Actions.NPCs.Move(new Vector2(-1f * 0.625f, 0f), 85))
+        //    .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> animationSegmentWithActions3 = new Segments.NPCSegment(startTime, ModContent.NPCType<McMoneypants>(), sceneAnchorPosition + new Vector2(200f, 0f), _originAtBottom)
+            .Then(new Actions.NPCs.LookAt(-1))
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 100))
+            .Then(new Actions.NPCs.Wait(90))
+            .Then(new Actions.NPCs.LookAt(1))
+            .Then(new Actions.NPCs.Wait(90))
+            .Then(new Actions.NPCs.LookAt(-1))
+            .Then(new Actions.NPCs.Move(new Vector2(-0.5f, 0f), 90))
+            .Then(new Actions.NPCs.Wait(15))
+            .Then(new Actions.NPCs.LookAt(1))
+            .Then(new Actions.NPCs.Wait(160))
+            .Then(new Actions.NPCs.ShowItem(210, ItemID.LuckyCoin))
+            .Then(new Actions.NPCs.Wait(85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<Player> item2 = new CustomPlayerSegment(startTime + 75 + 150 + 60 + 30, sceneAnchorPosition + new Vector2(200f, 0f), _originAtBottom, CustomPlayerSegment.DevType.Serork).UseShaderEffect(new CustomPlayerSegment.ImmediateSpritebatchForPlayerDyesEffect())
             .Then(new Actions.Players.Fade(0f))
             .Then(new Actions.Players.LookAt(1))
             .With(new Actions.Players.Fade(1f, num8))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(num6, 0), new Vector2(num7, 0f), 180))
-            .Then(new Actions.Players.Wait(20))
-            .Then(new Actions.Players.LookAt(-1))
-            .Then(new Actions.Players.Wait(200 + 30))
-            .Then(new Actions.Players.LookAt(1))
-            .Then(new Actions.Players.Wait(120))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 75))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6 * 0.625f, 0), new Vector2(num7, 0f), 100))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-1f, 0), new Vector2(num7, 0f), 60 - 7))
+            .Then(new Actions.Players.Wait(370))
+            .Then(new Actions.Players.Wait(100))
             .With(new Actions.Players.Fade(0f, 100));
-
-        Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
-            .Then(new Actions.NPCs.Fade(255))
-            .With(new Actions.NPCs.Fade(-5, 51))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
-            .Then(new Actions.NPCs.Wait(60 + 60 + 30))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f * 0.625f, 0f), 85))
-            .With(new Actions.NPCs.Fade(3, 85));
 
         num += 102;
 
         num += 620;
 
+        num += 120;
+
         animationSegmentWithActions.Then(new Actions.Sprites.Wait(num - startTime - 180)).Then(new Actions.Sprites.Fade(0f, 120));
         _segments.Add(animationSegmentWithActions);
+        //_segments.Add(item3);
+        _segments.Add(animationSegmentWithActions3);
         _segments.Add(item2);
-        _segments.Add(item3);
 
-        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f, 0), startTime + 160, 60, 0, 15, -1);
-        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 30f, 0), startTime + 400, 60, 0, EmoteID.EmoteSilly, 1, time: 60);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 18f + 16f, 1), startTime + 75 - 15, 60, 0, EmoteID.EmoteHappiness, -1, time: 60);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 18f - 10f, 1), startTime + 75 + 60, 60, 0, EmoteID.EmotionAlert, 1, time: 60);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 18f - 67 + 12, 1), startTime + 75 + 150 + 60 + 75 + 30 - 30, 60, 0, EmoteID.ItemGoldpile, 1, time: 60);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 18f - 67 + 125 + 8, -2), startTime + 75 + 150 + 60 + 30 + 90 - 15, 60, 0, EmoteID.DebuffSilence, -1, time: 60);
+
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 18f - 67 + 12, 1), startTime + 75 + 150 + 60 + 75 + 30 - 30 + 180, 60, 0, EmoteID.EmoteLaugh, 1);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 18f - 67 + 125 + 8, -2), startTime + 75 + 150 + 60 + 30 + 90 + 180 - 30 - 15, 60, 0, EmoteID.EmoteLaugh, -1);
 
         SegmentInforReport result = default(SegmentInforReport);
         result.totalTime = num - startTime;
@@ -451,8 +473,8 @@ sealed class ConsolariaCreditsRollComposer {
 
         animationSegmentWithActions.Then(new Actions.Sprites.Wait(num - startTime - 180)).Then(new Actions.Sprites.Fade(0f, 120));
         _segments.Add(animationSegmentWithActions);
-        _segments.Add(item2);
         _segments.Add(item3);
+        _segments.Add(item2);
 
         AddEmote(sceneAnchorPosition + new Vector2(101f - 20f, 0), startTime + 160, 60, 0, 15, -1);
         AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 30f, 0), startTime + 400, 60, 0, EmoteID.EmoteSilly, 1, time: 60);
@@ -586,6 +608,9 @@ sealed class ConsolariaCreditsRollComposer {
                             }
                             break;
                         case DevType.PeegeOn:
+                            Main.mouseX = (int)(_player.Center.X + 100 - Main.screenPosition.X);
+                            Main.mouseY = (int)(_player.Center.Y - 100 - Main.screenPosition.Y);
+
                             _cannonShootTime++;
                             if (_cannonShootTime == (60 + 60 + 90 + 150 + 60 + 140) - 150) {
                                 _player.controlUseItem = true;
@@ -593,8 +618,11 @@ sealed class ConsolariaCreditsRollComposer {
                             }
                             break;
                         case DevType.Serork:
+                            Main.mouseX = (int)(_player.Center.X - 100 - Main.screenPosition.X);
+                            Main.mouseY = (int)(_player.Center.Y - 100 - Main.screenPosition.Y);
+
                             _cannonShootTime++;
-                            if (_cannonShootTime == 500) {
+                            if (_cannonShootTime == 400) {
                                 _player.controlUseItem = true;
                                 _player.releaseUseItem = true;
                             }

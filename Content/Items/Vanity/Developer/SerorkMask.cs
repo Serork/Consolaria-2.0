@@ -68,7 +68,7 @@ sealed class SerorkMask : ModItem {
             if (ignoreLighting) {
                 brightness = 0f;
             }
-            return MathHelper.Lerp(0.375f, MathHelper.Lerp(0.875f, 0.75f, brightness), Ease.SineOut(Helper.Wave(0f, 1f, 0.25f, 0f)));
+            return MathHelper.Lerp(0.375f, 0.75f, Ease.SineOut(Helper.Wave(0f, 1f, 0.25f, 0f)));
         }
 
         public sealed class SerorkVisualsHeadGlowing : PlayerDrawLayer {
