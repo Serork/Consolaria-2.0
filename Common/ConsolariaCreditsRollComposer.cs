@@ -197,7 +197,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.Players.LookAt(1))
             .With(new Actions.Players.Fade(1f, num8))
             .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-1f, 0), new Vector2(num7, 0f), 60 - 7))
-            .Then(new Actions.Players.Wait(370))
+            .Then(new Actions.Players.Wait(375))
             .Then(new Actions.Players.Wait(100))
             .With(new Actions.Players.Fade(0f, 100));
 
@@ -343,7 +343,7 @@ sealed class ConsolariaCreditsRollComposer {
             .With(new Actions.NPCs.Fade(-5, 51))
             .Then(new Actions.NPCs.Move(new Vector2(-x * 0.25f, 1.5f), 32))
             .Then(new Actions.NPCs.Wait(waitTime))
-            .Then(new Actions.NPCs.Wait(60))
+            .Then(new Actions.NPCs.Wait(60 + 3))
             .Then(new Actions.NPCs.Wait(85))
             //.Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
             .With(new Actions.NPCs.Fade(3, 85));
@@ -354,7 +354,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.NPCs.Move(new Vector2(-x, 1.5f), 32))
             .Then(new Actions.NPCs.LookAt(-1))
             .Then(new Actions.NPCs.Wait(waitTime))
-            .Then(new Actions.NPCs.Wait(60 - 40))
+            .Then(new Actions.NPCs.Wait(60 - 40 + 3))
             .Then(new Actions.NPCs.Wait(85))
             //.Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
             .With(new Actions.NPCs.Fade(3, 85));
@@ -364,7 +364,7 @@ sealed class ConsolariaCreditsRollComposer {
             .With(new Actions.NPCs.Fade(-5, 51))
             .Then(new Actions.NPCs.Move(new Vector2(x, 1.5f), 32))
             .Then(new Actions.NPCs.LookAt(-1))
-            .Then(new Actions.NPCs.Wait(waitTime - 20))
+            .Then(new Actions.NPCs.Wait(waitTime - 20 + 3))
             //.Then(new Actions.NPCs.Wait(60 - 80))
             .Then(new Actions.NPCs.Wait(85))
             //.Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
@@ -374,7 +374,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.NPCs.Fade(255))
             .With(new Actions.NPCs.Fade(-5, 51))
             .Then(new Actions.NPCs.Move(new Vector2(-x * 0.5f, 1.5f), 32))
-            .Then(new Actions.NPCs.Wait(waitTime - 20))
+            .Then(new Actions.NPCs.Wait(waitTime - 20 + 3))
             //.Then(new Actions.NPCs.Wait(60 - 80))
             .Then(new Actions.NPCs.Wait(85))
             //.Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
@@ -385,7 +385,7 @@ sealed class ConsolariaCreditsRollComposer {
             .With(new Actions.NPCs.Fade(-5, 51))
             .Then(new Actions.NPCs.Move(new Vector2(-x * 0.375f, 1.5f), 32))
             .Then(new Actions.NPCs.Wait(waitTime))
-            .Then(new Actions.NPCs.Wait(60 - 60))
+            .Then(new Actions.NPCs.Wait(60 - 60 + 3))
             .Then(new Actions.NPCs.Wait(85))
             //.Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
             .With(new Actions.NPCs.Fade(3, 85));
@@ -396,7 +396,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.NPCs.Move(new Vector2(x * 1.5f, 1.5f), 32))
             .Then(new Actions.NPCs.LookAt(-1))
             .Then(new Actions.NPCs.Wait(waitTime))
-            .Then(new Actions.NPCs.Wait(60 - 50))
+            .Then(new Actions.NPCs.Wait(60 - 50 + 3))
             .Then(new Actions.NPCs.Wait(85))
             //.Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
             .With(new Actions.NPCs.Fade(3, 85));
