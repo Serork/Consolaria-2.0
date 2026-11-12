@@ -330,7 +330,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.Players.LookAt(-1))
             .Then(new Actions.Players.Wait(60))
             .Then(new Actions.Players.LookAt(1))
-            .Then(new Actions.Players.Wait(140))
+            .Then(new Actions.Players.Wait(140 - 3))
             .Then(new Actions.Players.Wait(100))
             .With(new Actions.Players.Fade(0f, 100));
 
