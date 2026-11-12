@@ -102,6 +102,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
     public static Asset<Texture2D> Has2rCutsceneArea { get; private set; }
     public static Asset<Texture2D> PeegeOnCutsceneArea { get; private set; }
+    public static Asset<Texture2D> SerorkCutsceneArea { get; private set; }
 
     public int AmountOfTimeNeededForFullPlay => _endTime;
 
@@ -119,6 +120,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         if (!Main.dedServ) {
             Has2rCutsceneArea = Helper.RequestTexture("Consolaria/Assets/Textures/Has2rCutsceneArea");
             PeegeOnCutsceneArea = Helper.RequestTexture("Consolaria/Assets/Textures/PeegeOnCutsceneArea");
+            SerorkCutsceneArea = Helper.RequestTexture("Consolaria/Assets/Textures/SerorkCutsceneArea");
         }
 
         //On_CreditsRollComposer.PlaySegment_TextRoll += On_CreditsRollComposer_PlaySegment_TextRoll;

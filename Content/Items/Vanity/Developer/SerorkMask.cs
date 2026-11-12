@@ -72,7 +72,7 @@ sealed class SerorkMask : ModItem {
                 }
 
                 Player player = drawInfo.drawPlayer;
-                if (!player.active || player.invis) {
+                if (player.dead || player.invis) {
                     return;
                 }
                 DrawHeadGlowMask(ref drawInfo);
@@ -119,7 +119,7 @@ sealed class SerorkMask : ModItem {
                             }
                             drawData.position = new Vector2(drawData.position.X + num3, drawData.position.Y + num4);
                             drawData.shader = drawinfo.cHead;
-                            drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow);
+                            drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow)* 0.75f;
                             drawinfo.DrawDataCache.Add(drawData);
                         }
 
@@ -127,7 +127,7 @@ sealed class SerorkMask : ModItem {
                             glowMaskTexture = _maskGlowTexture2.Value;
                             drawData = GetHeadGlowMask(ref drawInfo, glowMaskTexture, glowMaskColor);
                             glowMaskColor = Color.White * 0.9f;
-                            glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
+                            glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow* 0.75f);
                             drawData.color = glowMaskColor;
                             drawData.shader = drawinfo.cHead;
                             drawinfo.DrawDataCache.Add(drawData);
@@ -165,7 +165,7 @@ sealed class SerorkMask : ModItem {
                 }
 
                 Player player = drawInfo.drawPlayer;
-                if (!player.active || player.invis) {
+                if (player.dead || player.invis) {
                     return;
                 }
                 DrawArmorGlowMask(ref drawInfo);
@@ -209,14 +209,14 @@ sealed class SerorkMask : ModItem {
                         }
                         drawData.position = new Vector2(drawData.position.X + num3, drawData.position.Y + num4);
                         drawData.shader = drawinfo.cLegs;
-                        drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow);
+                        drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow)* 0.75f;
                         drawinfo.DrawDataCache.Add(drawData);
                     }
 
                     glowMaskTexture = _legsGlowTexture2.Value;
                     drawData = new(glowMaskTexture, drawPos.Floor() + legsOffset, player.legFrame, default, player.legRotation, legsOffset, 1f, drawInfo.playerEffect, 0);
                     glowMaskColor = Color.White * 0.9f;
-                    glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
+                    glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow)* 0.75f;
                     drawData.color = glowMaskColor;
                     drawData.shader = drawinfo.cLegs;
                     drawinfo.DrawDataCache.Add(drawData);
@@ -229,24 +229,24 @@ sealed class SerorkMask : ModItem {
             public float ghostDir;
 
             public override void PostUpdate() {
-                bool flag = false;
-                if (Player.head == EquipLoader.GetEquipSlot(Mod, nameof(SerorkHelmet), EquipType.Head) || Player.head == EquipLoader.GetEquipSlot(Mod, nameof(SerorkMask), EquipType.Head) ||
-                    Player.body == EquipLoader.GetEquipSlot(Mod, nameof(SerorkBreastplate), EquipType.Body) ||
-                    Player.legs == EquipLoader.GetEquipSlot(Mod, nameof(SerorkGreaves), EquipType.Legs)) {
-                    flag = true;
-                }
-                if (!Main.gamePaused && Main.instance.IsActive && flag) {
-                    float maxOffset = 10f;
-                    ghostFade = MathHelper.SmoothStep(ghostFade,
-                        (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
-                        0.25f);
-                    ghostFade2 = MathHelper.SmoothStep(ghostFade2,
-                         (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
-                         0.25f);
-                    ghostFade3 = MathHelper.SmoothStep(ghostFade3,
-                         (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
-                         0.25f);
-                }
+                //bool flag = false;
+                //if (Player.head == EquipLoader.GetEquipSlot(Mod, nameof(SerorkHelmet), EquipType.Head) || Player.head == EquipLoader.GetEquipSlot(Mod, nameof(SerorkMask), EquipType.Head) ||
+                //    Player.body == EquipLoader.GetEquipSlot(Mod, nameof(SerorkBreastplate), EquipType.Body) ||
+                //    Player.legs == EquipLoader.GetEquipSlot(Mod, nameof(SerorkGreaves), EquipType.Legs)) {
+                //    flag = true;
+                //}
+                //if (!Main.gamePaused && Main.instance.IsActive && flag) {
+                //    float maxOffset = 10f;
+                //    ghostFade = MathHelper.SmoothStep(ghostFade,
+                //        (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
+                //        0.25f);
+                //    ghostFade2 = MathHelper.SmoothStep(ghostFade2,
+                //         (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
+                //         0.25f);
+                //    ghostFade3 = MathHelper.SmoothStep(ghostFade3,
+                //         (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
+                //         0.25f);
+                //}
             }
         }
 
@@ -303,7 +303,7 @@ sealed class SerorkMask : ModItem {
                             Rectangle value2 = item2.sourceRect.Value;
                             item2.sourceRect = value2;
                             item2.shader = drawinfo.cBody;
-                            item2.color = drawinfo.drawPlayer.GetImmuneAlphaPure(item2.color, (float)drawinfo.shadow);
+                            item2.color = drawinfo.drawPlayer.GetImmuneAlphaPure(item2.color, (float)drawinfo.shadow)* 0.75f;
                             drawinfo.DrawDataCache.Add(item2);
                         }
                         break;
@@ -313,7 +313,7 @@ sealed class SerorkMask : ModItem {
                         DrawData item = data;
                         item.texture = _bodyGlowTexture2.Value;
                         Color glowMaskColor = Color.White * 0.9f;
-                        glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow);
+                        glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow)* 0.75f;
                         item.color = glowMaskColor;
                         Rectangle value = item.sourceRect.Value;
                         item.sourceRect = value;
@@ -326,9 +326,35 @@ sealed class SerorkMask : ModItem {
 
         private void On_PlayerDrawLayers_DrawPlayer_RenderAllLayers(On_PlayerDrawLayers.orig_DrawPlayer_RenderAllLayers orig, ref PlayerDrawSet drawinfo) {
             var drawPlayer = drawinfo.drawPlayer;
-            if (drawPlayer.active) {
+            if (!drawPlayer.dead) {
                 var handler = drawPlayer.GetModPlayer<SerorkVisualsStorage>();
-                bool flag = ItemLoader.GetItem(ModContent.ItemType<SerorkMask>()).IsVanitySet(drawPlayer.head, drawPlayer.body, drawPlayer.legs);
+
+                Player Player = drawPlayer;
+                ref float ghostFade = ref handler.ghostFade;
+                ref float ghostFade2 = ref handler.ghostFade2;
+                ref float ghostFade3 = ref handler.ghostFade3;
+                Mod Mod = Consolaria.Instance;
+
+                bool flag = false;
+                if (Player.head == EquipLoader.GetEquipSlot(Mod, nameof(SerorkHelmet), EquipType.Head) || Player.head == EquipLoader.GetEquipSlot(Mod, nameof(SerorkMask), EquipType.Head) ||
+                    Player.body == EquipLoader.GetEquipSlot(Mod, nameof(SerorkBreastplate), EquipType.Body) ||
+                    Player.legs == EquipLoader.GetEquipSlot(Mod, nameof(SerorkGreaves), EquipType.Legs)) {
+                    flag = true;
+                }
+                if (flag) {
+                    float maxOffset = 10f;
+                    ghostFade = MathHelper.SmoothStep(ghostFade,
+                        (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
+                        0.25f);
+                    ghostFade2 = MathHelper.SmoothStep(ghostFade2,
+                         (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
+                         0.25f);
+                    ghostFade3 = MathHelper.SmoothStep(ghostFade3,
+                         (float)Main.rand.NextFloatDirection() * (float)Math.Floor(Main.rand.NextFloatDirection()) * Main.rand.NextFloat(maxOffset),
+                         0.25f);
+                }
+
+                flag = ItemLoader.GetItem(ModContent.ItemType<SerorkMask>()).IsVanitySet(drawPlayer.head, drawPlayer.body, drawPlayer.legs);
                 if (flag && drawinfo.shadow == handler.ghostFade) {
                     for (int i = 0; i < drawinfo.DrawDataCache.Count; i++) {
                         DrawData value = drawinfo.DrawDataCache[i];
@@ -373,7 +399,7 @@ sealed class SerorkMask : ModItem {
         private void On_LegacyPlayerRenderer_DrawPlayerFull(On_LegacyPlayerRenderer.orig_DrawPlayerFull orig, LegacyPlayerRenderer self, Terraria.Graphics.Camera camera, Player drawPlayer) {
             Vector2 position = default(Vector2);
             var handler = drawPlayer.GetModPlayer<SerorkVisualsStorage>();
-            if (!drawPlayer.ghost) {
+            if (!drawPlayer.dead) {
                 if (!drawPlayer.invis) {
                     _ = drawPlayer.position;
                     //if (!Main.gamePaused)
