@@ -18,7 +18,7 @@ sealed class ConfettiGun_UI : ModItem {
         Item.height = 20;
         Item.maxStack = Item.CommonMaxStack;
         Item.consumable = true;
-        Item.UseSound = SoundID.Item11;
+        //Item.UseSound = SoundID.Item11;
         Item.useAnimation = 15;
         Item.useTime = 15;
         Item.noMelee = true;
