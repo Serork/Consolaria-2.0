@@ -11,6 +11,7 @@ using Terraria.GameContent.Creative;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Consolaria.Helper;
 
 namespace Consolaria.Content.Items.Vanity.Developer;
 
@@ -62,6 +63,13 @@ sealed class SerorkMask : ModItem {
 
     private class SerorkVisuals : ILoadable {
         public static Color EffectGlowColor => Color.Lerp(Color.LightYellow, Color.LightBlue, Helper.Wave(0f, 1f, 5f, 0f));
+        public static float GetEffectOpacity(Vector2 position, bool ignoreLighting) {
+            float brightness = 1f - Ease.CubeOut(Lighting.GetColor(position.ToTileCoordinates()).ToVector3().Length() / 3f);
+            if (ignoreLighting) {
+                brightness = 0f;
+            }
+            return MathHelper.Lerp(0.375f, MathHelper.Lerp(0.875f, 0.75f, brightness), Ease.SineOut(Helper.Wave(0f, 1f, 0.25f, 0f)));
+        }
 
         public sealed class SerorkVisualsHeadGlowing : PlayerDrawLayer {
             public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.Head);
@@ -119,7 +127,7 @@ sealed class SerorkMask : ModItem {
                             }
                             drawData.position = new Vector2(drawData.position.X + num3, drawData.position.Y + num4);
                             drawData.shader = drawinfo.cHead;
-                            drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow)* 0.75f;
+                            drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow) * GetEffectOpacity(drawInfo.drawPlayer.GetPlayerCorePoint(), drawInfo.drawPlayer.socialIgnoreLight);
                             drawinfo.DrawDataCache.Add(drawData);
                         }
 
@@ -127,7 +135,7 @@ sealed class SerorkMask : ModItem {
                             glowMaskTexture = _maskGlowTexture2.Value;
                             drawData = GetHeadGlowMask(ref drawInfo, glowMaskTexture, glowMaskColor);
                             glowMaskColor = Color.White * 0.9f;
-                            glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow* 0.75f);
+                            glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow * GetEffectOpacity(drawInfo.drawPlayer.GetPlayerCorePoint(), drawInfo.drawPlayer.socialIgnoreLight));
                             drawData.color = glowMaskColor;
                             drawData.shader = drawinfo.cHead;
                             drawinfo.DrawDataCache.Add(drawData);
@@ -209,14 +217,14 @@ sealed class SerorkMask : ModItem {
                         }
                         drawData.position = new Vector2(drawData.position.X + num3, drawData.position.Y + num4);
                         drawData.shader = drawinfo.cLegs;
-                        drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow)* 0.75f;
+                        drawData.color = drawinfo.drawPlayer.GetImmuneAlphaPure(drawData.color, (float)drawinfo.shadow) * GetEffectOpacity(drawInfo.drawPlayer.GetPlayerCorePoint(), drawInfo.drawPlayer.socialIgnoreLight);
                         drawinfo.DrawDataCache.Add(drawData);
                     }
 
                     glowMaskTexture = _legsGlowTexture2.Value;
                     drawData = new(glowMaskTexture, drawPos.Floor() + legsOffset, player.legFrame, default, player.legRotation, legsOffset, 1f, drawInfo.playerEffect, 0);
                     glowMaskColor = Color.White * 0.9f;
-                    glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow)* 0.75f;
+                    glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow) * GetEffectOpacity(drawInfo.drawPlayer.GetPlayerCorePoint(), drawInfo.drawPlayer.socialIgnoreLight);
                     drawData.color = glowMaskColor;
                     drawData.shader = drawinfo.cLegs;
                     drawinfo.DrawDataCache.Add(drawData);
@@ -303,7 +311,7 @@ sealed class SerorkMask : ModItem {
                             Rectangle value2 = item2.sourceRect.Value;
                             item2.sourceRect = value2;
                             item2.shader = drawinfo.cBody;
-                            item2.color = drawinfo.drawPlayer.GetImmuneAlphaPure(item2.color, (float)drawinfo.shadow)* 0.75f;
+                            item2.color = drawinfo.drawPlayer.GetImmuneAlphaPure(item2.color, (float)drawinfo.shadow) * GetEffectOpacity(drawinfo.drawPlayer.GetPlayerCorePoint(), drawinfo.drawPlayer.socialIgnoreLight);
                             drawinfo.DrawDataCache.Add(item2);
                         }
                         break;
@@ -313,7 +321,7 @@ sealed class SerorkMask : ModItem {
                         DrawData item = data;
                         item.texture = _bodyGlowTexture2.Value;
                         Color glowMaskColor = Color.White * 0.9f;
-                        glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow)* 0.75f;
+                        glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow) * GetEffectOpacity(drawinfo.drawPlayer.GetPlayerCorePoint(), drawinfo.drawPlayer.socialIgnoreLight);
                         item.color = glowMaskColor;
                         Rectangle value = item.sourceRect.Value;
                         item.sourceRect = value;
