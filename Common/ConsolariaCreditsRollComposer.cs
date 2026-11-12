@@ -573,7 +573,7 @@ sealed class ConsolariaCreditsRollComposer {
                         _player.armor[3].SetDefaults(ModContent.ItemType<EldritchRing>());
                         break;
                     case DevType.Serork:
-                        _player.armor[0].SetDefaults(ModContent.ItemType<SerorkHelmet>());
+                        _player.armor[0].SetDefaults(ModContent.ItemType<SerorkMask>());
                         _player.armor[1].SetDefaults(ModContent.ItemType<SerorkBreastplate>());
                         _player.armor[2].SetDefaults(ModContent.ItemType<SerorkGreaves>());
                         break;
