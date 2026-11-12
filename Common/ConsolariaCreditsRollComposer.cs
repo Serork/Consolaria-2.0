@@ -637,7 +637,7 @@ sealed class ConsolariaCreditsRollComposer {
                     }
                 }
 
-                if (_cannonShootTime > 600) {
+                if (_cannonShootTime > 1000) {
                     _cannonShootTime = 0;
                 }
 
