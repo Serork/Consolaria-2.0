@@ -362,15 +362,15 @@ sealed class SerorkMask : ModItem {
                          0.25f);
                 }
 
-                flag = ItemLoader.GetItem(ModContent.ItemType<SerorkMask>()).IsVanitySet(drawPlayer.head, drawPlayer.body, drawPlayer.legs);
-                if (flag && drawinfo.shadow == handler.ghostFade) {
-                    for (int i = 0; i < drawinfo.DrawDataCache.Count; i++) {
-                        DrawData value = drawinfo.DrawDataCache[i];
-                        value.color = Color.Lerp(value.color, EffectGlowColor, 0.5f);
-                        value.color.A = (byte)((float)(int)value.color.A * 0.375f);
-                        drawinfo.DrawDataCache[i] = value;
-                    }
-                }
+                //flag = ItemLoader.GetItem(ModContent.ItemType<SerorkMask>()).IsVanitySet(drawPlayer.head, drawPlayer.body, drawPlayer.legs);
+                //if (flag && drawinfo.shadow == handler.ghostFade) {
+                //    for (int i = 0; i < drawinfo.DrawDataCache.Count; i++) {
+                //        DrawData value = drawinfo.DrawDataCache[i];
+                //        value.color = Color.Lerp(value.color, EffectGlowColor, 0.5f);
+                //        value.color.A = (byte)((float)(int)value.color.A * 0.375f);
+                //        drawinfo.DrawDataCache[i] = value;
+                //    }
+                //}
             }
 
             //for (int i = 0; i < drawinfo.DrawDataCache.Count; i++) {
