@@ -637,6 +637,10 @@ sealed class ConsolariaCreditsRollComposer {
                     }
                 }
 
+                if (_cannonShootTime > 600) {
+                    _cannonShootTime = 0;
+                }
+
                 _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
 
                 _player.ItemCheck();
