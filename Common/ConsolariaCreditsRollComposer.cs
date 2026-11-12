@@ -673,6 +673,9 @@ sealed class ConsolariaCreditsRollComposer {
                 Main.mouseX = mouseX;
                 Main.mouseY = mouseY;
             }
+            else {
+                _cannonShootTime = 0;
+            }
         }
 
         private void ResetPlayerAnimation(ref GameAnimationSegment info) {
