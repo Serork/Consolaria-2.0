@@ -546,8 +546,10 @@ sealed class ConsolariaCreditsRollComposer {
         }
 
         public override void Draw(ref GameAnimationSegment info) {
-            if ((float)info.TimeInAnimation > (float)_targetTime + base.DedicatedTimeNeeded || info.TimeInAnimation < _targetTime)
+            if ((float)info.TimeInAnimation > (float)_targetTime + base.DedicatedTimeNeeded || info.TimeInAnimation < _targetTime) {
+                _cannonShootTime = 0;
                 return;
+            }
 
             ResetPlayerAnimation(ref info);
             float localTimeForObject = info.TimeInAnimation - _targetTime;
