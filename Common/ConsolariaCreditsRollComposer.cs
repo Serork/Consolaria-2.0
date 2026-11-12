@@ -601,6 +601,9 @@ sealed class ConsolariaCreditsRollComposer {
                 if (!Main.gamePaused && Main.instance.IsActive) {
                     switch (_devType) {
                         case DevType.Has2r:
+                            Main.mouseX = (int)(_player.Center.X + 100 - Main.screenPosition.X);
+                            Main.mouseY = (int)(_player.Center.Y - 0 - Main.screenPosition.Y);
+
                             _cannonShootTime++;
                             if (_cannonShootTime == 500) {
                                 _player.controlUseItem = true;
