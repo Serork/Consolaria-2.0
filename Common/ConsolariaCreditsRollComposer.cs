@@ -176,7 +176,7 @@ sealed class ConsolariaCreditsRollComposer {
                 Vector2 origin = FontAssets.DeathText.Value.MeasureString(value);
                 origin *= 0.5f;
                 float num6 = 1f - (1f - num3) * (1f - num3);
-                ChatManager.DrawColorCodedStringShadow(info.SpriteBatch, FontAssets.DeathText.Value, value, position, color * num6 * num6 * 0.25f * info.DisplayOpacity, 0f, origin, baseScale);
+                ChatManager.DrawColorCodedStringShadow(info.SpriteBatch, FontAssets.DeathText.Value, value, position, color * num6 * num6 * 0.375f * info.DisplayOpacity, 0f, origin, baseScale);
                 ChatManager.DrawColorCodedString(info.SpriteBatch, FontAssets.DeathText.Value, value, position, Color.White * num6 * info.DisplayOpacity, 0f, origin, baseScale);
             }
         }
