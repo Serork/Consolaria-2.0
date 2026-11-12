@@ -407,7 +407,6 @@ sealed class ConsolariaCreditsRollComposer {
 
         animationSegmentWithActions.Then(new Actions.Sprites.Wait(num - startTime - 180)).Then(new Actions.Sprites.Fade(0f, 120));
         _segments.Add(animationSegmentWithActions);
-        _segments.Add(item2);
         _segments.Add(item3);
         _segments.Add(item4);
         //_segments.Add(item5);
@@ -422,6 +421,8 @@ sealed class ConsolariaCreditsRollComposer {
         _segments.Add(returnBird4);
         _segments.Add(returnBird5);
         _segments.Add(returnBird6);
+
+        _segments.Add(item2);
 
         AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 50, 0), startTime + 240, 60, 0, EmoteID.EmoteConfused, 1, time: 60);
         AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 50, 0), startTime + 450, 60, 0, EmoteID.EmotionLove, 1, time: 60);
