@@ -17,6 +17,7 @@ using Terraria.GameContent.UI;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.UI.Chat;
 using static Terraria.GameContent.Animations.Actions.Sprites;
 using static Terraria.GameContent.Animations.Segments;
 
@@ -56,7 +57,7 @@ sealed class ConsolariaCreditsRollComposer {
         // test remove later
         //PlaySegment_SerorkAndMoneypants(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
 
-        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2 * new Vector2(0f, 1f)).totalTime;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2 * new Vector2(0f, 1f), true).totalTime;
         num += num3;
         num += num3;
         num += 60;
@@ -65,7 +66,7 @@ sealed class ConsolariaCreditsRollComposer {
         PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
-        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2).totalTime;
+        num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2, true).totalTime;
         num += num3;
         num += num3;
 
@@ -119,17 +120,66 @@ sealed class ConsolariaCreditsRollComposer {
 
     private Vector2 GetSceneFixVector() => new Vector2(0f - _backgroundOffset.X, 0f);
 
-    private SegmentInforReport PlaySegment_TextRoll(int startTime, string sourceCategory, Vector2 anchorOffset = default(Vector2)) {
+    private SegmentInforReport PlaySegment_TextRoll(int startTime, string sourceCategory, Vector2 anchorOffset = default(Vector2), bool header = false) {
         anchorOffset.Y -= 40f;
         int num = 80;
         LocalizedText[] array = Language.FindAll(Lang.CreateDialogFilter(sourceCategory + ".", null));
         for (int i = 0; i < array.Length; i++) {
-            _segments.Add(new Segments.LocalizedTextSegment(startTime + i * num, array[i], anchorOffset));
+            if (i == 0 && header) {
+                _segments.Add(new LocalizedTextSegment_Title(startTime + i * num, array[i], anchorOffset));
+            }
+            else {
+                _segments.Add(new Segments.LocalizedTextSegment(startTime + i * num, array[i], anchorOffset));
+            }
         }
 
         SegmentInforReport result = default(SegmentInforReport);
         result.totalTime = array.Length * num + num * -1;
         return result;
+    }
+
+    public class LocalizedTextSegment_Title : IAnimationSegment {
+        private const int PixelsForALine = 120;
+        private LocalizedText _text;
+        private float _timeToShowPeak;
+        private Vector2 _anchorOffset;
+
+        public float DedicatedTimeNeeded => 240f;
+
+        public LocalizedTextSegment_Title(float timeInAnimation, string textKey) {
+            _text = Language.GetText(textKey);
+            _timeToShowPeak = timeInAnimation;
+        }
+
+        public LocalizedTextSegment_Title(float timeInAnimation, LocalizedText textObject, Vector2 anchorOffset) {
+            _text = textObject;
+            _timeToShowPeak = timeInAnimation;
+            _anchorOffset = anchorOffset;
+        }
+
+        public void Draw(ref GameAnimationSegment info) {
+            float num = 250f;
+            float num2 = 250f;
+            int timeInAnimation = info.TimeInAnimation;
+            float num3 = Utils.GetLerpValue(_timeToShowPeak - num, _timeToShowPeak, timeInAnimation, clamped: true) * Utils.GetLerpValue(_timeToShowPeak + num2, _timeToShowPeak, timeInAnimation, clamped: true);
+            if (!(num3 <= 0f)) {
+                float num4 = _timeToShowPeak - (float)timeInAnimation;
+                Vector2 position = info.AnchorPositionOnScreen + new Vector2(0f, num4 * 0.5f);
+                position += _anchorOffset;
+                Vector2 baseScale = new Vector2(0.7f) * MathHelper.Lerp(1.125f, 1.25f, 0.5f);
+                float num5 = Main.GlobalTimeWrappedHourly * 0.02f % 1f;
+                if (num5 < 0f)
+                    num5 += 1f;
+
+                Color color = Main.hslToRgb(num5, 1f, 0.5f);
+                string value = _text.Value;
+                Vector2 origin = FontAssets.DeathText.Value.MeasureString(value);
+                origin *= 0.5f;
+                float num6 = 1f - (1f - num3) * (1f - num3);
+                ChatManager.DrawColorCodedStringShadow(info.SpriteBatch, FontAssets.DeathText.Value, value, position, color * num6 * num6 * 0.25f * info.DisplayOpacity, 0f, origin, baseScale);
+                ChatManager.DrawColorCodedString(info.SpriteBatch, FontAssets.DeathText.Value, value, position, Color.White * num6 * info.DisplayOpacity, 0f, origin, baseScale);
+            }
+        }
     }
 
     private struct SimplifiedNPCInfo {
