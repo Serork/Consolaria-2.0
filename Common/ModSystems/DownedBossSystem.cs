@@ -1,15 +1,16 @@
 ﻿using Consolaria.Content.Items.Consumables;
+using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Consolaria.Content.NPCs.Bosses.Lepus;
-
 using Microsoft.Xna.Framework;
-
 using System.Collections.Generic;
 using System.IO;
-
+using System.Reflection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.IO;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -39,6 +40,10 @@ namespace Consolaria.Common.ModSystems {
             if (downedTurkor) tag["downedTurkor"] = true;
             if (downedOcram) tag["downedOcram"] = true;
             if (downedEternalHorror) tag["downedEternalHorror"] = true;
+
+            if (EternalHorror.CanEternalHorrorExistInAWorld || WorldGen.getGoodWorldGen) {
+                Main.ActiveWorldFileData.DefeatedMoonlord = downedEternalHorror;
+            }
         }
 
         public override void LoadWorldData(TagCompound tag) {
@@ -46,6 +51,10 @@ namespace Consolaria.Common.ModSystems {
             downedTurkor = tag.ContainsKey("downedTurkor");
             downedOcram = tag.ContainsKey("downedOcram");
             downedEternalHorror = tag.ContainsKey("downedEternalHorror");
+
+            if (EternalHorror.CanEternalHorrorExistInAWorld || WorldGen.getGoodWorldGen) {
+                Main.ActiveWorldFileData.DefeatedMoonlord = downedEternalHorror;
+            }
         }
 
         public override void NetSend(BinaryWriter writer) {
