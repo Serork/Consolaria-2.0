@@ -167,7 +167,7 @@ sealed class PeegeonHood : ModItem {
                 return;
             }
 
-            if (drawInfo.shadow != 0f || drawInfo.drawPlayer.dead)
+            if ((drawInfo.shadow != 0f && drawInfo.drawPlayer.opacityForAnimation == 1f) || drawInfo.drawPlayer.dead)
                 return;
 
             var handler = drawInfo.drawPlayer.GetModPlayer<EyeTrailInfo>();
@@ -228,12 +228,12 @@ sealed class PeegeonHood : ModItem {
 
                 Color color2 = Color.White;
                 color2 *= (handler.trailPos.Length - i) / alpha;
-                DrawData drawData = new DrawData(texture, new Vector2((float)x - Main.screenPosition.X, (float)y - Main.screenPosition.Y) + new Vector2(0f, player.gfxOffY), new Rectangle?(bodyFrame), color2, 0f, new Vector2((float)texture.Width / 2f, (float)height / 2f), 1f, effect, 0);
+                DrawData drawData = new DrawData(texture, new Vector2((float)x - Main.screenPosition.X, (float)y - Main.screenPosition.Y) + new Vector2(0f, player.gfxOffY), new Rectangle?(bodyFrame), color2 * player.opacityForAnimation, 0f, new Vector2((float)texture.Width / 2f, (float)height / 2f), 1f, effect, 0);
                 drawInfo.DrawDataCache.Add(drawData);
 
                 color = player.underShirtColor;
                 color *= (handler.trailPos.Length - i) / alpha;
-                DrawData drawDataGlow = new DrawData(glow_texture, new Vector2((float)x - Main.screenPosition.X, (float)y - Main.screenPosition.Y) + new Vector2(0f, player.gfxOffY), new Rectangle?(bodyFrame), color, 0f, new Vector2((float)texture.Width / 2f, (float)height / 2f), 1f, effect, 0);
+                DrawData drawDataGlow = new DrawData(glow_texture, new Vector2((float)x - Main.screenPosition.X, (float)y - Main.screenPosition.Y) + new Vector2(0f, player.gfxOffY), new Rectangle?(bodyFrame), color * player.opacityForAnimation, 0f, new Vector2((float)texture.Width / 2f, (float)height / 2f), 1f, effect, 0);
                 drawInfo.DrawDataCache.Add(drawDataGlow);
             }
         }

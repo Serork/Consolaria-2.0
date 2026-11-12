@@ -101,6 +101,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
     private static float _opacity, _opacity2;
 
     public static Asset<Texture2D> Has2rCutsceneArea { get; private set; }
+    public static Asset<Texture2D> PeegeOnCutsceneArea { get; private set; }
 
     public int AmountOfTimeNeededForFullPlay => _endTime;
 
@@ -117,6 +118,7 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
 
         if (!Main.dedServ) {
             Has2rCutsceneArea = Helper.RequestTexture("Consolaria/Assets/Textures/Has2rCutsceneArea");
+            PeegeOnCutsceneArea = Helper.RequestTexture("Consolaria/Assets/Textures/PeegeOnCutsceneArea");
         }
 
         //On_CreditsRollComposer.PlaySegment_TextRoll += On_CreditsRollComposer_PlaySegment_TextRoll;
@@ -326,29 +328,29 @@ sealed class ConsolariaCreditsSky : CustomSky, ILoadable {
         orig();
         UpdateTime();
 
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
-        //    //ConsolariaCreditsSky.Reset_Internal();
-        //    CreditsRollEvent.Reset();
-        //}
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad2)) {
-        //    //CreditsRollEvent.Reset();
-        //    EnsureSegmentsAreMade();
-        //    ConsolariaCreditsSky.TryStartingCreditsRoll();
-        //    //CreditsRollEvent.TryStartingCreditsRoll();
-        //}
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad3)) {
-        //    ConsolariaCreditsSky.Reset_Internal();
-        //    CreditsRollEvent.Reset();
-        //}
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad4)) {
-        //    ConsolariaCreditsSky.TryStartingCreditsRoll();
-        //    ConsolariaCreditsSky.ForcedStart();
-        //}
-        //if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad5)) {
-        //    ConsolariaCreditsSky.Reset_Internal();
-        //    CreditsRollEvent.Reset();
-        //    ConsolariaCreditsSky.ForcedEnd();
-        //}
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad1)) {
+            //ConsolariaCreditsSky.Reset_Internal();
+            CreditsRollEvent.Reset();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad2)) {
+            //CreditsRollEvent.Reset();
+            EnsureSegmentsAreMade();
+            ConsolariaCreditsSky.TryStartingCreditsRoll();
+            //CreditsRollEvent.TryStartingCreditsRoll();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad3)) {
+            ConsolariaCreditsSky.Reset_Internal();
+            CreditsRollEvent.Reset();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad4)) {
+            ConsolariaCreditsSky.TryStartingCreditsRoll();
+            ConsolariaCreditsSky.ForcedStart();
+        }
+        if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.NumPad5)) {
+            ConsolariaCreditsSky.Reset_Internal();
+            CreditsRollEvent.Reset();
+            ConsolariaCreditsSky.ForcedEnd();
+        }
     }
 
     private void On_CreditsRollEvent_Reset(On_CreditsRollEvent.orig_Reset orig) {

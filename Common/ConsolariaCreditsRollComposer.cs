@@ -60,7 +60,8 @@ sealed class ConsolariaCreditsRollComposer {
         num += 60;
 
         // bodya
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_PeegeOnAndBirds(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2).totalTime;
@@ -76,7 +77,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // andryuha
-        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        //PlaySegment_PeegeOnAndBirds(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors3", vector2).totalTime;
@@ -149,6 +150,59 @@ sealed class ConsolariaCreditsRollComposer {
     }
 
     private delegate void AddNPCMethod(int npcType, Vector2 sceneAnchoePosition, int lookDirection, int fromTime, int duration, int timeToJumpAt);
+
+    private SegmentInforReport PlaySegment_PeegeOnAndBirds(int startTime, Vector2 sceneAnchorPosition) {
+        sceneAnchorPosition += GetSceneFixVector();
+        int num = startTime;
+        Asset<Texture2D> asset = ConsolariaCreditsSky.PeegeOnCutsceneArea;
+        Rectangle rectangle = asset.Frame();
+        DrawData data = new DrawData(asset.Value, Vector2.Zero, rectangle, Color.White, 0f, rectangle.Size() * new Vector2(0.5f, 1f) + new Vector2(0f, -42f), 1f, SpriteEffects.None);
+        Segments.AnimationSegmentWithActions<Segments.LooseSprite> animationSegmentWithActions = new Segments.SpriteSegment(asset, num, data, sceneAnchorPosition + _backgroundOffset).UseShaderEffect(new Segments.SpriteSegment.MaskedFadeEffect()).Then(new Actions.Sprites.Fade(0f)).With(new Actions.Sprites.Fade(1f, 60));
+
+        num += 70;
+
+        float num6 = 1f;
+        float num7 = 0f;
+        int num8 = 60;
+        Segments.AnimationSegmentWithActions<Player> item2 = new CustomPlayerSegment(startTime, sceneAnchorPosition + new Vector2(-100f, 0f), _originAtBottom, CustomPlayerSegment.DevType.PeegeOn).UseShaderEffect(new CustomPlayerSegment.ImmediateSpritebatchForPlayerDyesEffect())
+            .Then(new Actions.Players.Fade(0f))
+            .Then(new Actions.Players.LookAt(1))
+            .With(new Actions.Players.Fade(1f, num8))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(num6, 0), new Vector2(num7, 0f), 180))
+            .Then(new Actions.Players.Wait(20))
+            .Then(new Actions.Players.LookAt(-1))
+            .Then(new Actions.Players.Wait(200 + 30))
+            .Then(new Actions.Players.LookAt(1))
+            .Then(new Actions.Players.Wait(120))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 75))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 100))
+            .With(new Actions.Players.Fade(0f, 100));
+
+        Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
+            .Then(new Actions.NPCs.Wait(60 + 60 + 30))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        num += 102;
+
+        num += 620;
+
+        animationSegmentWithActions.Then(new Actions.Sprites.Wait(num - startTime - 180)).Then(new Actions.Sprites.Fade(0f, 120));
+        _segments.Add(animationSegmentWithActions);
+        _segments.Add(item2);
+        _segments.Add(item3);
+
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f, 0), startTime + 160, 60, 0, 15, -1);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 30f, 0), startTime + 400, 60, 0, EmoteID.EmoteSilly, 1, time: 60);
+
+        SegmentInforReport result = default(SegmentInforReport);
+        result.totalTime = num - startTime;
+        return result;
+    }
 
     private SegmentInforReport PlaySegment_Has2rLaughing(int startTime, Vector2 sceneAnchorPosition) {
         sceneAnchorPosition += GetSceneFixVector();
@@ -284,12 +338,12 @@ sealed class ConsolariaCreditsRollComposer {
                         _player.armor[2].SetDefaults(ModContent.ItemType<Has2rPants>());
                         _player.armor[3].SetDefaults(ModContent.ItemType<EldritchRing>());
                         break;
-                    case DevType.PeegeOn:
+                    case DevType.Serork:
                         _player.armor[0].SetDefaults(ModContent.ItemType<SerorkHelmet>());
                         _player.armor[1].SetDefaults(ModContent.ItemType<SerorkBreastplate>());
                         _player.armor[2].SetDefaults(ModContent.ItemType<SerorkGreaves>());
                         break;
-                    case DevType.Serork:
+                    case DevType.PeegeOn:
                         _player.armor[0].SetDefaults(ModContent.ItemType<PeegeonHood>());
                         _player.armor[1].SetDefaults(ModContent.ItemType<PeegeonChestguard>());
                         _player.armor[2].SetDefaults(ModContent.ItemType<PeegeonGreaves>());
@@ -306,29 +360,33 @@ sealed class ConsolariaCreditsRollComposer {
                 int mouseX = Main.mouseX;
                 int mouseY = Main.mouseY;
 
-                // has2r
-                {
-                    _player.inventory[_player.selectedItem].SetDefaults(ModContent.ItemType<ConfettiGun_UI>());
+                _player.inventory[_player.selectedItem].SetDefaults(ModContent.ItemType<ConfettiGun_UI>());
 
-                    Main.mouseX = (int)(_player.Center.X + 100);
-                    Main.mouseY = (int)(_player.Center.Y - 100);
+                float heightOffsetHitboxCenter = _player.HeightOffsetHitboxCenter;
+                Rectangle drawHitbox = Item.GetDrawHitbox(_player.inventory[_player.selectedItem].type, _player);
 
-                    _cannonShootTime++;
-                    if (_cannonShootTime == 500) {
-                        _player.controlUseItem = true;
-                        _player.releaseUseItem = true;
+                Main.mouseX = (int)(_player.Center.X + 100);
+                Main.mouseY = (int)(_player.Center.Y - 100);
 
-                        float heightOffsetHitboxCenter = _player.HeightOffsetHitboxCenter;
-                        Rectangle drawHitbox = Item.GetDrawHitbox(_player.inventory[_player.selectedItem].type, _player);
-                        _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
+                switch (_devType) {
+                    case DevType.Has2r:
+                        _cannonShootTime++;
+                        if (_cannonShootTime == 500) {
+                            _player.controlUseItem = true;
+                            _player.releaseUseItem = true;
 
-                        //_player.SetDummyItemTime(_player.inventory[_player.selectedItem].useAnimation);
+                            _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
+                        }
+                        break;
+                    case DevType.PeegeOn:
+                        _cannonShootTime++;
+                        if (_cannonShootTime == 500) {
+                            _player.controlUseItem = true;
+                            _player.releaseUseItem = true;
 
-                        //if (_player.whoAmI == Main.myPlayer && Main.netMode != 2) {
-                        //    Main.NewText(1);
-                        //    Projectile.NewProjectile(_player.GetSource_FromThis(), _player.Center, Vector2.UnitY.RotatedBy(-MathHelper.PiOver2) * 5f, 178, 0, 0f, _player.whoAmI);
-                        //}
-                    }
+                            _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
+                        }
+                        break;
                 }
 
                 _player.ItemCheck();
