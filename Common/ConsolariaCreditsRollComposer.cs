@@ -16,6 +16,7 @@ using Terraria.GameContent.UI;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using static Terraria.GameContent.Animations.Actions.Sprites;
 using static Terraria.GameContent.Animations.Segments;
 
 namespace Consolaria.Common;
@@ -51,8 +52,8 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
         ConsolariaCreditsSky._preparationTime = num;
 
-        //// test remove later
-        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
+        // test remove later
+        //PlaySegment_PeegeOnAndBirds(num - num3, new Vector2(vector2.X * -1f, vector2.Y));
 
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Creators", vector2).totalTime;
         num += num3;
@@ -60,8 +61,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += 60;
 
         // bodya
-        //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
-        PlaySegment_PeegeOnAndBirds(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2).totalTime;
@@ -77,7 +77,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += num3;
 
         // andryuha
-        //PlaySegment_PeegeOnAndBirds(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_PeegeOnAndBirds(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors3", vector2).totalTime;
@@ -164,27 +164,166 @@ sealed class ConsolariaCreditsRollComposer {
         float num6 = 1f;
         float num7 = 0f;
         int num8 = 60;
-        Segments.AnimationSegmentWithActions<Player> item2 = new CustomPlayerSegment(startTime, sceneAnchorPosition + new Vector2(-100f, 0f), _originAtBottom, CustomPlayerSegment.DevType.PeegeOn).UseShaderEffect(new CustomPlayerSegment.ImmediateSpritebatchForPlayerDyesEffect())
-            .Then(new Actions.Players.Fade(0f))
-            .Then(new Actions.Players.LookAt(1))
-            .With(new Actions.Players.Fade(1f, num8))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(num6, 0), new Vector2(num7, 0f), 180))
-            .Then(new Actions.Players.Wait(20))
-            .Then(new Actions.Players.LookAt(-1))
-            .Then(new Actions.Players.Wait(200 + 30))
-            .Then(new Actions.Players.LookAt(1))
-            .Then(new Actions.Players.Wait(120))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 75))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 100))
-            .With(new Actions.Players.Fade(0f, 100));
 
-        Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
+        //Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
+        //    .Then(new Actions.NPCs.Fade(255))
+        //    .With(new Actions.NPCs.Fade(-5, 51))
+        //    .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
+        //    .Then(new Actions.NPCs.Wait(60 + 60 + 30))
+        //    .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
+        //    .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 85))
+        //    .With(new Actions.NPCs.Fade(3, 85));
+
+        float x = -1.5f;
+        Segments.AnimationSegmentWithActions<NPC> item5 = new Segments.NPCSegment(num - 25, 74, sceneAnchorPosition + new Vector2(150f, -45f), _originAtBottom)
             .Then(new Actions.NPCs.Fade(255))
             .With(new Actions.NPCs.Fade(-5, 51))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
-            .Then(new Actions.NPCs.Wait(60 + 60 + 30))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 85))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 85))
+            .With(new Actions.NPCs.MoveWithRotor(new Vector2(10f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 100))
+            .With(new Actions.NPCs.MoveWithRotor(new Vector2(4f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        x = 1.5f;
+        Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(num, 298, sceneAnchorPosition + new Vector2(-80f, -70f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 85))
+            .With(new Actions.NPCs.MoveWithRotor(new Vector2(10f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 100))
+            .With(new Actions.NPCs.MoveWithRotor(new Vector2(4f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        x = -1.5f;
+        Segments.AnimationSegmentWithActions<NPC> item4 = new Segments.NPCSegment(num + 25, 297, sceneAnchorPosition + new Vector2(200f, -37.5f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 85))
+            .With(new Actions.NPCs.MoveWithRotor(new Vector2(10f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 0f), 100))
+            .With(new Actions.NPCs.MoveWithRotor(new Vector2(4f, 0f), (float)Math.PI * 2f / 85f, new Vector2(0f, 1f), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        int time = 30;
+        int waitTime = 75;
+
+        float speed2 = 1.5f;
+
+        Segments.AnimationSegmentWithActions<NPC> sittingBird1 = new Segments.NPCSegment(num + 50 + time, 74, sceneAnchorPosition + new Vector2(100f - 30f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> sittingBird2 = new Segments.NPCSegment(num + 30 + time, 297, sceneAnchorPosition + new Vector2(65f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-x, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> sittingBird3 = new Segments.NPCSegment(num + 60 + time, 74, sceneAnchorPosition + new Vector2(140f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-x * 0.5f, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Move(new Vector2(-x * 0.5f * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> sittingBird4 = new Segments.NPCSegment(num + 40 + time, 298, sceneAnchorPosition + new Vector2(10f - 30f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(x * 0.25f, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Move(new Vector2(x * 0.25f * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        num6 = 3f;
+        num7 = -0.05f;
+
+        Segments.AnimationSegmentWithActions<Player> item2 = new CustomPlayerSegment(num + 30 + time + 60, sceneAnchorPosition + new Vector2(60f, 0f - 90f), _originAtBottom, CustomPlayerSegment.DevType.PeegeOn).UseShaderEffect(new CustomPlayerSegment.ImmediateSpritebatchForPlayerDyesEffect())
+            .Then(new Actions.Players.Fade(0f))
+            .Then(new Actions.Players.LookAt(-1))
+            .With(new Actions.Players.Fade(1f, num8))
+            .With(new Actions.Players.MoveWithAcceleration(new Vector2(0f, num6), new Vector2(0f, num7), num8))
+            .Then(new Actions.Players.Wait(90))
+            .Then(new Actions.Players.LookAt(1))
+            .Then(new Actions.Players.Wait(150))
+            .Then(new Actions.Players.LookAt(-1))
+            .Then(new Actions.Players.Wait(60))
+            .Then(new Actions.Players.LookAt(1))
+            .Then(new Actions.Players.Wait(140))
+            .Then(new Actions.Players.Wait(100))
+            .With(new Actions.Players.Fade(0f, 100));
+
+        int waitTime2 = 240;
+
+        waitTime *= 2;
+
+        Segments.AnimationSegmentWithActions<NPC> returnBird1 = new Segments.NPCSegment(num + 50 + time + waitTime2, 297, sceneAnchorPosition + new Vector2(20f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-x * 0.25f, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Wait(60))
+            .Then(new Actions.NPCs.Wait(85))
+            //.Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> returnBird2 = new Segments.NPCSegment(num + 50 + time + waitTime2 + 40, 74, sceneAnchorPosition + new Vector2(50f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-x, 1.5f), 32))
+            .Then(new Actions.NPCs.LookAt(-1))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Wait(60 - 40))
+            .Then(new Actions.NPCs.Wait(85))
+            //.Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> returnBird3 = new Segments.NPCSegment(num + 50 + time + waitTime2 + 80, 298, sceneAnchorPosition + new Vector2(170f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(x, 1.5f), 32))
+            .Then(new Actions.NPCs.LookAt(-1))
+            .Then(new Actions.NPCs.Wait(waitTime - 20))
+            //.Then(new Actions.NPCs.Wait(60 - 80))
+            .Then(new Actions.NPCs.Wait(85))
+            //.Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> returnBird4 = new Segments.NPCSegment(num + 50 + time + waitTime2 + 80, 74, sceneAnchorPosition + new Vector2(-30f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-x * 0.5f, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime - 20))
+            //.Then(new Actions.NPCs.Wait(60 - 80))
+            .Then(new Actions.NPCs.Wait(85))
+            //.Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> returnBird5 = new Segments.NPCSegment(num + 50 + time + waitTime2 + 60, 297, sceneAnchorPosition + new Vector2(-70f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(-x * 0.375f, 1.5f), 32))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Wait(60 - 60))
+            .Then(new Actions.NPCs.Wait(85))
+            //.Then(new Actions.NPCs.Move(new Vector2(x * -speed2, 1.5f * -speed2), 85))
+            .With(new Actions.NPCs.Fade(3, 85));
+
+        Segments.AnimationSegmentWithActions<NPC> returnBird6 = new Segments.NPCSegment(num + 50 + time + waitTime2 + 50, 297, sceneAnchorPosition + new Vector2(250f, -50f), _originAtBottom)
+            .Then(new Actions.NPCs.Fade(255))
+            .With(new Actions.NPCs.Fade(-5, 51))
+            .Then(new Actions.NPCs.Move(new Vector2(x * 1.5f, 1.5f), 32))
+            .Then(new Actions.NPCs.LookAt(-1))
+            .Then(new Actions.NPCs.Wait(waitTime))
+            .Then(new Actions.NPCs.Wait(60 - 50))
+            .Then(new Actions.NPCs.Wait(85))
+            //.Then(new Actions.NPCs.Move(new Vector2(-x * -speed2, 1.5f * -speed2), 85))
             .With(new Actions.NPCs.Fade(3, 85));
 
         num += 102;
@@ -195,9 +334,22 @@ sealed class ConsolariaCreditsRollComposer {
         _segments.Add(animationSegmentWithActions);
         _segments.Add(item2);
         _segments.Add(item3);
+        _segments.Add(item4);
+        //_segments.Add(item5);
+        _segments.Add(sittingBird1);
+        _segments.Add(sittingBird2);
+        _segments.Add(sittingBird3);
+        _segments.Add(sittingBird4);
 
-        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f, 0), startTime + 160, 60, 0, 15, -1);
-        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 30f, 0), startTime + 400, 60, 0, EmoteID.EmoteSilly, 1, time: 60);
+        _segments.Add(returnBird1);
+        _segments.Add(returnBird2);
+        _segments.Add(returnBird3);
+        _segments.Add(returnBird4);
+        _segments.Add(returnBird5);
+        _segments.Add(returnBird6);
+
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 50, 0), startTime + 240, 60, 0, EmoteID.EmoteConfused, 1, time: 60);
+        AddEmote(sceneAnchorPosition + new Vector2(101f - 20f - 50, 0), startTime + 450, 60, 0, EmoteID.EmotionLove, 1, time: 60);
 
         SegmentInforReport result = default(SegmentInforReport);
         result.totalTime = num - startTime;
@@ -228,7 +380,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.Players.LookAt(1))
             .Then(new Actions.Players.Wait(120))
             .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 75))
-            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6, 0), new Vector2(num7, 0f), 100))
+            .Then(new Actions.Players.MoveWithAcceleration(new Vector2(-num6 * 0.625f, 0), new Vector2(num7, 0f), 100))
             .With(new Actions.Players.Fade(0f, 100));
 
         Segments.AnimationSegmentWithActions<NPC> item3 = new Segments.NPCSegment(startTime + 340, ModContent.NPCType<DisasterBunny>(), sceneAnchorPosition + new Vector2(210f, 0f), _originAtBottom)
@@ -237,7 +389,7 @@ sealed class ConsolariaCreditsRollComposer {
             .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 60))
             .Then(new Actions.NPCs.Wait(60 + 60 + 30))
             .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 90))
-            .Then(new Actions.NPCs.Move(new Vector2(-1f, 0f), 85))
+            .Then(new Actions.NPCs.Move(new Vector2(-1f * 0.625f, 0f), 85))
             .With(new Actions.NPCs.Fade(3, 85));
 
         num += 102;
@@ -332,27 +484,35 @@ sealed class ConsolariaCreditsRollComposer {
                 switch (_devType) {
                     case DevType.Has2r:
                         _player.hair = 26;
-                        _player.GetModPlayer<EldritchRing.EldritchRingDrawLayer.EldritchRingHandler>().shouldDraw = true;
+                        //_player.GetModPlayer<EldritchRing.EldritchRingDrawLayer.EldritchRingHandler>().shouldDraw = true;
+                        //PlayerLoader.PostUpdateEquips(_player);
                         _player.armor[0].SetDefaults(ModContent.ItemType<Has2rMask>());
                         _player.armor[1].SetDefaults(ModContent.ItemType<Has2rJacket>());
                         _player.armor[2].SetDefaults(ModContent.ItemType<Has2rPants>());
+                        _player.armor[10].SetDefaults(0);
+                        _player.armor[11].SetDefaults(0);
+                        _player.armor[12].SetDefaults(0);
                         _player.armor[3].SetDefaults(ModContent.ItemType<EldritchRing>());
                         break;
                     case DevType.Serork:
                         _player.armor[0].SetDefaults(ModContent.ItemType<SerorkHelmet>());
                         _player.armor[1].SetDefaults(ModContent.ItemType<SerorkBreastplate>());
                         _player.armor[2].SetDefaults(ModContent.ItemType<SerorkGreaves>());
+                        _player.armor[10].SetDefaults(0);
+                        _player.armor[11].SetDefaults(0);
+                        _player.armor[12].SetDefaults(0);
                         break;
                     case DevType.PeegeOn:
+                        _player.back = EquipLoader.GetEquipSlot(Consolaria.Instance, nameof(PeegeonCape), EquipType.Back);
                         _player.armor[0].SetDefaults(ModContent.ItemType<PeegeonHood>());
                         _player.armor[1].SetDefaults(ModContent.ItemType<PeegeonChestguard>());
                         _player.armor[2].SetDefaults(ModContent.ItemType<PeegeonGreaves>());
                         _player.armor[3].SetDefaults(ModContent.ItemType<PeegeonCape>());
+                        _player.armor[10].SetDefaults(0);
+                        _player.armor[11].SetDefaults(0);
+                        _player.armor[12].SetDefaults(0);
                         break;
                 }
-
-                _player.UpdateDyes();
-                _player.PlayerFrame();
 
                 _player.position += Main.screenPosition;
                 _player.position -= new Vector2(_player.width / 2, _player.height);
@@ -368,26 +528,26 @@ sealed class ConsolariaCreditsRollComposer {
                 Main.mouseX = (int)(_player.Center.X + 100);
                 Main.mouseY = (int)(_player.Center.Y - 100);
 
-                switch (_devType) {
-                    case DevType.Has2r:
-                        _cannonShootTime++;
-                        if (_cannonShootTime == 500) {
-                            _player.controlUseItem = true;
-                            _player.releaseUseItem = true;
-
-                            _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
-                        }
-                        break;
-                    case DevType.PeegeOn:
-                        _cannonShootTime++;
-                        if (_cannonShootTime == 500) {
-                            _player.controlUseItem = true;
-                            _player.releaseUseItem = true;
-
-                            _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
-                        }
-                        break;
+                if (!Main.gamePaused && Main.instance.IsActive) {
+                    switch (_devType) {
+                        case DevType.Has2r:
+                            _cannonShootTime++;
+                            if (_cannonShootTime == 500) {
+                                _player.controlUseItem = true;
+                                _player.releaseUseItem = true;
+                            }
+                            break;
+                        case DevType.PeegeOn:
+                            _cannonShootTime++;
+                            if (_cannonShootTime == (60 + 60 + 90 + 150 + 60 + 140) - 150) {
+                                _player.controlUseItem = true;
+                                _player.releaseUseItem = true;
+                            }
+                            break;
+                    }
                 }
+
+                _player.ItemCheck_ApplyUseStyle(heightOffsetHitboxCenter, _player.inventory[_player.selectedItem], drawHitbox);
 
                 _player.ItemCheck();
 
@@ -395,8 +555,8 @@ sealed class ConsolariaCreditsRollComposer {
 
                 _player.opacityForAnimation *= info.DisplayOpacity;
 
-                Item item = _player.inventory[_player.selectedItem];
-                _player.inventory[_player.selectedItem] = _blankItem;
+                //Item item = _player.inventory[_player.selectedItem];
+                //_player.inventory[_player.selectedItem] = _blankItem;
 
                 float num = 1f - _player.opacityForAnimation;
                 num = 0f;
@@ -407,7 +567,21 @@ sealed class ConsolariaCreditsRollComposer {
                 if (_shaderEffect != null)
                     _shaderEffect.AfterDrawing(ref info);
 
-                _player.inventory[_player.selectedItem] = item;
+                //_player.inventory[_player.selectedItem] = item;
+
+                _player.UpdateDyes();
+                _player.PlayerFrame();
+
+                switch (_devType) {
+                    case DevType.Has2r:
+                        break;
+                    case DevType.PeegeOn:
+                        if (_cannonShootTime < 60) {
+                            _player.bodyFrame.Y = _player.bodyFrame.Height * 5;
+                            _player.legFrame.Y = _player.legFrame.Height * 5;
+                        }
+                        break;
+                }
 
                 Main.mouseX = mouseX;
                 Main.mouseY = mouseY;

@@ -200,7 +200,7 @@ sealed class EldritchRing : ModItem {
             var handler = player.GetModPlayer<EldritchRingHandler>();
             if (handler.shouldDraw)
             {
-                if (drawInfo.shadow == 0) {
+                if (drawInfo.shadow == 0 || drawInfo.drawPlayer.opacityForAnimation != 1f) {
                     if (!drawInfo.hideEntirePlayer && !player.dead && !player.invis && !player.ShouldNotDraw) {
                         Vector2 position2 = handler.runePosition;
                         Vector2 position = new(drawInfo.Center.X, drawInfo.Center.Y);
@@ -209,7 +209,7 @@ sealed class EldritchRing : ModItem {
                         Vector2 origin = new(texture.Width * 0.5f, texture.Height * 0.5f);
                         Color color = new(255, 215, 50, 180);
                         if (player.gravDir == -1.0) position.Y += 60f;
-                        DrawData drawData = new(texture, position2 - Main.screenPosition - new Vector2(3f * player.direction, 0f), new Rectangle?(), color, handler.runeRotation, origin, 1f, SpriteEffects.None, 0);
+                        DrawData drawData = new(texture, position2 - Main.screenPosition - new Vector2(3f * player.direction, 0f), new Rectangle?(), color * drawInfo.drawPlayer.opacityForAnimation, handler.runeRotation, origin, 1f, SpriteEffects.None, 0);
                         drawData.shader = drawInfo.cWings;
                         drawInfo.DrawDataCache.Add(drawData);
                     }
