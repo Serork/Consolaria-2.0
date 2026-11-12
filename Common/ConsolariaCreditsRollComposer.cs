@@ -72,7 +72,7 @@ sealed class ConsolariaCreditsRollComposer {
         // something else
         //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
-        vector2.X *= -1f;
+        //vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors2", vector2).totalTime;
         num += num3;
         num += num3;
@@ -88,7 +88,7 @@ sealed class ConsolariaCreditsRollComposer {
         // something else
         //PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
 
-        vector2.X *= -1f;
+        //vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors4", vector2).totalTime;
         num += num3;
         num += num3;
