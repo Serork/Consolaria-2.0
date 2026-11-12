@@ -552,6 +552,9 @@ sealed class ConsolariaCreditsRollComposer {
             ResetPlayerAnimation(ref info);
             float localTimeForObject = info.TimeInAnimation - _targetTime;
             ProcessActions(_player, localTimeForObject);
+            if (info.DisplayOpacity < 1f) {
+                _cannonShootTime = 0;
+            }
             if (info.DisplayOpacity != 0f) {
                 _player.ResetEffects();
                 _player.ResetVisibleAccessories();
