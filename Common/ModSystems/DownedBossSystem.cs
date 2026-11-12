@@ -2,17 +2,20 @@
 using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Consolaria.Content.NPCs.Bosses.Lepus;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.ItemDropRules;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
-using Terraria.IO;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.UI;
 
 namespace Consolaria.Common.ModSystems {
     public class DownedBossSystem : ModSystem {
@@ -20,6 +23,45 @@ namespace Consolaria.Common.ModSystems {
         public static bool downedTurkor = false;
         public static bool downedOcram = false;
         public static bool downedEternalHorror = false;
+
+        public override void Load() {
+            On_Main.LoadWorlds += On_Main_LoadWorlds;
+            On_UIWorldListItem.AddTmlElements += On_UIWorldListItem_AddTmlElements;
+        }
+
+        private void On_UIWorldListItem_AddTmlElements(On_UIWorldListItem.orig_AddTmlElements orig, UIWorldListItem self, Terraria.IO.WorldFileData data, ref float offset) {
+            orig(self, data, ref offset);
+
+            if (self.Data.TryGetHeaderData<DownedBossSystem>(out TagCompound tag) && tag.ContainsKey("downedEternalHorror"))
+            //if (data.DefeatedMoonlord)
+            {
+                UIImage_OcramCrown element = new UIImage_OcramCrown(Main.Assets.Request<Texture2D>("Images/UI/IconCompletion")) {
+                    HAlign = 0.5f,
+                    VAlign = 0.5f,
+                    Top = new StyleDimension(-111f + 100f + 1f, 0f),
+                    Left = new StyleDimension(-3f, 0f),
+                    IgnoresMouseInteraction = true
+                };
+                var field = typeof(UIWorldListItem).GetField("_worldIcon", BindingFlags.NonPublic | BindingFlags.Instance);
+                (field.GetValue(self) as UIElement).Append(element);
+            }
+        }
+
+        private void On_Main_LoadWorlds(On_Main.orig_LoadWorlds orig) {
+            orig();
+
+            for (int i = 0; i < Main.WorldList.Count; i++) {
+                if (Main.WorldList[i].ForTheWorthy) {
+                    Main.WorldList[i].DefeatedMoonlord = false;
+                }
+            }
+        }
+
+        public override void SaveWorldHeader(TagCompound tag) {
+            if (downedEternalHorror) {
+                tag.Add("downedEternalHorror", true);
+            }
+        }
 
         public override void OnWorldLoad() {
             downedLepus = false;
@@ -41,9 +83,9 @@ namespace Consolaria.Common.ModSystems {
             if (downedOcram) tag["downedOcram"] = true;
             if (downedEternalHorror) tag["downedEternalHorror"] = true;
 
-            if (EternalHorror.CanEternalHorrorExistInAWorld || WorldGen.getGoodWorldGen) {
-                Main.ActiveWorldFileData.DefeatedMoonlord = downedEternalHorror;
-            }
+            //if (EternalHorror.CanEternalHorrorExistInAWorld || WorldGen.getGoodWorldGen) {
+            //    Main.ActiveWorldFileData.DefeatedMoonlord = downedEternalHorror;
+            //}
         }
 
         public override void LoadWorldData(TagCompound tag) {
@@ -52,9 +94,9 @@ namespace Consolaria.Common.ModSystems {
             downedOcram = tag.ContainsKey("downedOcram");
             downedEternalHorror = tag.ContainsKey("downedEternalHorror");
 
-            if (EternalHorror.CanEternalHorrorExistInAWorld || WorldGen.getGoodWorldGen) {
-                Main.ActiveWorldFileData.DefeatedMoonlord = downedEternalHorror;
-            }
+            //if (EternalHorror.CanEternalHorrorExistInAWorld || WorldGen.getGoodWorldGen) {
+            //    Main.ActiveWorldFileData.DefeatedMoonlord = downedEternalHorror;
+            //}
         }
 
         public override void NetSend(BinaryWriter writer) {
