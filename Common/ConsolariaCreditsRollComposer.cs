@@ -166,7 +166,7 @@ sealed class ConsolariaCreditsRollComposer {
                 float num4 = _timeToShowPeak - (float)timeInAnimation;
                 Vector2 position = info.AnchorPositionOnScreen + new Vector2(0f, num4 * 0.5f);
                 position += _anchorOffset;
-                Vector2 baseScale = new Vector2(0.7f) * MathHelper.Lerp(1.125f, 1.25f, 0.5f);
+                Vector2 baseScale = new Vector2(0.7f) * MathHelper.Lerp(1.125f, 1.25f, 0.375f);
                 float num5 = Main.GlobalTimeWrappedHourly * 0.02f % 1f;
                 if (num5 < 0f)
                     num5 += 1f;
