@@ -63,7 +63,7 @@ sealed class ConsolariaCreditsRollComposer {
         num += 60;
 
         // bodya
-        PlaySegment_Has2rLaughing(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_Has2rLaughingWhyIsHeDoingSo(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors1", vector2, true).totalTime;
@@ -97,7 +97,7 @@ sealed class ConsolariaCreditsRollComposer {
         //num += num3;
 
         // serega
-        PlaySegment_SerorkAndMoneypants(num - num3, new Vector2(vector2.X, vector2.Y));
+        PlaySegment_SerorkAndSomeFuckingBusinessman(num - num3, new Vector2(vector2.X, vector2.Y));
 
         vector2.X *= -1f;
         num += PlaySegment_TextRoll(num, "Mods.Consolaria.ConsolariaCreditsRollCategory_Contributors5", vector2).totalTime;
@@ -204,7 +204,7 @@ sealed class ConsolariaCreditsRollComposer {
 
     private delegate void AddNPCMethod(int npcType, Vector2 sceneAnchoePosition, int lookDirection, int fromTime, int duration, int timeToJumpAt);
 
-    private SegmentInforReport PlaySegment_SerorkAndMoneypants(int startTime, Vector2 sceneAnchorPosition) {
+    private SegmentInforReport PlaySegment_SerorkAndSomeFuckingBusinessman(int startTime, Vector2 sceneAnchorPosition) {
         sceneAnchorPosition += GetSceneFixVector();
         int num = startTime;
         Asset<Texture2D> asset = ConsolariaCreditsSky.SerorkCutsceneArea;
@@ -484,7 +484,7 @@ sealed class ConsolariaCreditsRollComposer {
         return result;
     }
 
-    private SegmentInforReport PlaySegment_Has2rLaughing(int startTime, Vector2 sceneAnchorPosition) {
+    private SegmentInforReport PlaySegment_Has2rLaughingWhyIsHeDoingSo(int startTime, Vector2 sceneAnchorPosition) {
         sceneAnchorPosition += GetSceneFixVector();
         int num = startTime;
         Asset<Texture2D> asset = ConsolariaCreditsSky.Has2rCutsceneArea;
