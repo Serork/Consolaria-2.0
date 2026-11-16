@@ -807,7 +807,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
             else {
-                npc.ResetTrails();
+                //npc.ResetTrails();
 
                 boss._copiesIntensity = preparationProgress2;
 
