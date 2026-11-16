@@ -292,7 +292,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void PlaySpawnRoarSound() {
-        SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoar") with { Pitch = -0.25f }, Main.player[NPC.target].Center);
+        //SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoar") with { Pitch = -0.25f }, Main.player[NPC.target].Center);
     }
 
     private void InitializeClones() {
@@ -658,7 +658,7 @@ sealed partial class EternalHorror : ModNPC {
         vector8 += spawnOffset.RotatedBy(NPC.rotation - MathHelper.PiOver4);
 
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
-        SoundEngine.PlaySound(SoundID.Item8 with { Pitch = -0.1f, MaxInstances = 5 }, vector8);
+        //SoundEngine.PlaySound(SoundID.Item8 with { Pitch = -0.1f, MaxInstances = 5 }, vector8);
 
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
@@ -724,7 +724,7 @@ sealed partial class EternalHorror : ModNPC {
         const float Speed = 12f;
         Player target = NPC.GetTargetPlayer();
         Vector2 vector8 = GetEyePosition();
-        SoundEngine.PlaySound(SoundID.Item33, vector8);
+        //SoundEngine.PlaySound(SoundID.Item33, vector8);
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
             rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);

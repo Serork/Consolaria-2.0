@@ -95,7 +95,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        _spawnSoundSlotID = SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/OcramRoarSummon"), Main.LocalPlayer.Center);
+        _spawnSoundSlotID = SoundEngine.PlaySound(EternalHorror.SummonSound, Main.LocalPlayer.Center);
 
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
@@ -291,7 +291,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (bossSpawnProgress >= 0f && !_soulWhooshPlayed) {
-                SoundEngine.PlaySound(new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/SoulWhoosh") with { Pitch = 0.375f, Volume = 0.5f }, Main.LocalPlayer.Center);
+                SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound_Whoosh, Main.LocalPlayer.Center);
 
                 _soulWhooshPlayed = true;
             }
@@ -743,7 +743,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 bossCenter.Y += EternalHorror.SPAWNOFFSETY;
 
                 if (eyeInfo.TimeLeft == eyeInfo.MaxTimeLeftForSelfCollapse) {
-                    SoundEngine.PlaySound(SoundID.NPCDeath6 with { MaxInstances = 100, Pitch = 0.5f + Main.rand.NextFloat(0.5f, 1f), Volume = 0.125f * 0.25f }, position);
+                    SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound, position);
                 }
 
                 bossSpawned = true;

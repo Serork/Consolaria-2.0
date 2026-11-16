@@ -62,7 +62,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
             Projectile.scale = 1f;
 
-            SoundEngine.PlaySound(SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, Projectile.Center);
+            //SoundEngine.PlaySound(SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, Projectile.Center);
         }
 
         if (Projectile.timeLeft <= TIMELEFT - 5) Projectile.alpha = 50;
@@ -179,7 +179,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
                     _spawnedScythe = true;
 
-                    SoundEngine.PlaySound(ReflectSound, Projectile.Center);
+                    //SoundEngine.PlaySound(ReflectSound, Projectile.Center);
 
                     int num5 = Main.rand.Next(20, 40);
                     Vector2 positionInWorld = Projectile.Center;
