@@ -461,7 +461,7 @@ sealed partial class EternalHorror : ModNPC {
                         return;
                     }
 
-                    //npc.ResetTrails();
+                    npc.ResetTrails();
 
                     //SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
@@ -529,7 +529,7 @@ sealed partial class EternalHorror : ModNPC {
                     float lerpValue = 0.25f;
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f);
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * MathHelper.Lerp(0f, 1f, 0.25f));
                 }
             }
             void destroyClones() {
@@ -807,7 +807,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
             else {
-                //npc.ResetTrails();
+                npc.ResetTrails();
 
                 boss._copiesIntensity = preparationProgress2;
 
@@ -1442,7 +1442,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 
-                    //npc.ResetTrails();
+                    npc.ResetTrails();
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     boss._dashVelocity = dashDirection * dashStrength;
 
@@ -1508,7 +1508,7 @@ sealed partial class EternalHorror : ModNPC {
                     float lerpValue = 0.25f;
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * 0.75f);
+                    npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * 0.75f * MathHelper.Lerp(0f, 1f, 0.25f));
                 }
             }
             void destroyClones() {
@@ -1663,7 +1663,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.SpawnClone(insta: true);
 
-                    //npc.ResetTrails();
+                    npc.ResetTrails();
 
                     Player target = npc.GetTargetPlayer();
                     Vector2 targetCenter = target.Center;
@@ -2064,7 +2064,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 
-                    //npc.ResetTrails();
+                    npc.ResetTrails();
                     Vector2 dashDirection = Vector2.UnitY.RotatedBy(npc.rotation);
                     boss._dashVelocity = dashDirection * dashStrength;
 
@@ -2099,7 +2099,7 @@ sealed partial class EternalHorror : ModNPC {
                     npc.velocity = Vector2.Lerp(npc.velocity, boss._dashVelocity, lerpValue);
                     if (attackProgress < 1.75f) {
                         float velocityRotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
-                        npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * 0.75f);
+                        npc.rotation = npc.rotation.AngleLerp(velocityRotation, lerpValue * 0.5f * MathHelper.Lerp(0f, 1f, 0.25f));
                     }
                 }
             }
