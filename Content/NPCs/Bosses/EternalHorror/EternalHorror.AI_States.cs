@@ -96,7 +96,7 @@ sealed partial class EternalHorror : ModNPC {
                         }
                     }
                     //SoundEngine.PlaySound(SoundID.Item14, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.Roar with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) + 0.25f, MaxInstances = 0 }, NPC.position);
+                    //SoundEngine.PlaySound(SoundID.Roar with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) + 0.25f, MaxInstances = 0 }, NPC.position);
 
                     ChromaOpacity = HorrorEffectShaderData3.STRENGTH;
                     ChromaPosition = boss.GetEyePosition();
@@ -354,7 +354,7 @@ sealed partial class EternalHorror : ModNPC {
         public static float DASHATTACKCOUNT => 5;
         public static float DASHSTRENGTH => 40f;
 
-        public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
+        //public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             Player target = npc.GetTargetPlayer();
@@ -463,7 +463,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     npc.ResetTrails();
 
-                    SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     boss.AICounter = -DASHTIME;
 
@@ -639,7 +639,7 @@ sealed partial class EternalHorror : ModNPC {
         public static float SLOWDOWNTIME => Helper.SecondsToFrames(1f * 0.875f);
         public static float ATTACKTIME => Helper.SecondsToFrames(1.5f * 0.875f);
 
-        public static SoundStyle SummonSpawnSound => SoundID.NPCDeath45;
+        //public static SoundStyle SummonSpawnSound => SoundID.NPCDeath45;
 
         // the mess begins
         // sometimes i just wanna make stuff in game
@@ -757,7 +757,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 if (boss._dashOpacity >= dashOpacity / 4f && boss.AICounter % 6 == 0) {
-                    SoundEngine.PlaySound(SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
                     void makeSpawnDust() {
@@ -892,8 +892,8 @@ sealed partial class EternalHorror : ModNPC {
 
                 if (boss._ai5 % 20 == 0 && (boss.AICounter2 == 1f || boss._ai4 == 1f)) {
                     //AddGlow(20f, 0.5f, Color.BlueViolet);
-                    SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
-                    SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     if (!Main.dedServ) {
                         for (int i = 0; i < 2; i++) {
@@ -970,7 +970,7 @@ sealed partial class EternalHorror : ModNPC {
                             boss.AICounter3 = 0f;
                         }
                         else {
-                            SoundEngine.PlaySound(SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                            //SoundEngine.PlaySound(SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                             //SoundEngine.PlaySound(3, (int)position.X, (int)position.Y);
                             if (!Main.dedServ) {
@@ -991,7 +991,7 @@ sealed partial class EternalHorror : ModNPC {
                             //}
 
                             //SoundEngine.PlaySound(15, (int)position.X, (int)position.Y, 0);
-                            SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.position);
+                            //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.position);
                         }
                     }
                 }
@@ -1256,7 +1256,7 @@ sealed partial class EternalHorror : ModNPC {
         public static float DASHATTACKCOUNT => 5;
         public static float DASHSTRENGTH => 40f;
 
-        public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
+        //public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             HorrorEffectShaderData2.TimeFactor = Helper.Approach(HorrorEffectShaderData2.TimeFactor, 1 / 60f, 1 / 60f * 0.125f);
@@ -1427,7 +1427,7 @@ sealed partial class EternalHorror : ModNPC {
                         boss.Phase2_WasDoingCloneAttack = false;
                     }
 
-                    SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     {
                         boss._eyeEffectOpacity = 1f;
@@ -1679,7 +1679,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss._eyeEffectOpacity = 1f;
 
-                    SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     npc.velocity = boss._dashVelocity;
 
@@ -1943,7 +1943,7 @@ sealed partial class EternalHorror : ModNPC {
                 npc.rotation = npc.rotation.AngleLerp(rotation, ROTATIONLERP * attackProgress6);
 
                 if (boss._dashOpacity >= 0.5f && boss.AICounter % 6 == 0 && attackProgress3 <= 0.8f) {
-                    SoundEngine.PlaySound(Phase1SummonSpawnAttack.SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(Phase1SummonSpawnAttack.SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
                 }
 
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * 2f * attackProgress7);
@@ -2060,7 +2060,7 @@ sealed partial class EternalHorror : ModNPC {
                 float dashStrength = Phase2DashAttack.DASHSTRENGTH;
 
                 if (boss.Phase2DashAttackCount < 0) {
-                    SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 
