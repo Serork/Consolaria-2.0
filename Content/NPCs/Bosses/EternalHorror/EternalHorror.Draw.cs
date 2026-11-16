@@ -459,7 +459,7 @@ sealed partial class EternalHorror : ModNPC {
                 value67 *= 1f - num247;
                 value67 *= 0.375f;
                 Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2()
-                    * num248 * num247;
+                    * num248 * num247 * _dashOpacity;
                 if (СloneStateEffectOpacity < 1f) {
                     Draw_Inner(NPC, drawContext with {
                         Position = position23,
@@ -757,7 +757,7 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
         void drawTrails() {
-            if (_dashOpacity > 0f) {
+            if (_dashOpacity > 0f && _dashVelocity.Length() > 0f) {
                 int length = NPC.oldPos.Length - 1;
                 for (int num173 = 1; num173 < length; num173 += 1) {
                     _ = ref NPC.oldPos[num173];

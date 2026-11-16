@@ -2110,7 +2110,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 npc.velocity *= Ease.CubeOut(preparationSlowDown);
 
-                //if (attackProgress < 0.875f)
+                if (attackProgress < MathHelper.Lerp(0.875f, 1f, 0.5f))
                 {
                     setRotation();
                 }
