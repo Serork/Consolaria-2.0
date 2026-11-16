@@ -757,7 +757,7 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
         void drawTrails() {
-            if (_dashOpacity > 0f && _dashVelocity.Length() > 0f) {
+            if (_dashOpacity > 0f/* && _dashVelocity.Length() > 0f*/) {
                 int length = NPC.oldPos.Length - 1;
                 for (int num173 = 1; num173 < length; num173 += 1) {
                     _ = ref NPC.oldPos[num173];
