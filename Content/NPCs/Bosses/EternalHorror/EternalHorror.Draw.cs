@@ -459,7 +459,7 @@ sealed partial class EternalHorror : ModNPC {
                 value67 *= 1f - num247;
                 value67 *= 0.375f;
                 Vector2 position23 = rCurrentNPC.Center + ((float)num251 / (float)num246 * ((float)Math.PI * 2f) + rCurrentNPC.rotation).ToRotationVector2()
-                    * num248 * num247 * _dashOpacity;
+                    * num248 * num247;
                 if (СloneStateEffectOpacity < 1f) {
                     Draw_Inner(NPC, drawContext with {
                         Position = position23,
