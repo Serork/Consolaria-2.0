@@ -312,6 +312,7 @@ sealed partial class EternalHorror : ModNPC {
             void prepareAndSpawnClone() {
                 bool justStarted = boss.AICounter == 0f;
                 if (justStarted) {
+                    boss.PlayCloneSound();
                     boss.SpawnClone();
                 }
 
