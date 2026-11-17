@@ -62,7 +62,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
             Projectile.scale = 1f;
 
-            //SoundEngine.PlaySound(SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, Projectile.Center);
+            SoundEngine.PlaySound(EternalHorror.LaserSound(), Projectile.Center);
         }
 
         if (Projectile.timeLeft <= TIMELEFT - 5) Projectile.alpha = 50;
