@@ -53,6 +53,8 @@ sealed partial class EternalHorror : ModNPC {
                   _dashOpacity,
                   _copiesIntensity;
 
+    private bool _hasShadow;
+
     private float _eyeEffectOpacity;
     private float _cloneStateEffectOpacity;
 
@@ -428,7 +430,7 @@ sealed partial class EternalHorror : ModNPC {
                     });
                 });
             }, sinWaveOffset: WaveOffset,
-               progress: _shadowProgress,
+               progress: !_hasShadow ? 1f : _shadowProgress,
                opacity: 0.375f,
                sinStep: _shadowTime);
         }
@@ -1068,14 +1070,11 @@ sealed partial class EternalHorror : ModNPC {
                 hasShadow = true;
             }
         }
-        if (!hasShadow) {
-            lerpValue = 1f;
-        }
+        _hasShadow = hasShadow;
         //shadowOpacity = MathF.Max(shadowOpacity, shadowOpacity_FromClones);
         //if (shadowOpacity == shadowOpacity_FromClones) {
         //    lerpValue = previousLerpValue;
         //}
-        shadowOpacity = Ease.CubeOut(shadowOpacity);
         _shadowProgress = Helper.Approach(_shadowProgress, shadowOpacity, lerpValue);
         _shadowTime += 1 / 60f;
         //if (_shadowProgress <= 0f) {

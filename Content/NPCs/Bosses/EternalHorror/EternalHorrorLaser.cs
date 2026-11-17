@@ -15,7 +15,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     private static ushort TIMELEFT => 360;
 
-    private static SoundStyle ReflectSound => SoundID.Item150 with { Pitch = -1f, Volume = 0.5f };
+    private static SoundStyle ReflectSound => EternalHorror.LaserReflectSound();
 
     private bool _spawnedScythe;
 
@@ -179,7 +179,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
                     _spawnedScythe = true;
 
-                    //SoundEngine.PlaySound(ReflectSound, Projectile.Center);
+                    SoundEngine.PlaySound(ReflectSound, Projectile.Center);
 
                     int num5 = Main.rand.Next(20, 40);
                     Vector2 positionInWorld = Projectile.Center;
