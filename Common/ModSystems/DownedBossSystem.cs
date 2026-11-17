@@ -19,7 +19,7 @@ using Terraria.UI;
 
 namespace Consolaria.Common.ModSystems {
     public class DownedBossSystem : ModSystem {
-        private static HashSet<Guid> _canAppendNewUIElement;
+        private static Dictionary<Guid, int> _canAppendNewUIElement;
 
         public static bool downedLepus = false;
         public static bool downedTurkor = false;
@@ -37,16 +37,28 @@ namespace Consolaria.Common.ModSystems {
             if (self.Data.TryGetHeaderData<DownedBossSystem>(out TagCompound tag) && tag.ContainsKey("downedEternalHorror"))
             //if (data.DefeatedMoonlord)
             {
-                if (_canAppendNewUIElement.Add(data.UniqueId)) {
+                //if (!_canAppendNewUIElement[data.UniqueId])
+                {
+                    bool justAdded = _canAppendNewUIElement[data.UniqueId] == 0;
+                    float topY = 0f;
+                    float leftX = 0f;
+                    if (!justAdded) {
+                        leftX = -30;
+                        topY = -28;
+                    }
+                    StyleDimension top = new StyleDimension(-111f + 100f + 1f + topY, 0f);
+                    StyleDimension left = new StyleDimension(-3f + leftX, 0f);
                     UIImage_OcramCrown element = new UIImage_OcramCrown(Main.Assets.Request<Texture2D>("Images/UI/IconCompletion")) {
                         HAlign = 0.5f,
                         VAlign = 0.5f,
-                        Top = new StyleDimension(-111f + 100f + 1f, 0f),
-                        Left = new StyleDimension(-3f, 0f),
+                        Top = top,
+                        Left = left,
                         IgnoresMouseInteraction = true
                     };
                     var field = typeof(UIWorldListItem).GetField("_worldIcon", BindingFlags.NonPublic | BindingFlags.Instance);
                     (field.GetValue(self) as UIElement).Append(element);
+                    _canAppendNewUIElement[data.UniqueId]++;
+                    //_canAppendNewUIElement[data.UniqueId] = true;
                 }
             }
         }
@@ -54,12 +66,12 @@ namespace Consolaria.Common.ModSystems {
         private void On_Main_LoadWorlds(On_Main.orig_LoadWorlds orig) {
             orig();
 
-            _canAppendNewUIElement = new HashSet<Guid>();
+            _canAppendNewUIElement = new Dictionary<Guid, int>();
             for (int i = 0; i < Main.WorldList.Count; i++) {
                 if (Main.WorldList[i].ForTheWorthy) {
                     Main.WorldList[i].DefeatedMoonlord = false;
                 }
-                _canAppendNewUIElement.Add(Main.WorldList[i].UniqueId);
+                _canAppendNewUIElement.Add(Main.WorldList[i].UniqueId, 0);
             }
         }
 
