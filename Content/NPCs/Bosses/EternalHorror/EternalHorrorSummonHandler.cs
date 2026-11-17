@@ -95,7 +95,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        _spawnSoundSlotID = SoundEngine.PlaySound(EternalHorror.SummonSound, Main.LocalPlayer.Center);
+        _spawnSoundSlotID = SoundEngine.PlaySound(EternalHorror.RitualSound(), Main.LocalPlayer.Center);
 
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
@@ -291,7 +291,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (bossSpawnProgress >= 0f && !_soulWhooshPlayed) {
-                SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound_Whoosh, Main.LocalPlayer.Center);
+                SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound_Whoosh(), Main.LocalPlayer.Center);
 
                 _soulWhooshPlayed = true;
             }
@@ -743,7 +743,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 bossCenter.Y += EternalHorror.SPAWNOFFSETY;
 
                 if (eyeInfo.TimeLeft == eyeInfo.MaxTimeLeftForSelfCollapse) {
-                    SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound, position);
+                    SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound(), position);
                 }
 
                 bossSpawned = true;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -20,6 +21,12 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static void GetSoundAndAdjust(float soundSlot_Float, Action<ActiveSound> adjust) {
+        if (SoundEngine.TryGetActiveSound(SlotId.FromFloat(soundSlot_Float), out ActiveSound result)) {
+            adjust(result);
+        }
+    }
+
     public static Vector2 MovementOffset(this Player player) {
         Vector2[] positions = [
             new Vector2(0f, 0f),

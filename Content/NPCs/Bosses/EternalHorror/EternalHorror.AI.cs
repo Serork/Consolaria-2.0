@@ -1,6 +1,7 @@
 ﻿using Consolaria.Common.ModSystems;
 using Consolaria.Common.Particles;
 using Microsoft.Xna.Framework;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -228,6 +229,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
+        AdjustSoundPositions();
+
         SomeSecondPhaseShitCode();
         UpdateCustomImmunityFrames();
     }
@@ -265,6 +268,8 @@ sealed partial class EternalHorror : ModNPC {
         if (Init) {
             return;
         }
+
+        PlaySoundOnSpawn();
 
         InitializeCustomImmunityFrames();
 
