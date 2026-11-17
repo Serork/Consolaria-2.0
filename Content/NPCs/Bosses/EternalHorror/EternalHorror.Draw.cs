@@ -1075,6 +1075,7 @@ sealed partial class EternalHorror : ModNPC {
         //if (shadowOpacity == shadowOpacity_FromClones) {
         //    lerpValue = previousLerpValue;
         //}
+        shadowOpacity = Ease.CubeOut(shadowOpacity);
         _shadowProgress = Helper.Approach(_shadowProgress, shadowOpacity, lerpValue);
         _shadowTime += 1 / 60f;
         //if (_shadowProgress <= 0f) {
