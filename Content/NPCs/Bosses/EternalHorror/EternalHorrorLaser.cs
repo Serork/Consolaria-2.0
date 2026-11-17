@@ -81,7 +81,9 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
             }
         }
 
-        ReflectFromEternalHorrorClones();
+        if (Projectile.timeLeft <= TIMELEFT - 5) {
+            ReflectFromEternalHorrorClones();
+        }
 
         if (Main.rand.NextBool(50)) {
             MakeMovementSparkle();
