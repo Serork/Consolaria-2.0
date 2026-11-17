@@ -19,6 +19,8 @@ using Terraria.UI;
 
 namespace Consolaria.Common.ModSystems {
     public class DownedBossSystem : ModSystem {
+        private static HashSet<Guid> _canAppendNewUIElement;
+
         public static bool downedLepus = false;
         public static bool downedTurkor = false;
         public static bool downedOcram = false;
@@ -35,25 +37,29 @@ namespace Consolaria.Common.ModSystems {
             if (self.Data.TryGetHeaderData<DownedBossSystem>(out TagCompound tag) && tag.ContainsKey("downedEternalHorror"))
             //if (data.DefeatedMoonlord)
             {
-                UIImage_OcramCrown element = new UIImage_OcramCrown(Main.Assets.Request<Texture2D>("Images/UI/IconCompletion")) {
-                    HAlign = 0.5f,
-                    VAlign = 0.5f,
-                    Top = new StyleDimension(-111f + 100f + 1f, 0f),
-                    Left = new StyleDimension(-3f, 0f),
-                    IgnoresMouseInteraction = true
-                };
-                var field = typeof(UIWorldListItem).GetField("_worldIcon", BindingFlags.NonPublic | BindingFlags.Instance);
-                (field.GetValue(self) as UIElement).Append(element);
+                if (_canAppendNewUIElement.Add(data.UniqueId)) {
+                    UIImage_OcramCrown element = new UIImage_OcramCrown(Main.Assets.Request<Texture2D>("Images/UI/IconCompletion")) {
+                        HAlign = 0.5f,
+                        VAlign = 0.5f,
+                        Top = new StyleDimension(-111f + 100f + 1f, 0f),
+                        Left = new StyleDimension(-3f, 0f),
+                        IgnoresMouseInteraction = true
+                    };
+                    var field = typeof(UIWorldListItem).GetField("_worldIcon", BindingFlags.NonPublic | BindingFlags.Instance);
+                    (field.GetValue(self) as UIElement).Append(element);
+                }
             }
         }
 
         private void On_Main_LoadWorlds(On_Main.orig_LoadWorlds orig) {
             orig();
 
+            _canAppendNewUIElement = new HashSet<Guid>();
             for (int i = 0; i < Main.WorldList.Count; i++) {
                 if (Main.WorldList[i].ForTheWorthy) {
                     Main.WorldList[i].DefeatedMoonlord = false;
                 }
+                _canAppendNewUIElement.Add(Main.WorldList[i].UniqueId);
             }
         }
 
