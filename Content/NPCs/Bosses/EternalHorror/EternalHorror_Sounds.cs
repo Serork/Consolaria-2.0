@@ -21,7 +21,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle SoulAbsorptionSound() => SoundID.NPCDeath6 with { MaxInstances = 100, Pitch = 0.5f + Main.rand.NextFloat(0.5f, 1f), Volume = 0.125f * 0.25f };
     public static SoundStyle SoulAbsorptionSound_Whoosh() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/SoulWhoosh") with { Pitch = 0.375f, Volume = 0.5f };
     public static SoundStyle LaserSound() => SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 1, PitchVariance = 0.24f, Volume = 0.5f };
-    public static SoundStyle CloneSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Clone") with { Pitch = 0.125f, Volume = 1f };
+    public static SoundStyle CloneSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Clone") with { Pitch = 0.25f, Volume = 1f };
     public static SoundStyle LaserReflectSound() => SoundID.Item150 with { Pitch = -1f, Volume = 0.375f };
 
     private void PlaySoundOnSpawn() {
