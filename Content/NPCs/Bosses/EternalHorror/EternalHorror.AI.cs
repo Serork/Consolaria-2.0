@@ -54,7 +54,8 @@ sealed partial class EternalHorror : ModNPC {
                                                                              int ExplosionTime = -1,
                                                                              bool ShouldDoLaserAttack = false,
                                                                              ushort LaserAttackTime_Current = 0,
-                                                                             ushort LaserAttackTime_Max = 0) {
+                                                                             ushort LaserAttackTime_Max = 0,
+                                                                             bool ShouldSlowdown = false) {
         public static float OPACITYMAXTIMELEFTFACTOR => 0.75f;
         public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(2f);
 
@@ -474,7 +475,7 @@ sealed partial class EternalHorror : ModNPC {
 
             if (!cloneInfo.ShouldFade) {
                 if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f) {
-                    if (/*IsInSecondPhase && */cloneInfo.Opacity < (IsInSecondPhase ? 1f : 0.25f) && cloneInfo.ExplosionTime == -1) {
+                    if (/*IsInSecondPhase && */cloneInfo.Opacity < (IsInSecondPhase ? 1f : 0.375f) && cloneInfo.ExplosionTime == -1) {
                         Vector2 targetCenter = target.Center;
 
                         cloneInfo.Position = GetCloneSpawnPosition();
@@ -490,6 +491,10 @@ sealed partial class EternalHorror : ModNPC {
 
             if (cloneInfo.ExplosionProgress2 > 0f) {
                 _eyeEffectOpacity = Helper.YoYo(cloneInfo.ExplosionProgress2);
+            }
+
+            if (cloneInfo.ShouldSlowdown) {
+                cloneInfo.Velocity *= 0.9f;
             }
 
             int dustCount = 1;
@@ -859,24 +864,24 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void DestroyClonesOnContact() {
-        OnIterateActiveCloneData((ref cloneInfo) => {
-            Rectangle hitbox = NPC.Hitbox;
-            Vector2 clonePosition = cloneInfo.VisualPosition;
-            float cloneRotation = cloneInfo.Rotation;
-            Vector2 cloneDirection = Vector2.UnitY.RotatedBy(cloneRotation);
-            int width = NPC.width;
-            float fluffFactor = 0.875f;
-            width = (int)(width * fluffFactor);
-            Vector2 clonePosition_Start = clonePosition + cloneDirection * NPC.height / 2f * fluffFactor,
-                    clonePosition_End = clonePosition + -cloneDirection * NPC.height / 2f * fluffFactor;
-            float collisionPoint = 0f;
-            if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, width, ref collisionPoint)) {
-                cloneInfo.TimeLeft = 0;
+        //OnIterateActiveCloneData((ref cloneInfo) => {
+        //    Rectangle hitbox = NPC.Hitbox;
+        //    Vector2 clonePosition = cloneInfo.VisualPosition;
+        //    float cloneRotation = cloneInfo.Rotation;
+        //    Vector2 cloneDirection = Vector2.UnitY.RotatedBy(cloneRotation);
+        //    int width = NPC.width;
+        //    float fluffFactor = 0.875f;
+        //    width = (int)(width * fluffFactor);
+        //    Vector2 clonePosition_Start = clonePosition + cloneDirection * NPC.height / 2f * fluffFactor,
+        //            clonePosition_End = clonePosition + -cloneDirection * NPC.height / 2f * fluffFactor;
+        //    float collisionPoint = 0f;
+        //    if (Collision.CheckAABBvLineCollision(hitbox.Location.ToVector2(), hitbox.Size(), clonePosition_Start, clonePosition_End, width, ref collisionPoint)) {
+        //        cloneInfo.TimeLeft = 0;
 
-                Vector2 position = Vector2.Lerp(clonePosition_Start, clonePosition_End, 0.5f);
-                SpawnCloneExplosion(position);
-            }
-        });
+        //        Vector2 position = Vector2.Lerp(clonePosition_Start, clonePosition_End, 0.5f);
+        //        SpawnCloneExplosion(position);
+        //    }
+        //});
     }
 
     private void SpawnCloneExplosion(Vector2 position) {
