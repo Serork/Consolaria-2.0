@@ -474,7 +474,7 @@ sealed partial class EternalHorror : ModNPC {
 
             if (!cloneInfo.ShouldFade) {
                 if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f) {
-                    if (IsInSecondPhase && cloneInfo.Opacity < 1f && cloneInfo.ExplosionTime == -1) {
+                    if (/*IsInSecondPhase && */cloneInfo.Opacity < (IsInSecondPhase ? 1f : 0.25f) && cloneInfo.ExplosionTime == -1) {
                         Vector2 targetCenter = target.Center;
 
                         cloneInfo.Position = GetCloneSpawnPosition();
