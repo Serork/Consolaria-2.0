@@ -238,6 +238,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
+        TryToPlayAmbientSounds();
+
         AdjustSoundPositions();
 
         SomeSecondPhaseShitCode();
@@ -465,6 +467,9 @@ sealed partial class EternalHorror : ModNPC {
 
             if (cloneInfo.ExplosionTime > 0) {
                 cloneInfo.ExplosionTime--;
+                if (cloneInfo.ExplosionTime == CloneInfo.EXPLOSIONTIME / 2) {
+                    PlayCloneExplosionPreparationSound2();
+                }
                 if (cloneInfo.ExplosionTime == 0) {
                     cloneInfo.TimeLeft = 0;
 
@@ -989,6 +994,7 @@ sealed partial class EternalHorror : ModNPC {
         OnIterateActiveCloneData((ref cloneInfo) => {
             if (!cloneInfo.ShouldFade) {
                 cloneInfo.ShouldFade = true;
+                //cloneInfo.ForceFade();
 
                 cloneInfo.ExplosionTime = CloneInfo.EXPLOSIONTIME;
             }

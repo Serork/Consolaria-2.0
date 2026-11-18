@@ -401,6 +401,10 @@ sealed partial class EternalHorror : ModNPC {
             //    //});
             //}
 
+            //if (boss.AICounter == 0f) {
+            //    boss.PlayCloneExplosionPreparationSound();
+            //}
+
             boss._cloneTargetPosition = targetCenter;
 
             Vector2 baseTargetCenter = targetCenter;
@@ -476,7 +480,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     npc.ResetTrails();
 
-                    //SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase1(), npc.Center);
 
                     boss.AICounter = -DASHTIME;
 
@@ -664,6 +668,10 @@ sealed partial class EternalHorror : ModNPC {
 
             boss._cloneTargetPosition = targetCenter;
 
+            if (boss.AICounter == (int)MOVETOPLAYERTIME / 2) {
+                boss.PlaySummonPreparationSound();
+            }
+
             boss.AICounter += 1f;
 
             const float WaveMovementSpeed = 30f;
@@ -770,7 +778,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 if (boss._dashOpacity >= dashOpacity / 4f && boss.AICounter % 6 == 0) {
-                    //SoundEngine.PlaySound(SummonSpawnSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound(EternalHorror.SummonSound(), npc.Center);
 
                     Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
                     void makeSpawnDust() {
@@ -1442,7 +1450,7 @@ sealed partial class EternalHorror : ModNPC {
                         boss.Phase2_WasDoingCloneAttack = false;
                     }
 
-                    //SoundEngine.PlaySound(DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase2(), npc.Center);
 
                     {
                         boss._eyeEffectOpacity = 1f;
@@ -1694,7 +1702,7 @@ sealed partial class EternalHorror : ModNPC {
 
                     boss._eyeEffectOpacity = 1f;
 
-                    //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase1(), npc.Center);
 
                     npc.velocity = boss._dashVelocity;
 
@@ -1926,7 +1934,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 if (progress <= 0f) {
                     boss.DeactivateState<Phase2MoveToPlayer>();
-                    //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase1(), npc.Center);
                 }
 
                 float attackProgress3 = progress / ATTACKTIME;
@@ -2075,7 +2083,7 @@ sealed partial class EternalHorror : ModNPC {
                 float dashStrength = Phase2DashAttack.DASHSTRENGTH;
 
                 if (boss.Phase2DashAttackCount < 0) {
-                    //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase1(), npc.Center);
 
                     boss.DeactivateState<Phase2MoveToPlayer>();
 

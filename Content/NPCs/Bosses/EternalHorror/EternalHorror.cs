@@ -156,8 +156,8 @@ sealed partial class EternalHorror : ModNPC {
                                spawnSlots: 10f,
                                boss: true);
 
-        //NPC.SetHitSounds(hitSound: HitSound,
-        //                 deathSound: DeathSound);
+        NPC.SetHitSounds(hitSound: HitSound(),
+                         deathSound: DeathSound());
 
         NPC.SetMiscellaneousProperties(dropCoins: Item.buyPrice(gold: 15),
                                        lavaImmune: true);

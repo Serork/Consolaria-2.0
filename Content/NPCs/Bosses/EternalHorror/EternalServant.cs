@@ -113,8 +113,8 @@ sealed class EternalServant : ModNPC {
         NPC.defense = 10;
         NPC.knockBackResist = 0f;
 
-        //NPC.HitSound = EternalHorror.HitSound_Servant;
-        //NPC.DeathSound = EternalHorror.DeathSound_Servant;
+        NPC.HitSound = EternalHorror.HitSound_Servant();
+        NPC.DeathSound = EternalHorror.DeathSound_Servant();
 
         NPC.noTileCollide = true;
         NPC.noGravity = true;
