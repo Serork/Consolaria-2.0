@@ -111,6 +111,8 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         return false;
     }
 
+    public override bool? CanDamage() => Projectile.Opacity * Ease.QuartOut(_scaleX) >= 1f;
+
     public override void AI() {
         if (!Main.projectile[(int)Projectile.ai[1]].active || Main.projectile[(int)Projectile.ai[1]].type != ModContent.ProjectileType<EternalHorrorLaser_Holdout>()) {
             Projectile.Kill();
