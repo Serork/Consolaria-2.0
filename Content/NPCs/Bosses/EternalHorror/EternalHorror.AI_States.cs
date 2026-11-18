@@ -272,6 +272,8 @@ sealed partial class EternalHorror : ModNPC {
                     return;
                 }
 
+                boss.PrepareLaserAttackForClones((ushort)(LASERATTACKTIME * 0.5f));
+
                 boss.ResetLaserAttack();
 
                 boss.LaserAttackCount++;

@@ -51,7 +51,10 @@ sealed partial class EternalHorror : ModNPC {
                                                                              CloneStarInfo[] CloneStarData = null,
                                                                              float AllStarOpacityFactor = 0f,
                                                                              float LerpVelocityValue = 1f,
-                                                                             int ExplosionTime = -1) {
+                                                                             int ExplosionTime = -1,
+                                                                             bool ShouldDoLaserAttack = false,
+                                                                             ushort LaserAttackTime_Current = 0,
+                                                                             ushort LaserAttackTime_Max = 0) {
         public static float OPACITYMAXTIMELEFTFACTOR => 0.75f;
         public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(2f);
 
@@ -71,6 +74,11 @@ sealed partial class EternalHorror : ModNPC {
 
         public readonly float ExplosionProgress => 1f - Utils.GetLerpValue(0f, EXPLOSIONTIME, ExplosionTime, true);
         public readonly float ExplosionProgress2 => Utils.GetLerpValue(0.25f, 1f, ExplosionProgress == 1f ? 0f : ExplosionProgress, true);
+
+        public void PrepareLaserAttack(ushort time) {
+            ShouldDoLaserAttack = true;
+            LaserAttackTime_Max = time;
+        }
 
         public void ForceFade() {
             if (TimeLeft > CLONEACTIVETIME * 0.25f) {
@@ -397,6 +405,12 @@ sealed partial class EternalHorror : ModNPC {
         }
     }
 
+    public void PrepareLaserAttackForClones(ushort time) {
+        OnIterateActiveCloneData((ref cloneInfo) => {
+            cloneInfo.PrepareLaserAttack(time);
+        });
+    }
+
     private void UpdateClones() {
         for (int i = 0; i < _cloneData.Length; i++) {
             ref CloneInfo cloneInfo = ref _cloneData[i];
@@ -540,6 +554,25 @@ sealed partial class EternalHorror : ModNPC {
             //        _eyeEffectOpacity = 1f;
             //    }
             //}
+
+            if (cloneInfo.ShouldDoLaserAttack) {
+                cloneInfo.ShouldDoLaserAttack = false;
+                cloneInfo.LaserAttackTime_Current++;
+            }
+            if (cloneInfo.LaserAttackTime_Current > 0) {
+                cloneInfo.LaserAttackTime_Current++;
+
+                if (cloneInfo.LaserAttackTime_Current % 2 == 0) {
+                    Vector2 cloneEyePosition = cloneInfo.VisualPosition;
+                    cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
+                    _eyeEffectOpacity = 1f;
+                    ShootLaser(shootBasedOnRotation: true, clonePosition: cloneEyePosition, reflectedFromStart: true);
+                }
+
+                if (cloneInfo.LaserAttackTime_Current > cloneInfo.LaserAttackTime_Max) {
+                    cloneInfo.LaserAttackTime_Current = 0;
+                }
+            }
         }
     }
 
@@ -721,14 +754,18 @@ sealed partial class EternalHorror : ModNPC {
         Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
     }
 
-    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false) {
+    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false, Vector2? clonePosition = null) {
         if (!NPC.HasPlayerTarget) {
             return;
         }
 
         const float Speed = 12f;
+
+        clonePosition ??= GetEyePosition();
+
+        Vector2 vector8 = clonePosition.Value;
+
         Player target = NPC.GetTargetPlayer();
-        Vector2 vector8 = GetEyePosition();
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
