@@ -599,7 +599,7 @@ sealed partial class EternalHorror : ModNPC {
                         true, explosionOpacity, explosionProgress2, cloneInfo.VisualPosition, secondHalf: false);
                 }
 
-                if (IsInSecondPhase && explosionProgress > 0f) {
+                if (/*IsInSecondPhase && */explosionProgress > 0f) {
                     ShaderLoader.WavyCircleShader.Time = _seed + Main.GlobalTimeWrappedHourly * 5;
                     ShaderLoader.WavyCircleShader.WaveCount1 = 6f;
                     ShaderLoader.WavyCircleShader.WaveCount2 = 12f;
