@@ -578,7 +578,9 @@ sealed partial class EternalHorror : ModNPC {
                     _eyeEffectOpacity = 1f;
                     ShootLaser(shootBasedOnRotation: true, clonePosition: cloneEyePosition, reflectedFromStart: true);
 
-                    cloneInfo.AddStar(cloneEyePosition);
+                    if (Main.rand.NextBool()) {
+                        cloneInfo.AddStar(cloneEyePosition);
+                    }
                 }
 
                 if (cloneInfo.LaserAttackTime_Current > (cloneInfo.LaserAttackTime_Max * (IsInSecondPhase ? 1/*2*/ : 1))) {
