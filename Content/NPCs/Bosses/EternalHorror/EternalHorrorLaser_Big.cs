@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.Build.Evaluation;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
@@ -111,7 +112,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         return false;
     }
 
-    public override bool? CanDamage() => Projectile.Opacity >= 0.5f;
+    public override bool? CanDamage() => Projectile.Opacity >= 0.125f ? base.CanDamage() : false;
 
     public override void AI() {
         if (!Main.projectile[(int)Projectile.ai[1]].active || Main.projectile[(int)Projectile.ai[1]].type != ModContent.ProjectileType<EternalHorrorLaser_Holdout>()) {
