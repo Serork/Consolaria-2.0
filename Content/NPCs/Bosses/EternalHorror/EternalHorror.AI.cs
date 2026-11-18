@@ -700,7 +700,7 @@ sealed partial class EternalHorror : ModNPC {
 
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
-            rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);
+            rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 1f/*2f*/);
         }
 
         rotation += angleShiftToPlayer;

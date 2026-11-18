@@ -1439,8 +1439,7 @@ sealed partial class EternalHorror : ModNPC {
 
                         Vector2[] scytheSpawnOffsets = [new Vector2(120, 50), new Vector2(160, 50), new Vector2(-120, -50), new Vector2(-160, -50), new Vector2(50, 120), new Vector2(50, 160), new Vector2(-50, -120), new Vector2(-50, -160)];
                         foreach (Vector2 spawnOffset in scytheSpawnOffsets) {
-                            boss.SpawnScythe(spawnOffset * 1f, 
-                                speed: (npc.Center + spawnOffset.RotatedBy(npc.rotation - MathHelper.PiOver4)).DirectionTo(targetCenter) * 12f);
+                            boss.SpawnScythe(spawnOffset * 1f, shootBasedOnRotation: true);
                         }
                     }
 
