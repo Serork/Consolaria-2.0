@@ -828,7 +828,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
             else {
-                boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, preparationProgress2, 1f / 60f * MathHelper.Lerp(1f, 2.5f, 0.25f));
+                boss._cloneStateEffectOpacity = Helper.Approach(boss._cloneStateEffectOpacity, preparationProgress2, 1f / 60f * MathHelper.Lerp(1f, 2.5f, 0.375f));
 
                 //npc.ResetTrails();
 
