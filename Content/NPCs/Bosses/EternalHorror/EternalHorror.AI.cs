@@ -501,7 +501,7 @@ sealed partial class EternalHorror : ModNPC {
             dustCount += (int)MathF.Floor(cloneInfo.ExplosionProgress2 * 2);
             for (int k = 0; k < dustCount; k++) {
                 float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity * 1f) * (cloneInfo.ExplosionProgress2 > 0f ? 1f : 0.875f);
-                if (Main.rand.NextChance(IsInSecondPhase ? opacityChance : MathF.Max(0.5f, MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH))) 
+                if (Main.rand.NextChance(/*IsInSecondPhase ? */opacityChance/* : MathF.Max(0.5f, MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH))*/) 
                     && Main.rand.NextBool(1)) {
                     Color colorTint = MainPurpleColor * 0.375f;
                     colorTint *= opacityChance;
