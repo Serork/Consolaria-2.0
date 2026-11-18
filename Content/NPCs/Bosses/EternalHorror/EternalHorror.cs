@@ -64,6 +64,22 @@ sealed partial class EternalHorror : ModNPC {
         return false;
     }
 
+    public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
+        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded) {
+            return false;
+        }
+
+        return base.CanHitPlayer(target, ref cooldownSlot);
+    }
+
+    public override bool CanHitNPC(NPC target) {
+        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded) {
+            return false;
+        }
+
+        return base.CanHitNPC(target);
+    }
+
     public static ushort SelfType => (ushort)ModContent.NPCType<EternalHorror>();
 
     public EternalHorror Self => NPC.As<EternalHorror>();
