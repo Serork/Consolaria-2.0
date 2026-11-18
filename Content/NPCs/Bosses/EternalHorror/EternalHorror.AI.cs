@@ -467,7 +467,7 @@ sealed partial class EternalHorror : ModNPC {
 
             if (cloneInfo.ExplosionTime > 0) {
                 cloneInfo.ExplosionTime--;
-                if (cloneInfo.ExplosionTime == CloneInfo.EXPLOSIONTIME / 2) {
+                if (cloneInfo.ExplosionTime == CloneInfo.EXPLOSIONTIME - (int)MathHelper.Lerp(CloneInfo.EXPLOSIONTIME / 3, CloneInfo.EXPLOSIONTIME / 2, 0.5f)) {
                     PlayCloneExplosionPreparationSound2();
                 }
                 if (cloneInfo.ExplosionTime == 0) {
