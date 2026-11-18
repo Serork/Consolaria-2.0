@@ -1070,6 +1070,11 @@ sealed partial class EternalHorror : ModNPC {
                 hasShadow = true;
             }
         }
+        //if (HasActiveState<Phase1SummonSpawnAttack>()) {
+        //    float preparationProgress2 = (AICounter - Phase1SummonSpawnAttack.MOVETOPLAYERTIME) / Phase1SummonSpawnAttack.SLOWDOWNTIME;
+        //    shadowOpacity = Helper.Clamp01(preparationProgress2) * 0.5f;
+        //    hasShadow = true;
+        //}
         _hasShadow = hasShadow;
         //shadowOpacity = MathF.Max(shadowOpacity, shadowOpacity_FromClones);
         //if (shadowOpacity == shadowOpacity_FromClones) {
