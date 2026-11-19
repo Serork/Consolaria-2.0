@@ -2178,6 +2178,7 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (boss.AICounter == 0f) {
+                boss.PlayLaserDashSound();
                 //if (!Helper.IsClient()) {
                 //    boss._ai5 = Main.rand.NextBool().ToDirectionInt();
                 //    npc.netUpdate = true;

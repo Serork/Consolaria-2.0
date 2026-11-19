@@ -12,6 +12,7 @@ sealed partial class EternalHorror : ModNPC {
     private float _cloneSoundSlot;
     private float _explosionPreparationSoundSlot, _explosionPreparationSoundSlot2;
     private float _scytheAttackPreparationSoundSlot, _scytheAttackPreparationSoundSlot2;
+    private float _laserDashSoundSlot;
 
     public static SoundStyle HitSound() => SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle DeathSound() => SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
@@ -40,6 +41,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle ScytheAttackLaserSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackLaser") with { Volume = 0.625f, Pitch = -0.5f, PitchVariance = 0.15f };
     public static SoundStyle ScytheCastSound() => SoundID.Item8 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10, PitchVariance = 0.24f, Volume = 0.875f };
     public static SoundStyle TransitionSoundExtra() => SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.24f };
+    public static SoundStyle LaserDashSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/LaserDash") with { Volume = 1f, Pitch = -0.25f, PitchVariance = 0.15f, PauseBehavior = PauseBehavior.PauseWithGame };
 
     private void PlaySoundOnSpawn() {
         _breatheSoundSlot = SoundEngine.PlaySound(BreatheSound(), NPC.Center).ToFloat();
@@ -78,6 +80,10 @@ sealed partial class EternalHorror : ModNPC {
         _scytheAttackPreparationSoundSlot2 = SoundEngine.PlaySound(ScytheAttackLaserSound(), NPC.Center).ToFloat();
     }
 
+    private void PlayLaserDashSound() {
+        _laserDashSoundSlot = SoundEngine.PlaySound(LaserDashSound(), NPC.Center).ToFloat();
+    }
+
     private void AdjustSoundPositions() {
         Helper.GetSoundAndAdjust(_breatheSoundSlot, (result) => {
             result.Position = NPC.Center;
@@ -92,6 +98,9 @@ sealed partial class EternalHorror : ModNPC {
             result.Position = NPC.Center;
         });
         Helper.GetSoundAndAdjust(_scytheAttackPreparationSoundSlot, (result) => {
+            result.Position = NPC.Center;
+        });
+        Helper.GetSoundAndAdjust(_laserDashSoundSlot, (result) => {
             result.Position = NPC.Center;
         });
     }
