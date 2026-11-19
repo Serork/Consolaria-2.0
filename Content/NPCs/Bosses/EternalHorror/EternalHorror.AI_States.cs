@@ -2080,7 +2080,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 if (progress <= 0f) {
                     boss.DeactivateState<Phase2MoveToPlayer>();
-                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase2(), npc.Center);
+                    //SoundEngine.PlaySound(EternalHorror.DashSound_Phase2(), npc.Center);
                 }
 
                 float attackProgress3 = progress / ATTACKTIME;
