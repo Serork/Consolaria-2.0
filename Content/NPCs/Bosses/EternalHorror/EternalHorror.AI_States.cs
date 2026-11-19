@@ -1853,7 +1853,7 @@ sealed partial class EternalHorror : ModNPC {
 
                         boss.Phase2CloneAttack_ShouldDoScytheAttack = true;
 
-                        boss.ResetLaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
+                        boss.ResetLaserAttack(applyIncreasedDelay: true/*, applyExtraIncreasedDelay: true*/);
                     }
                     boss.DeactivateState<Phase2CloneSpawn>();
 
