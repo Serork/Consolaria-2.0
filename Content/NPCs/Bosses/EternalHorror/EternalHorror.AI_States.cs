@@ -269,7 +269,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 bool shotLaser = ++boss.AICounter >= LASERATTACKTIME;
 
-                if (boss.AICounter >= -LASERATTACKTIME * 1.125f * 1.5f) {
+                if (boss.AICounter >= -LASERATTACKTIME * 1.125f * MathHelper.Lerp(1.375f, 1.5f, 0.625f)) {
                     if (boss.WasDoingCloneAttack) {
                         boss.WasDoingCloneAttack = false;
                     }
