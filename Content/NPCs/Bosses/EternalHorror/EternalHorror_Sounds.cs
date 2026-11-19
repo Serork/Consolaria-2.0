@@ -21,7 +21,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle BreatheSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Breathe") with { Pitch = 0f, Volume = 1.5f, PauseBehavior = PauseBehavior.PauseWithGame };
     public static SoundStyle RoarSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Roar") with { Pitch = -0.25f };
     public static SoundStyle SoulAbsorptionSound() => SoundID.NPCDeath6 with { MaxInstances = 100, Pitch = 0.5f + Main.rand.NextFloat(0.5f, 1f), Volume = 0.125f * 0.25f };
-    public static SoundStyle SoulAbsorptionSound_Whoosh() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/SoulWhoosh") with { Pitch = 0.375f, Volume = 0.5f };
+    public static SoundStyle SoulAbsorptionSound_Whoosh() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/SoulWhoosh") with { Pitch = 0.375f, Volume = 0.5f, PauseBehavior = PauseBehavior.PauseWithGame };
     public static SoundStyle LaserSound() => SoundID.Item33 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 1, PitchVariance = 0.24f, Volume = 0.5f };
     public static SoundStyle LaserSound_New1() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Laser1") with { MaxInstances = 10, Pitch = 0f, Volume = 1f, PitchVariance = 0.15f };
     public static SoundStyle LaserSound_New2() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Laser2") with { MaxInstances = 10, Pitch = 0f, Volume = 1f, PitchVariance = 0.15f };
@@ -39,6 +39,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle ScytheAttackPreparationSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackPreparation") with { Volume = 0.875f, Pitch = -MathHelper.Lerp(0f, 0.25f, 1f), PitchVariance = 0.15f };
     public static SoundStyle ScytheAttackLaserSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackLaser") with { Volume = 0.625f, Pitch = -0.5f, PitchVariance = 0.15f };
     public static SoundStyle ScytheCastSound() => SoundID.Item8 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10, PitchVariance = 0.24f, Volume = 0.875f };
+    public static SoundStyle TransitionSoundExtra() => SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.24f };
 
     private void PlaySoundOnSpawn() {
         _breatheSoundSlot = SoundEngine.PlaySound(BreatheSound(), NPC.Center).ToFloat();

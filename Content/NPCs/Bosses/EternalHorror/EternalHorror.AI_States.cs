@@ -1003,11 +1003,18 @@ sealed partial class EternalHorror : ModNPC {
 
             Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) / 2f;
 
+            if (boss.AICounter >= 15f && boss.AICounter % 15 == 0 && boss.AICounter < 75f) {
+                SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10 }, npc.Center);
+                SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10 }, npc.Center);
+            }
+            if (boss.AICounter == 45f) {
+                SoundEngine.PlaySound(DashSound_Phase2(), npc.Center);
+            }
+
             if (boss.AICounter2 == 1f || boss.AICounter2 == 2f) {
                 boss._ai5 += 1f;
 
                 if (boss.AICounter2 == 1f || boss._ai4 == 1f) {
-
                     boss.AICounter3 += 0.01f;
                     if ((double)boss.AICounter3 > 0.5)
                         boss.AICounter3 = 0.5f;
@@ -1028,28 +1035,30 @@ sealed partial class EternalHorror : ModNPC {
 
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
 
-                if (boss._ai5 % 20 == 0 && (boss.AICounter2 == 1f || boss._ai4 == 1f)) {
+                if (boss._ai5 % 20 == 0) {
                     //AddGlow(20f, 0.5f, Color.BlueViolet);
-                    //SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
-                    //SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                    //SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10 }, npc.Center);
+                    //SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10 }, npc.Center);
 
-                    if (!Main.dedServ) {
-                        for (int i = 0; i < 2; i++) {
-                            if (i > 0 || Main.rand.NextBool()) {
-                                Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(0.9f, 1.4f));
-                                Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(0.9f, 1.4f));
-                                Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                    if ((boss.AICounter2 == 1f || boss._ai4 == 1f)) {
+                        if (!Main.dedServ) {
+                            for (int i = 0; i < 2; i++) {
+                                if (i > 0 || Main.rand.NextBool()) {
+                                    Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore1").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                                    Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore2").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                                    Gore.NewGore(npc.GetSource_FromAI(), getPosition(), new Vector2(Main.rand.Next(-30, 31) * 0.2f, Main.rand.Next(-30, 31) * 0.2f) * 1.5f, ModContent.Find<ModGore>("Consolaria/EternalHorrorGore3").Type, Main.rand.NextFloat(0.9f, 1.4f));
+                                }
                             }
-                        }
 
-                        //for (int index1 = 0; index1 < 14; ++index1) {
-                        //    int index2 = Dust.NewDust(new Vector2(NPC.Center.X, NPC.Center.Y), 0, 0, DustID.Shadowflame, 0f, 0f, 100, default, Main.rand.NextFloat(1f, 2.5f));
-                        //    Main.dust[index2].noGravity = true;
-                        //    Main.dust[index2].noLight = false;
-                        //    Main.dust[index2].fadeIn = Main.rand.NextFloat(0, 1f);
-                        //    Main.dust[index2].position += new Vector2(Main.rand.Next(40, 120), 0).RotatedByRandom(rad);
-                        //    Main.dust[index2].velocity = Vector2.Normalize(NPC.Center - Main.dust[index2].position) * Main.rand.NextFloat(-10f, -1f);
-                        //}
+                            //for (int index1 = 0; index1 < 14; ++index1) {
+                            //    int index2 = Dust.NewDust(new Vector2(NPC.Center.X, NPC.Center.Y), 0, 0, DustID.Shadowflame, 0f, 0f, 100, default, Main.rand.NextFloat(1f, 2.5f));
+                            //    Main.dust[index2].noGravity = true;
+                            //    Main.dust[index2].noLight = false;
+                            //    Main.dust[index2].fadeIn = Main.rand.NextFloat(0, 1f);
+                            //    Main.dust[index2].position += new Vector2(Main.rand.Next(40, 120), 0).RotatedByRandom(rad);
+                            //    Main.dust[index2].velocity = Vector2.Normalize(NPC.Center - Main.dust[index2].position) * Main.rand.NextFloat(-10f, -1f);
+                            //}
+                        }
                     }
                 }
 
@@ -1059,8 +1068,10 @@ sealed partial class EternalHorror : ModNPC {
                 int num29 = 20;
                 //if (Main.getGoodWorld && life < lifeMax / 3)
                 num29 = 6;
-                if (Main.netMode != 1 && NPC.CountNPCS(ModContent.NPCType<EternalServant>()) < num29 * 2) {
-                    if (boss._ai5 % (float)num29 == 0f) {
+                if (boss._ai5 % (float)num29 == 0f) {
+                    //SoundEngine.PlaySound(EternalHorror.SummonSound(), npc.Center);
+
+                    if (Main.netMode != 1 && NPC.CountNPCS(ModContent.NPCType<EternalServant>()) < num29 * 2) {
                         float num30 = 5f;
                         Vector2 vector5 = boss.GetEyePosition();
                         float num31 = Main.rand.Next(-200, 200);
@@ -1108,7 +1119,7 @@ sealed partial class EternalHorror : ModNPC {
                             boss.AICounter3 = 0f;
                         }
                         else {
-                            //SoundEngine.PlaySound(SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.Center);
+                            SoundEngine.PlaySound(TransitionSoundExtra(), npc.Center);
 
                             //SoundEngine.PlaySound(3, (int)position.X, (int)position.Y);
                             if (!Main.dedServ) {
@@ -1129,7 +1140,7 @@ sealed partial class EternalHorror : ModNPC {
                             //}
 
                             //SoundEngine.PlaySound(15, (int)position.X, (int)position.Y, 0);
-                            //SoundEngine.PlaySound(Phase2DashAttack.DashSound with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) }, npc.position);
+                            SoundEngine.PlaySound(DashSound_Phase2(), npc.Center);
                         }
                     }
                 }
