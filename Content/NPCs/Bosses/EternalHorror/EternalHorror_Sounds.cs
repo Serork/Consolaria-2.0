@@ -27,7 +27,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle CloneSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Clone") with { Pitch = 0.25f, Volume = 1f, PitchVariance = 0.15f };
     public static SoundStyle LaserReflectSound() => SoundID.Item150 with { Pitch = -1f, Volume = 0.375f };
     public static SoundStyle DashSound_Phase1() => SoundID.Roar with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, MaxInstances = 0 };
-    public static SoundStyle DashSound_Phase2() => SoundID.ForceRoar with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, MaxInstances = 0 };
+    public static SoundStyle DashSound_Phase2() => SoundID.ForceRoar with { Pitch = 0.3f + -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, MaxInstances = 0 };
     public static SoundStyle SummonSound() => SoundID.NPCDeath45 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f };
     public static SoundStyle ExplosionSound() => SoundID.Item14 with { Pitch = -Main.rand.NextFloat(0.75f, 1f), PitchVariance = 0.15f, MaxInstances = 0 };
     public static SoundStyle CloneExplosionPreparation() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ClonePreparation") with { Volume = 0.875f, Pitch = -1f, PitchVariance = 0.15f };
