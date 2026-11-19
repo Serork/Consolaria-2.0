@@ -711,7 +711,7 @@ sealed partial class EternalHorror : ModNPC {
         vector8 += spawnOffset.RotatedBy(NPC.rotation - MathHelper.PiOver4);
 
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
-        //SoundEngine.PlaySound(SoundID.Item8 with { Pitch = -0.1f, MaxInstances = 5 }, vector8);
+        SoundEngine.PlaySound(ScytheCastSound(), vector8);
 
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {

@@ -1150,6 +1150,7 @@ sealed partial class EternalHorror : ModNPC {
             boss.ActivateState<Phase2MoveToPlayer>();
             boss.ActivateState<Phase2BurstLaserAttack>();
             //boss.ActivateState<Phase2BigLaserAttack>();
+            //boss.ActivateState<Phase2ScytheAttack>();
 
             npc.dontTakeDamage = false;
 
@@ -1951,6 +1952,10 @@ sealed partial class EternalHorror : ModNPC {
                     boss.SpawnPreparationDust_Shadow(eyeEffectOpacity);
                 }
 
+                //if (boss.Phase2ScytheAttackProgress == 0f) {
+                //    boss.PlayScytheAttackPreparationSound();
+                //}
+
                 boss.Phase2ScytheAttackProgress = Helper.Approach(boss.Phase2ScytheAttackProgress, 1f, 1 / 60f);
                 if (boss.Phase2ScytheAttackProgress >= 0f) {
                     float baseDirection = MathF.Sign(boss.Phase2ScytheAttackDirection);
@@ -1968,6 +1973,10 @@ sealed partial class EternalHorror : ModNPC {
                         }
 
                         boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: false, angleShiftToPlayer: boss.Phase2ScytheAttackAngle + baseDirection * -MathHelper.PiOver2);
+                    }
+
+                    if (boss.Phase2ScytheAttackAngle == 0f) {
+                        boss.PlayScytheAttackLaserSound();
                     }
 
                     boss.Phase2ScytheAttackAngle += 1 / 60f * 5f * baseDirection;
@@ -2000,6 +2009,10 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 npc.dontTakeDamage = npc.Opacity < 0.5f;
+            }
+
+            if (boss.AICounter == 1f) {
+                boss.PlayScytheAttackPreparationSound();
             }
         }
 
