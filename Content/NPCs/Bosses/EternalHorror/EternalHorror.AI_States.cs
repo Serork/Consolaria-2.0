@@ -268,6 +268,13 @@ sealed partial class EternalHorror : ModNPC {
                 laserRotation = Utils.AngleLerp(laserRotation, newLaserRotation, laserProgress_ForLaserRotation);
 
                 bool shotLaser = ++boss.AICounter >= LASERATTACKTIME;
+
+                if (boss.AICounter >= -LASERATTACKTIME * 1.125f) {
+                    if (boss.WasDoingCloneAttack) {
+                        boss.WasDoingCloneAttack = false;
+                    }
+                }
+
                 if (!shotLaser) {
                     return;
                 }
@@ -301,6 +308,10 @@ sealed partial class EternalHorror : ModNPC {
 
             prepareLasers();
             shootLasers();
+
+            if (boss.WasDoingCloneAttack && boss.AICounter % 1 == 0) {
+                boss.MakeTrailDust();
+            }
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) { }
@@ -313,42 +324,129 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             void prepareAndSpawnClone() {
                 bool justStarted = boss.AICounter == 0f;
-                if (justStarted) {
-                    boss.PlayCloneSound();
-                    boss.SpawnClone();
-                }
 
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
 
                 float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
 
-                ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
+                float preparationSlowDown = Utils.Remap(1f - dustProgress, 0f, 1f, 0.75f, 1f, true);
+
+                npc.velocity *= preparationSlowDown;
+
+                ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f * 2f);
+
+                boss._eyeEffectOpacity = Ease.CubeIn(dustProgress);
 
                 dustProgress = Helper.YoYo(dustProgress);
-                boss.SpawnPreparationDust_Shadow(dustProgress);
+                for (int i = 0; i < 2; i++) {
+                    boss.SpawnPreparationDust_Shadow(dustProgress);
+                }
 
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
-                    if (boss.Phase1CloneSpawn_ShouldDashAfter) {
-                        boss.Phase1CloneSpawn_ShouldDashAfter = false;
-                        boss.ActivateState<Phase1DashAttack>();
-                        boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
+                    boss.SpawnClone(insta: true);
 
-                        //boss.ResetSmoothFactor();
-                    }
-                    else {
-                        boss.ActivateState<Phase1BurstLaserAttack>();
+                    npc.ResetTrails();
+
+                    Player target = npc.GetTargetPlayer();
+                    Vector2 targetCenter = target.Center;
+                    Vector2 dashDirection = npc.DirectionTo(targetCenter);
+                    dashDirection *= -1;
+                    boss._dashVelocity = dashDirection * Phase2DashAttack.DASHSTRENGTH;
+
+                    boss._dashOpacity = 1f;
+
+                    boss.OnIterateActiveCloneData((ref cloneInfo) => {
+                        cloneInfo.DashOpacity = 1f;
+                    });
+
+                    boss._eyeEffectOpacity = 1f;
+
+                    SoundEngine.PlaySound(EternalHorror.DashSound_Phase1(), npc.Center);
+
+                    npc.velocity = boss._dashVelocity;
+
+                    //if (boss.Phase1CloneSpawn_ShouldDashAfter) {
+                    //    boss.Phase1CloneSpawn_ShouldDashAfter = false;
+                    //    boss.ActivateState<Phase2DashAttack>();
+                    //    boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
+
+                    //    //boss.ResetSmoothFactor();
+                    //}
+                    //else
+                    {
+                        boss.ResetCounters();
+
+                        if (boss.Phase1CloneSpawn_ShouldDashAfter) {
+                            boss.Phase1CloneSpawn_ShouldDashAfter = false;
+                            boss.ActivateState<Phase1DashAttack>();
+                            boss.Phase1DashAttack_ShouldSummonAfter = true;
+
+                            boss.AICounter = -Phase1DashAttack.DASHTIME / 2;
+
+                            //boss.ResetSmoothFactor();
+                        }
+                        else {
+                            boss.ActivateState<Phase1BurstLaserAttack>();
+
+                            boss.ResetLaserAttack(applyIncreasedDelay: true, applyExtraIncreasedDelay: true);
+                        }
                     }
                     boss.DeactivateState<Phase1CloneSpawn>();
+
+                    boss.WasDoingCloneAttack = true;
                 }
             }
 
             prepareAndSpawnClone();
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
+
+        //public static float SHADOWSPAWNTIME => Helper.SecondsToFrames(1);
+
+        //void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+        //    void prepareAndSpawnClone() {
+        //        bool justStarted = boss.AICounter == 0f;
+        //        if (justStarted) {
+        //            boss.PlayCloneSound();
+        //            boss.SpawnClone();
+        //        }
+
+        //        bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
+
+        //        float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
+
+        //        ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f);
+
+        //        dustProgress = Helper.YoYo(dustProgress);
+        //        boss.SpawnPreparationDust_Shadow(dustProgress);
+
+        //        if (shadowSpawnProgress) {
+        //            boss.ResetCounters();
+
+        //            if (boss.Phase1CloneSpawn_ShouldDashAfter) {
+        //                boss.Phase1CloneSpawn_ShouldDashAfter = false;
+        //                boss.ActivateState<Phase1DashAttack>();
+        //                boss.Phase1DashAttack_ShouldBurstLaserAfter = true;
+
+        //                //boss.ResetSmoothFactor();
+        //            }
+        //            else {
+        //                boss.ActivateState<Phase1BurstLaserAttack>();
+        //            }
+        //            boss.DeactivateState<Phase1CloneSpawn>();
+        //        }
+        //    }
+
+        //    prepareAndSpawnClone();
+        //}
+
+        //void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        //void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
     public readonly struct Phase1DashAttack : IAIState {
@@ -364,6 +462,13 @@ sealed partial class EternalHorror : ModNPC {
             Vector2 targetCenter = target.Center;
 
             float dashProgress = boss.AICounter / DASHTIME;
+            dashProgress = Helper.Clamp01(dashProgress);
+
+            if (boss.AICounter < 0f) {
+                if (boss.WasDoingCloneAttack && boss.AICounter % 1 == 0) {
+                    boss.MakeTrailDust();
+                }
+            }
 
             float dustProgress = dashProgress;
             dustProgress = Helper.YoYo(dustProgress);
@@ -433,8 +538,8 @@ sealed partial class EternalHorror : ModNPC {
                 if (boss.Phase1DashAttackCount >= DASHATTACKCOUNT) {
                     boss.ActivateState<Phase1MoveToPlayer>();
                     boss.DeactivateState<Phase1DashAttack>();
-                    if (boss.Phase1DashAttack_ShouldBurstLaserAfter) {
-                        boss.Phase1DashAttack_ShouldBurstLaserAfter = false;
+                    if (boss.Phase1DashAttack_ShouldSummonAfter) {
+                        boss.Phase1DashAttack_ShouldSummonAfter = false;
                         boss.ActivateState<Phase1SummonSpawnAttack>();
                     }
                     else {
@@ -476,6 +581,10 @@ sealed partial class EternalHorror : ModNPC {
                 if (shouldDash) {
                     if (shouldResetState()) {
                         return;
+                    }
+
+                    if (boss.WasDoingCloneAttack) {
+                        boss.WasDoingCloneAttack = false;
                     }
 
                     npc.ResetTrails();
@@ -1207,8 +1316,8 @@ sealed partial class EternalHorror : ModNPC {
                 boss.AICounter += boss.AICounter < LASERATTACKTIME * 0.5f ? 1f : 0.5f;
 
                 if (boss.AICounter >= -LASERATTACKTIME * 1.125f) {
-                    if (boss.Phase2_WasDoingCloneAttack) {
-                        boss.Phase2_WasDoingCloneAttack = false;
+                    if (boss.WasDoingCloneAttack) {
+                        boss.WasDoingCloneAttack = false;
                     }
                 }
 
@@ -1258,7 +1367,7 @@ sealed partial class EternalHorror : ModNPC {
                 //boss.ActivateState<Phase1CloneSpawn>();
             }
 
-            if (boss.Phase2_WasDoingCloneAttack && boss.AICounter % 1 == 0) {
+            if (boss.WasDoingCloneAttack && boss.AICounter % 1 == 0) {
                 boss.MakeTrailDust();
             }
 
@@ -1448,8 +1557,8 @@ sealed partial class EternalHorror : ModNPC {
                         return;
                     }
 
-                    if (boss.Phase2_WasDoingCloneAttack) {
-                        boss.Phase2_WasDoingCloneAttack = false;
+                    if (boss.WasDoingCloneAttack) {
+                        boss.WasDoingCloneAttack = false;
                     }
 
                     SoundEngine.PlaySound(EternalHorror.DashSound_Phase2(), npc.Center);
@@ -1725,7 +1834,7 @@ sealed partial class EternalHorror : ModNPC {
                     }
                     boss.DeactivateState<Phase2CloneSpawn>();
 
-                    boss.Phase2_WasDoingCloneAttack = true;
+                    boss.WasDoingCloneAttack = true;
                 }
             }
 

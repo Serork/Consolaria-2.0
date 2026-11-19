@@ -137,6 +137,7 @@ sealed partial class EternalHorror : ModNPC {
     private float _eyeScale;
     private float _eyeDirectionChangeTime, _eyeAngle, _eyeAngle2;
     private float _shouldDoScytheAttackValue, _shouldDoSpiralAttackValue, _shouldDoBigLaserAttackValue;
+    private float _shouldBurstLaserAfter;
 
     private float _ai4, _ai5;
 
@@ -163,7 +164,7 @@ sealed partial class EternalHorror : ModNPC {
     public ref float Phase2LaserSpamPreparationSlowDown => ref AICounter3;
 
     public ref float Phase1CloneSpawn_ShouldDashAfterValue => ref NPC.localAI[0];
-    public ref float Phase1DashAttack_ShouldBurstLaserAfterValue => ref NPC.localAI[0];
+    //public ref float Phase1DashAttack_ShouldBurstLaserAfterValue => ref NPC.localAI[0];
     public ref float Phase1SpawnSummonAttack_DoneValue => ref NPC.localAI[0];
     public ref float Phase2_WasDoingCloneAattackValue => ref NPC.localAI[0];
     //public ref float Phase2CloneAttack_ShouldDoScytheAttackValue => ref NPC.localAI[0];
@@ -182,9 +183,9 @@ sealed partial class EternalHorror : ModNPC {
         set => Phase1CloneSpawn_ShouldDashAfterValue = value.ToInt();
     }
 
-    public bool Phase1DashAttack_ShouldBurstLaserAfter {
-        get => Phase1DashAttack_ShouldBurstLaserAfterValue != 0f;
-        set => Phase1DashAttack_ShouldBurstLaserAfterValue = value.ToInt();
+    public bool Phase1DashAttack_ShouldSummonAfter {
+        get => _shouldBurstLaserAfter != 0f;
+        set => _shouldBurstLaserAfter = value.ToInt();
     }
 
     public bool Phase1SpawnSummonAttack_Done {
@@ -192,7 +193,7 @@ sealed partial class EternalHorror : ModNPC {
         set => Phase1SpawnSummonAttack_DoneValue = value.ToInt();
     }
 
-    public bool Phase2_WasDoingCloneAttack {
+    public bool WasDoingCloneAttack {
         get => Phase2_WasDoingCloneAattackValue != 0f;
         set => Phase2_WasDoingCloneAattackValue = value.ToInt();
     }
@@ -480,7 +481,7 @@ sealed partial class EternalHorror : ModNPC {
 
             if (!cloneInfo.ShouldFade) {
                 if (cloneInfo.TimeLeft > CLONEACTIVETIME * 0.25f) {
-                    if (/*IsInSecondPhase && */cloneInfo.Opacity < (IsInSecondPhase ? 1f : 0.375f) && cloneInfo.ExplosionTime == -1) {
+                    if (/*IsInSecondPhase && */cloneInfo.Opacity < 1f/*(IsInSecondPhase ? 1f : 0.375f)*/ && cloneInfo.ExplosionTime == -1) {
                         Vector2 targetCenter = target.Center;
 
                         cloneInfo.Position = GetCloneSpawnPosition();
