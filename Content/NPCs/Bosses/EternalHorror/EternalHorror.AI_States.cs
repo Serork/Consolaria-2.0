@@ -2050,6 +2050,8 @@ sealed partial class EternalHorror : ModNPC {
 
             if (boss._tempPosition == default) {
                 boss._tempPosition = npc.Center;
+
+                boss.PlaySpiralSound();
             }
 
             float maxDistance = 600f;
@@ -2080,7 +2082,6 @@ sealed partial class EternalHorror : ModNPC {
 
                 if (progress <= 0f) {
                     boss.DeactivateState<Phase2MoveToPlayer>();
-                    //SoundEngine.PlaySound(EternalHorror.DashSound_Phase2(), npc.Center);
                 }
 
                 float attackProgress3 = progress / ATTACKTIME;
@@ -2403,7 +2404,7 @@ sealed partial class EternalHorror : ModNPC {
     public float Phase2ShadowSpawnProgress => Helper.Clamp01(AICounter / Phase2CloneSpawn.SHADOWSPAWNTIME);
     public float Phase2ScythePreparationProgress => Helper.Clamp01(AICounter / Phase2ScytheAttack.ATTACKPREPARATIONTIME);
 
-    public bool ShouldUpdateFilterPosition => true/*!Dead && *//*!HasActiveState<Phase2SpiralAttack>()*/;
+    public bool ShouldUpdateFilterPosition => /*true*//*!Dead && */!HasActiveState<Phase2SpiralAttack>();
 
     private partial void InitializeStates() {
         _states = [];

@@ -14,6 +14,7 @@ sealed partial class EternalHorror : ModNPC {
     private float _scytheAttackPreparationSoundSlot, _scytheAttackPreparationSoundSlot2;
     private float _laserDashSoundSlot;
     private float _deathRoarSoundSlot;
+    private float _spiralSoundSlot;
 
     public static SoundStyle HitSound() => SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle DeathSound() => SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
@@ -44,6 +45,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle TransitionSoundExtra() => SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.24f };
     public static SoundStyle LaserDashSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/LaserDash") with { Volume = 1f, Pitch = -0.25f, PitchVariance = 0.15f, PauseBehavior = PauseBehavior.PauseWithGame };
     public static SoundStyle DeathRoarSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/DeathRoar") with { Volume = 1f, Pitch = 0.25f, PitchVariance = 0f, PauseBehavior = PauseBehavior.PauseWithGame };
+    public static SoundStyle SpiralSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Spiral") with { Volume = 1f, Pitch = 0.25f, PitchVariance = 0f, PauseBehavior = PauseBehavior.PauseWithGame };
 
     private void PlaySoundOnSpawn() {
         _breatheSoundSlot = SoundEngine.PlaySound(BreatheSound(), NPC.Center).ToFloat();
@@ -90,6 +92,10 @@ sealed partial class EternalHorror : ModNPC {
         _deathRoarSoundSlot = SoundEngine.PlaySound(DeathRoarSound(), NPC.Center).ToFloat();
     }
 
+    private void PlaySpiralSound() {
+        _spiralSoundSlot = SoundEngine.PlaySound(SpiralSound(), NPC.Center).ToFloat();
+    }
+
     private void AdjustSoundPositions() {
         Helper.GetSoundAndAdjust(_breatheSoundSlot, (result) => {
             result.Position = NPC.Center;
@@ -107,6 +113,12 @@ sealed partial class EternalHorror : ModNPC {
             result.Position = NPC.Center;
         });
         Helper.GetSoundAndAdjust(_laserDashSoundSlot, (result) => {
+            result.Position = NPC.Center;
+        });
+        Helper.GetSoundAndAdjust(_deathRoarSoundSlot, (result) => {
+            result.Position = NPC.Center;
+        });
+        Helper.GetSoundAndAdjust(_spiralSoundSlot, (result) => {
             result.Position = NPC.Center;
         });
     }
