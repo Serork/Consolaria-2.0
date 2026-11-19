@@ -13,6 +13,7 @@ sealed partial class EternalHorror : ModNPC {
     private float _explosionPreparationSoundSlot, _explosionPreparationSoundSlot2;
     private float _scytheAttackPreparationSoundSlot, _scytheAttackPreparationSoundSlot2;
     private float _laserDashSoundSlot;
+    private float _deathRoarSoundSlot;
 
     public static SoundStyle HitSound() => SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle DeathSound() => SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
@@ -37,11 +38,12 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle AmbientSound1() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Ambient1") with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew, MaxInstances = 1 };
     public static SoundStyle AmbientSound2() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Ambient2") with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew, MaxInstances = 1 };
     public static SoundStyle ServantDashSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ServantDash") with { Volume = MathHelper.Lerp(0.25f, 0.375f, 0.5f), Pitch = 0.75f, PitchVariance = 0.2f, MaxInstances = 10 };
-    public static SoundStyle ScytheAttackPreparationSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackPreparation") with { Volume = 0.75f, Pitch = -MathHelper.Lerp(0f, 0.25f, 1f), PitchVariance = 0.15f };
-    public static SoundStyle ScytheAttackLaserSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackLaser") with { Volume = 0.625f, Pitch = -0.5f, PitchVariance = 0.15f };
-    public static SoundStyle ScytheCastSound() => SoundID.Item8 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10, PitchVariance = 0.24f, Volume = 0.875f };
+    public static SoundStyle ScytheAttackPreparationSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackPreparation") with { Volume = 1f, Pitch = -MathHelper.Lerp(0f, 0.25f, 1f), PitchVariance = 0.15f };
+    public static SoundStyle ScytheAttackLaserSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ScytheAttackLaser") with { Volume = 0.875f, Pitch = -0.5f, PitchVariance = 0.15f };
+    public static SoundStyle ScytheCastSound() => SoundID.Item8 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10, PitchVariance = 0.24f, Volume = 1f };
     public static SoundStyle TransitionSoundExtra() => SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.24f };
     public static SoundStyle LaserDashSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/LaserDash") with { Volume = 1f, Pitch = -0.25f, PitchVariance = 0.15f, PauseBehavior = PauseBehavior.PauseWithGame };
+    public static SoundStyle DeathRoarSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/DeathRoar") with { Volume = 1f, Pitch = 0.25f, PitchVariance = 0f, PauseBehavior = PauseBehavior.PauseWithGame };
 
     private void PlaySoundOnSpawn() {
         _breatheSoundSlot = SoundEngine.PlaySound(BreatheSound(), NPC.Center).ToFloat();
@@ -82,6 +84,10 @@ sealed partial class EternalHorror : ModNPC {
 
     private void PlayLaserDashSound() {
         _laserDashSoundSlot = SoundEngine.PlaySound(LaserDashSound(), NPC.Center).ToFloat();
+    }
+
+    private void PlayDeathRoarSound() {
+        _deathRoarSoundSlot = SoundEngine.PlaySound(DeathRoarSound(), NPC.Center).ToFloat();
     }
 
     private void AdjustSoundPositions() {

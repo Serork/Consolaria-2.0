@@ -251,6 +251,7 @@ sealed partial class EternalHorror : ModNPC {
         if (!Dead) {
             DeactivateAllStates();
             if (!HasActiveState<DeathState>()) {
+                PlayDeathRoarSound();
                 if (!DownedBossSystem.downedEternalHorror)
                 {
                     if (!Helper.IsClient()) {
