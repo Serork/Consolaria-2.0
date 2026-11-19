@@ -389,7 +389,7 @@ sealed partial class EternalHorror : ModNPC {
                             boss.ActivateState<Phase1DashAttack>();
                             boss.Phase1DashAttack_ShouldSummonAfter = true;
 
-                            boss.AICounter = -Phase1DashAttack.DASHTIME / 2;
+                            boss.AICounter = -Phase1DashAttack.DASHTIME / 1;
 
                             //boss.ResetSmoothFactor();
                         }
