@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -274,6 +275,8 @@ sealed class EternalServant : ModNPC {
             NPC.TargetClosest();
 
         if (NPC.ai[0] == 0f) {
+            SoundEngine.PlaySound(EternalHorror.ServantDashSound(), NPC.Center);
+
             _immortal = false;
 
             float num335 = 30f;

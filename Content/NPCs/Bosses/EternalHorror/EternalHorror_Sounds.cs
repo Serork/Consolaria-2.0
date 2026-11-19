@@ -13,9 +13,9 @@ sealed partial class EternalHorror : ModNPC {
     private float _explosionPreparationSoundSlot, _explosionPreparationSoundSlot2;
 
     public static SoundStyle HitSound() => SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
-    public static SoundStyle DeathSound() => SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
-    public static SoundStyle HitSound_Servant() => SoundID.NPCHit18;
-    public static SoundStyle DeathSound_Servant() => SoundID.NPCHit18;
+    public static SoundStyle DeathSound() => SoundID.NPCDeath60 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
+    public static SoundStyle HitSound_Servant() => SoundID.NPCHit9 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
+    public static SoundStyle DeathSound_Servant() => SoundID.NPCDeath11 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle RitualSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Ritual") with { PauseBehavior = PauseBehavior.PauseWithGame };
     public static SoundStyle BreatheSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Breathe") with { Pitch = 0f, Volume = 1.5f, PauseBehavior = PauseBehavior.PauseWithGame };
     public static SoundStyle RoarSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Roar") with { Pitch = -0.25f };
@@ -34,6 +34,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle CloneExplosionPreparation2() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ClonePreparation2") with { Volume = 0.75f, Pitch = -0.25f, PitchVariance = 0.15f };
     public static SoundStyle AmbientSound1() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Ambient1") with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew, MaxInstances = 1 };
     public static SoundStyle AmbientSound2() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Ambient2") with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.15f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew, MaxInstances = 1 };
+    public static SoundStyle ServantDashSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/ServantDash") with { Volume = 0.5f, Pitch = 0.75f, PitchVariance = 0.2f, MaxInstances = 5 };
 
     private void PlaySoundOnSpawn() {
         _breatheSoundSlot = SoundEngine.PlaySound(BreatheSound(), NPC.Center).ToFloat();
