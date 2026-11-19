@@ -57,7 +57,7 @@ sealed partial class EternalHorror : ModNPC {
 
             //EternalHorrorSummonHandler.FilterPosition = Vector2.Lerp(EternalHorrorSummonHandler.FilterPosition, npc.Center, 1 / 60f * 1f);
 
-            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f + attackProgress2 * 2f, 1f / 60f * 2.5f * 2f);
+            EternalHorrorSummonHandler.FilterOpacity = Helper.Approach(EternalHorrorSummonHandler.FilterOpacity, 1f + attackProgress2 * 2f, 1f / 60f/* * 2.5f * 2f*/);
             HorrorEffectShaderData2.TimeFactor = Helper.Approach(HorrorEffectShaderData2.TimeFactor, 1 / 60f * (1f + attackProgress2), 1 / 60f * 0.25f);
 
             if (boss._ai4 == 0f) {
