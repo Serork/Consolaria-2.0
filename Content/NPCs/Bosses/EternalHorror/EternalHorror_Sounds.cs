@@ -13,7 +13,7 @@ sealed partial class EternalHorror : ModNPC {
     private float _explosionPreparationSoundSlot, _explosionPreparationSoundSlot2;
 
     public static SoundStyle HitSound() => SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
-    public static SoundStyle DeathSound() => SoundID.NPCDeath60 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
+    public static SoundStyle DeathSound() => SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle HitSound_Servant() => SoundID.NPCHit9 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle DeathSound_Servant() => SoundID.NPCDeath11 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle RitualSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Ritual") with { PauseBehavior = PauseBehavior.PauseWithGame };
