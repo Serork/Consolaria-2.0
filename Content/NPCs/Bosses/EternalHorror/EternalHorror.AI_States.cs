@@ -2178,7 +2178,7 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (boss.AICounter == 0f) {
-                boss.PlayLaserDashSound();
+                //boss.PlayLaserDashSound();
                 //if (!Helper.IsClient()) {
                 //    boss._ai5 = Main.rand.NextBool().ToDirectionInt();
                 //    npc.netUpdate = true;
@@ -2189,6 +2189,10 @@ sealed partial class EternalHorror : ModNPC {
                 else {
                     boss._ai5 *= -1f;
                 }
+            }
+
+            if (boss.AICounter == 20f) {
+                boss.PlayLaserDashSound();
             }
 
             boss.AICounter++;
