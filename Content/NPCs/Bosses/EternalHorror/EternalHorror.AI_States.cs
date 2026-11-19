@@ -325,6 +325,12 @@ sealed partial class EternalHorror : ModNPC {
             void prepareAndSpawnClone() {
                 bool justStarted = boss.AICounter == 0f;
 
+                //bool justStarted = boss.AICounter == 0f;
+                if (justStarted) {
+                    boss.PlayCloneSound();
+                    //boss.SpawnClone();
+                }
+
                 bool shadowSpawnProgress = ++boss.AICounter >= SHADOWSPAWNTIME;
 
                 float dustProgress = boss.AICounter / SHADOWSPAWNTIME;
