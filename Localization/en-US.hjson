@@ -1434,7 +1434,7 @@ Mods: {
 			}
 
 			SuspiciousLookingSkull_EternalHorror: {
-				DisplayName: Suspicious Looking Skull_ Eternal Horror
+				DisplayName: Suspicious Looking Skull_ Emperor of Darkness
 				Tooltip: ""
 			}
 
@@ -1744,8 +1744,8 @@ Mods: {
 				DisplayName: Giant Albino Swarmer
 			}
 
-			EternalHorror.DisplayName: Eternal Horror
-			EternalServant.DisplayName: Eternal Servant
+			EternalHorror.DisplayName: Emperor of Darkness
+			EternalServant.DisplayName: Dark Servant
 		}
 
 		Projectiles: {
@@ -1837,14 +1837,14 @@ Mods: {
 			SirenSeaCreature.DisplayName: Siren Sea Creature
 			AlbinoRunt.DisplayName: Albino Runt
 			.DisplayName: ""
-			EternalHorrorLaser1.DisplayName: Eternal Horror Laser1
-			EternalHorrorLaser.DisplayName: Eternal Horror Laser
-			EternalHorrorCloneExplosion.DisplayName: Eternal Horror Clone Explosion
-			EternalHorrorCloneExplosionSkull.DisplayName: Eternal Horror Clone Explosion Skull
-			EternalHorrorScythe.DisplayName: Eternal Horror Scythe
-			EternalHorrorLaser_Big.DisplayName: Eternal Horror Laser_ Big
-			EternalHorrorLaser_Holdout.DisplayName: Eternal Horror Laser_ Holdout
-			ConfettiGun_UI_Shot.DisplayName: Confetti Gun_ U I_ Shot
+			EternalHorrorLaser1.DisplayName: Emperor of Darkness Laser1
+			EternalHorrorLaser.DisplayName: Emperor of Darkness Laser
+			EternalHorrorCloneExplosion.DisplayName: Emperor of Darkness Clone Explosion
+			EternalHorrorCloneExplosionSkull.DisplayName: Emperor of Darkness Clone Explosion Skull
+			EternalHorrorScythe.DisplayName: Emperor of Darkness Scythe
+			EternalHorrorLaser_Big.DisplayName: EEmperor of Darkness Laser_ Big
+			EternalHorrorLaser_Holdout.DisplayName: Emperor of Darkness Laser_ Holdout
+			ConfettiGun_UI_Shot.DisplayName: Confetti Gun
 		}
 
 		Tiles: {
