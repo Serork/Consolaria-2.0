@@ -1003,7 +1003,7 @@ sealed partial class EternalHorror : ModNPC {
 
             Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) / 2f;
 
-            if (boss.AICounter >= 15f && boss.AICounter % 15 == 0 && boss.AICounter < 75f) {
+            if (boss.AICounter >= 15f && boss.AICounter % 15 == 0 && boss.AICounter <= 75f) {
                 SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10 }, npc.Center);
                 SoundEngine.PlaySound((Main.rand.NextBool(3) ? SoundID.NPCDeath23 : SoundID.NPCDeath22) with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), MaxInstances = 10 }, npc.Center);
             }
