@@ -153,6 +153,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         BlinkOpacity = 1f;
     }
 
+    private static float _activeForTime;
+
     public override void PostUpdateNPCs() {
         if (_spawnSoundSlotID is not null && SoundEngine.TryGetActiveSound(_spawnSoundSlotID.Value, out ActiveSound result)) {
             result.Position = Main.LocalPlayer.Center;
@@ -166,9 +168,18 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         screenObstructionFactor = Helper.Clamp01(screenObstructionFactor);
         screenObstructionFactor = Ease.QuadOut(screenObstructionFactor);
 
+        if (_activeForTime > 0f) {
+            _activeForTime--;
+        }
+
         if (!Main.dedServ) {
             bool any = false;
             bool any2 = EternalHorrorSummonEnded;
+
+            if (_activeForTime > 0f) {
+                any = true;
+                any2 = true;
+            }
 
             void applyFilter(EternalHorror npc) {
                 string filterName = ShaderLoader.HorrorEffectFilterName2;
@@ -199,6 +210,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
                 if (any2) {
                     shader.Shader.Parameters["uSaturation"].SetValue(2f * screenObstructionFactor * FilterOpacity);
+
+                    _activeForTime = 10f;
                 }
 
                 //shader.Shader.Parameters["waveOffset"].SetValue((index + 1) * 2f);
@@ -214,7 +227,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 shader.UseTargetPosition(FilterPosition - new Vector2(500f, 500f)/* * (1f / Main.GameViewMatrix.Zoom.X)*/);
                 shader.UseOpacity(0.5f);
 
-                if (screenObstructionFactor <= 0f) {
+                if (screenObstructionFactor <= 0f && _activeForTime <= 0f) {
                     Filters.Scene.Deactivate(filterName);
                     FilterPosition = Vector2.Zero;
                     FilterMoveFactor = 0f;
@@ -237,6 +250,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 applyFilter(modNPC);
 
                 any = true;
+
+                _activeForTime = 10f;
             }
 
             if (filter.IsActive()) {

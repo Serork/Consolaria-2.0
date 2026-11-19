@@ -241,7 +241,8 @@ sealed partial class EternalHorror : ModNPC {
 
                         shader.UseTargetPosition(modNPC.GetEyePosition());
                     }
-                    else {
+                    else 
+                    {
                         Whitening_ForDeath = 0f;
                     }
                 }
