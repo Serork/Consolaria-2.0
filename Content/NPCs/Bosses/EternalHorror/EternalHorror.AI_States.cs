@@ -640,7 +640,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             bool shouldSlowDownAfterDash() {
                 bool preparingDash = boss.AICounter < 0f;
-                if (preparingDash) {
+                if (preparingDash && !boss.WasDoingCloneAttack) {
                     return true;
                 }
 
