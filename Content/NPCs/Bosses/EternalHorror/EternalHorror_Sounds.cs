@@ -45,7 +45,7 @@ sealed partial class EternalHorror : ModNPC {
     public static SoundStyle TransitionSoundExtra() => SoundID.NPCHit1 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f), PitchVariance = 0.24f };
     public static SoundStyle LaserDashSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/LaserDash") with { Volume = 1f, Pitch = -0.25f, PitchVariance = 0.15f, PauseBehavior = PauseBehavior.PauseWithGame };
     public static SoundStyle DeathRoarSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/DeathRoar") with { Volume = 1f, Pitch = 0.25f, PitchVariance = 0f, PauseBehavior = PauseBehavior.PauseWithGame };
-    public static SoundStyle SpiralSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Spiral") with { Volume = 1f, Pitch = 0.25f, PitchVariance = 0f, PauseBehavior = PauseBehavior.PauseWithGame };
+    public static SoundStyle SpiralSound() => new SoundStyle($"{nameof(Consolaria)}/Assets/Sounds/EternalHorror/Spiral") with { Volume = 1f, Pitch = 0f, PitchVariance = 0f, PauseBehavior = PauseBehavior.PauseWithGame };
 
     private void PlaySoundOnSpawn() {
         _breatheSoundSlot = SoundEngine.PlaySound(BreatheSound(), NPC.Center).ToFloat();
