@@ -269,7 +269,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 bool shotLaser = ++boss.AICounter >= LASERATTACKTIME;
 
-                if (boss.AICounter >= -LASERATTACKTIME * 1.125f * 1.375f) {
+                if (boss.AICounter >= -LASERATTACKTIME * 1.125f * 1.5f) {
                     if (boss.WasDoingCloneAttack) {
                         boss.WasDoingCloneAttack = false;
                     }
@@ -389,7 +389,7 @@ sealed partial class EternalHorror : ModNPC {
                             boss.ActivateState<Phase1DashAttack>();
                             boss.Phase1DashAttack_ShouldSummonAfter = true;
 
-                            boss.AICounter = -Phase1DashAttack.DASHTIME / 1;
+                            boss.AICounter = -(Phase1DashAttack.DASHTIME / 1.5f);
 
                             //boss.ResetSmoothFactor();
                         }
