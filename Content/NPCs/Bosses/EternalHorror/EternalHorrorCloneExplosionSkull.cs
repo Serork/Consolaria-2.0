@@ -25,7 +25,7 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
     }
 
     public override void SetDefaults() {
-        Projectile.SetSizeValues(20);
+        Projectile.SetSizeValues(30);
 
         Projectile.aiStyle = -1;
 

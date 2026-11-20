@@ -102,7 +102,7 @@ sealed class EternalServant : ModNPC {
     }
 
     public override void SetDefaults() {
-        int width = 54; int height = width;
+        int width = 30; int height = width;
         NPC.Size = new Vector2(width, height);
 
         NPC.aiStyle = -1;

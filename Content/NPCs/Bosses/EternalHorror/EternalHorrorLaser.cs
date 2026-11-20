@@ -48,6 +48,8 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
         Projectile.penetrate = -1;
 
         Projectile.light = 0.1f;
+
+        Projectile.SetSizeValues(15);
     }
 
     public override bool PreAI() {

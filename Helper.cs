@@ -21,6 +21,11 @@ using static Consolaria.Helper;
 namespace Consolaria;
 
 public static class Helper {
+    public static Rectangle CenteredSquare(Vector2 position, int size) => new() { X = (int)position.X - size / 2, Y = (int)position.Y - size / 2, Width = size, Height = size };
+    public static Rectangle CenteredSquare(Vector2 position, int sizeX, int sizeY) => new() { X = (int)position.X - sizeX / 2, Y = (int)position.Y - sizeY / 2, Width = sizeX, Height = sizeY };
+    public static Rectangle CenteredSquare(Vector2 position, Vector2 size) => CenteredSquare(position, (int)size.X, (int)size.Y);
+    public static Rectangle Square(Vector2 position, int size) => new() { X = (int)position.X, Y = (int)position.Y, Width = size, Height = size };
+
     public static void GetSoundAndAdjust(float soundSlot_Float, Action<ActiveSound> adjust) {
         if (SoundEngine.TryGetActiveSound(SlotId.FromFloat(soundSlot_Float), out ActiveSound result)) {
             adjust(result);

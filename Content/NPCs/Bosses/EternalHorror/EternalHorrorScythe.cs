@@ -29,7 +29,7 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override void SetDefaults() {
-        int width = 60; int height = width;
+        int width = 30; int height = width;
         Projectile.Size = new Vector2(width, height);
 
         Projectile.hostile = true;

@@ -106,7 +106,7 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) {
         float collisionPoint11 = 0f;
-        if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], 22f * Projectile.scale, ref collisionPoint11))
+        if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], 22f * Projectile.scale * 0.75f, ref collisionPoint11))
             return true;
 
         return false;

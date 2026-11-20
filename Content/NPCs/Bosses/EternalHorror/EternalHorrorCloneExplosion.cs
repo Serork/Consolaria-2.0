@@ -40,6 +40,10 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
         Projectile.manualDirectionChange = true;
     }
 
+    public override void ModifyDamageHitbox(ref Rectangle hitbox) {
+        hitbox = Helper.CenteredSquare(Projectile.Center, (int)(250f * Projectile.scale));
+    }
+
     public override void AI() {
         Projectile.timeLeft = 2;
 
