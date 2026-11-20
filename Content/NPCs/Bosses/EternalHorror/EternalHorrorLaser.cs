@@ -49,7 +49,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
         Projectile.light = 0.1f;
 
-        Projectile.SetSizeValues(15);
+        Projectile.SetSizeValues(10);
     }
 
     public override bool PreAI() {
