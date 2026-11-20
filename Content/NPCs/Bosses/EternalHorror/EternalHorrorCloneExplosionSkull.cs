@@ -29,6 +29,7 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
 
         Projectile.aiStyle = -1;
 
+        Projectile.friendly = false;
         Projectile.hostile = true;
         Projectile.tileCollide = false;
 
