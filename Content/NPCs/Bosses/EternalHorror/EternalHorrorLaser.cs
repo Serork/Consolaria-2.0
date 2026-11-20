@@ -29,12 +29,15 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     public override void SetStaticDefaults() {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 16;
         ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
+
+        ProjectileID.Sets.CanHitPastShimmer[Type] = true;
     }
 
     public override void SetDefaults() {
         Projectile.CloneDefaults(ProjectileID.EyeLaser);
         AIType = ProjectileID.EyeLaser;
 
+        Projectile.friendly = false;
         Projectile.hostile = true;
         Projectile.tileCollide = false;
 
@@ -52,6 +55,8 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
         Projectile.light = 0.1f;
 
         Projectile.SetSizeValues(10);
+
+        CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
     public override bool PreAI() {

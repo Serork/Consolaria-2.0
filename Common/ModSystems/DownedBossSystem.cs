@@ -42,10 +42,10 @@ namespace Consolaria.Common.ModSystems {
                     bool justAdded = _canAppendNewUIElement[data.UniqueId] == 0;
                     float topY = 0f;
                     float leftX = 0f;
-                    if (!justAdded) {
-                        leftX = -30;
-                        topY = -28;
-                    }
+                    //if (!justAdded) {
+                    //    leftX = -30;
+                    //    topY = -28;
+                    //}
                     StyleDimension top = new StyleDimension(-111f + 100f + 1f + topY, 0f);
                     StyleDimension left = new StyleDimension(-3f + leftX, 0f);
                     UIImage_OcramCrown element = new UIImage_OcramCrown(Main.Assets.Request<Texture2D>("Images/UI/IconCompletion")) {

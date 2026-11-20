@@ -245,6 +245,10 @@ sealed partial class EternalHorror : ModNPC {
 
         SomeSecondPhaseShitCode();
         UpdateCustomImmunityFrames();
+
+        if (NPC.GetTargetPlayer().dead) {
+            NPC.KillNPC();
+        }
     }
 
     public override bool CheckDead() {
@@ -737,7 +741,7 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
         Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorScythe>(),
-            27, 1.5f, Main.myPlayer);
+            GetScytheDamage(), GetScytheKnockback(), Main.myPlayer);
     }
 
     private void SpawnEyeParticle(Vector2 center, Vector2 velocity) {
@@ -826,8 +830,10 @@ sealed partial class EternalHorror : ModNPC {
         if (Helper.IsClient()) {
             return;
         }
+        int damage = IsInSecondPhase ? GetLaserDamage_Phase2() : GetLaserDamage_Phase1();
+        float knockBack = IsInSecondPhase ? GetLaserKnockback_Phase2() : GetLaserKnockback_Phase1();
         Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser>(),
-            27, 1.5f, Main.myPlayer, ai2: reflectedFromStart.ToInt());
+            damage, knockBack, Main.myPlayer, ai2: reflectedFromStart.ToInt());
     }
 
     private void MakeTrailDust(float velocityFactor = 1f, float rotation = float.MaxValue) {
@@ -898,8 +904,8 @@ sealed partial class EternalHorror : ModNPC {
             IEntitySource source = NPC.GetSource_FromAI();
             Vector2 velocity = Vector2.Zero;
             int type = ModContent.ProjectileType<EternalHorrorCloneExplosion>();
-            int damage = 30;
-            float knockBack = 5f;
+            int damage = IsInSecondPhase ? GetExplosionDamage_Phase2() : GetExplosionDamage_Phase1();
+            float knockBack = IsInSecondPhase ? GetExplosionKnockback_Phase2() : GetExplosionKnockback_Phase1();
             Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack, owner: Main.myPlayer);
         }
     }

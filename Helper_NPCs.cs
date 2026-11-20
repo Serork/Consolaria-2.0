@@ -84,9 +84,9 @@ public static class Helper_NPCs {
 
     public static T As<T>(this NPC npc) where T : ModNPC => npc.ModNPC as T;
 
-    public static void SetDefaultsToEnemy(this NPC npc, ushort lifeMax,
-                                                        ushort damage,
-                                                        ushort defense,
+    public static void SetDefaultsToEnemy(this NPC npc, int lifeMax,
+                                                        int damage,
+                                                        int defense,
                                                         float knockBackResist = 0f,
                                                         float spawnSlots = 0f,
                                                         int aiStyle = -1,

@@ -22,6 +22,8 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
     public override void SetStaticDefaults() {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 16;
         ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
+
+        ProjectileID.Sets.CanHitPastShimmer[Type] = true;
     }
 
     public override void SetDefaults() {
@@ -40,6 +42,8 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
 
         Projectile.timeLeft = 900;
         Projectile.penetrate = -1;
+
+        CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
     public override void AI() {

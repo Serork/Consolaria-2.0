@@ -65,7 +65,7 @@ sealed class EternalServant : ModNPC {
 
         if (player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
-                _customImmunityFrames[player.whoAmI] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 2);
+                _customImmunityFrames[player.whoAmI] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 1);
             }
         }
     }
@@ -77,7 +77,7 @@ sealed class EternalServant : ModNPC {
 
         if (projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
-                _customImmunityFrames[projectile.owner] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 2);
+                _customImmunityFrames[projectile.owner] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 1);
             }
         }
     }
@@ -117,10 +117,10 @@ sealed class EternalServant : ModNPC {
         NPC.aiStyle = -1;
         //AnimationType = NPCID.ServantofCthulhu;
 
-        NPC.lifeMax = 500;
-        NPC.damage = 90;
+        NPC.lifeMax = EternalHorror.HP_SERVANT;
+        NPC.damage = EternalHorror.DAMAGE_BODY_SERVANT;
 
-        NPC.defense = 10;
+        NPC.defense = EternalHorror.DEFENSE_SERVANT;
         NPC.knockBackResist = 0f;
 
         NPC.HitSound = EternalHorror.HitSound_Servant();

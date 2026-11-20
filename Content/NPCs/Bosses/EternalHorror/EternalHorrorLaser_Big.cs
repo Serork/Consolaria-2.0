@@ -63,6 +63,8 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
     public override void SetStaticDefaults() {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 4000;
 
+        ProjectileID.Sets.CanHitPastShimmer[Type] = true;
+
         if (!Main.dedServ) {
             _laser = ModContent.Request<Texture2D>(Texture + "2");
             _trailParticle = ModContent.Request<Texture2D>(Texture + "_TrailParticle");
@@ -83,6 +85,9 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         Projectile.tileCollide = false;
 
         Projectile.ignoreWater = true;
+
+
+        CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
     private void MakeTrailDust(Vector2 position, Vector2 velocity, Vector2 velocity2, float opacity) {

@@ -19,9 +19,10 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
     private float rotationTimer = (float)Math.PI;
 
     public override void SetStaticDefaults() {
-
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
         ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
+
+        ProjectileID.Sets.CanHitPastShimmer[Type] = true;
 
         if (!Main.dedServ) {
             _glowTexture = Helper.RequestTexture(Texture + "_Glow");
@@ -44,6 +45,9 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
         //Projectile.scale = 0.6f;
 
         Projectile.ignoreWater = true;
+
+
+        CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
     public override void AI() {

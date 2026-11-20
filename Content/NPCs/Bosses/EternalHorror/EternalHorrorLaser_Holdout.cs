@@ -14,6 +14,8 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
     public override void SetStaticDefaults() {
         ProjectileID.Sets.NeedsUUID[Type] = true;
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
+
+        ProjectileID.Sets.CanHitPastShimmer[Type] = true;
     }
 
     public override void SetDefaults() {
@@ -30,6 +32,9 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
         Projectile.ignoreWater = true;
 
         Projectile.ignoreWater = true;
+
+
+        CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
     public override void AI() {

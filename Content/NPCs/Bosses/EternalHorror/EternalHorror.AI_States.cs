@@ -587,6 +587,13 @@ sealed partial class EternalHorror : ModNPC {
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
             }
             void prepareDash() {
+                if (boss.AICounter >= 0f) {
+                    boss._bodyDamageFactor = 1f;
+                }
+                else {
+                    boss._bodyDamageFactor = DAMAGEFACTOR_BODY_ONDASH;
+                }
+
                 boss.AICounter += 1f;
                 if (!didAtLeastOneDash) {
                     boss.AICounter -= 0.25f;
@@ -689,6 +696,7 @@ sealed partial class EternalHorror : ModNPC {
             if (shouldSlowDownAfterDash()) {
                 prepareSelfAfterDash();
                 slowDown();
+
                 return;
             }
 
@@ -1590,6 +1598,13 @@ sealed partial class EternalHorror : ModNPC {
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * boss.SmoothFactor);
             }
             void prepareDash() {
+                if (boss.AICounter >= 0f) {
+                    boss._bodyDamageFactor = 1f;
+                }
+                else {
+                    boss._bodyDamageFactor = DAMAGEFACTOR_BODY_ONDASH;
+                }
+
                 boss.AICounter += 1f;
 
                 if (!didAtLeastOneDash) {
@@ -2122,6 +2137,8 @@ sealed partial class EternalHorror : ModNPC {
                 boss.Phase2ScytheAttackDirection = npc.direction;
             }
             else {
+                boss._bodyDamageFactor = DAMAGEFACTOR_BODY_ONDASH;
+
                 float progress = boss.AICounter - ATTACKPREPARATIONTIME;
 
                 if (progress <= 0f) {
@@ -2163,6 +2180,8 @@ sealed partial class EternalHorror : ModNPC {
                 npc.rotation = npc.rotation.AngleLerp(angleToTarget, ROTATIONLERP * 2f * attackProgress7);
 
                 if (attackProgress3 >= 0.9f) {
+                    boss._bodyDamageFactor = 1f;
+
                     boss.Phase2ScytheAttackDirection = 0;
 
                     boss.ResetCounters();
@@ -2418,7 +2437,7 @@ sealed partial class EternalHorror : ModNPC {
                 }
 
                 if (!Helper.IsClient() && noProj) {
-                    Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, npc.Center.DirectionTo(baseTargetCenter), laser, 50, 0, Main.myPlayer, ai2: npc.whoAmI);
+                    Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, npc.Center.DirectionTo(baseTargetCenter), laser, boss.GetBigLaserDamage(), boss.GetBigLaserKnockback(), Main.myPlayer, ai2: npc.whoAmI);
                 }
             }
         }
