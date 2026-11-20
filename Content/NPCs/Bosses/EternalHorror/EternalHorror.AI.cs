@@ -900,7 +900,7 @@ sealed partial class EternalHorror : ModNPC {
             int type = ModContent.ProjectileType<EternalHorrorCloneExplosion>();
             int damage = 30;
             float knockBack = 5f;
-            Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack);
+            Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack, owner: Main.myPlayer);
         }
     }
 

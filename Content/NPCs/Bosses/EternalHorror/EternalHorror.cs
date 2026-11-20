@@ -139,12 +139,20 @@ sealed partial class EternalHorror : ModNPC {
     private void SetMiscellaneousProperties() {
         NPCID.Sets.MPAllowedEnemies[Type] = true;
         NPCID.Sets.MustAlwaysDraw[Type] = true;
+        NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+        NPCID.Sets.CanHitPastShimmer[Type] = true;
+        NPCID.Sets.ReflectStarShotsInForTheWorthy[Type] = true;
+
+        NPCID.Sets.NeedsExpertScaling[Type] = true;
+
+        NPCID.Sets.BossBestiaryPriority.Add(Type);
     }
 
     private void SetDebuffImmuneData() {
         NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
         NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
         NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.ShadowFlame] = true;
+        NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Shimmer] = true;
     }
 
     public override void SetDefaults() {
@@ -153,13 +161,13 @@ sealed partial class EternalHorror : ModNPC {
         NPC.SetDefaultsToEnemy(lifeMax: 10000/*54000*/,
                                damage: 55, 
                                defense: 36, 
-                               spawnSlots: 10f,
+                               spawnSlots: 20f,
                                boss: true);
 
         NPC.SetHitSounds(hitSound: HitSound(),
                          deathSound: DeathSound());
 
-        NPC.SetMiscellaneousProperties(dropCoins: Item.buyPrice(gold: 15),
+        NPC.SetMiscellaneousProperties(dropCoins: 1000000f * 2f,
                                        lavaImmune: true);
 
         NPC.SpawnWithHigherTime(timeMult: 30);
@@ -167,6 +175,8 @@ sealed partial class EternalHorror : ModNPC {
         SetMusic();
 
         NPC.BossBar = ModContent.GetInstance<EternalHorrorBossBar>();
+
+        NPC.netAlways = true;
     }
 
     private void SetMusic() {

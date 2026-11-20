@@ -30,6 +30,15 @@ sealed class EternalServant : ModNPC {
         NPCID.Sets.DontDoHardmodeScaling[Type] = true;
         NPCID.Sets.CantTakeLunchMoney[Type] = true;
         NPCID.Sets.BossBestiaryPriority.Add(Type);
+        NPCID.Sets.ReflectStarShotsInForTheWorthy[Type] = true;
+        NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+        NPCID.Sets.DangerDetectRange[Type] = 142;
+        NPCID.Sets.CanHitPastShimmer[Type] = true;
+
+        NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
+        NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
+        NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.ShadowFlame] = true;
+        NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Shimmer] = true;
 
         if (!Main.dedServ) {
             _eyeTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Eye");
@@ -119,6 +128,12 @@ sealed class EternalServant : ModNPC {
 
         NPC.noTileCollide = true;
         NPC.noGravity = true;
+
+        NPC.value = 0f;
+
+        NPC.netAlways = true;
+
+        NPC.npcSlots = 0f;
     }
 
     public override void FindFrame(int frameHeight) {

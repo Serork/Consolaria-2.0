@@ -41,7 +41,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
     }
 
     public override void ModifyDamageHitbox(ref Rectangle hitbox) {
-        hitbox = Helper.CenteredSquare(Projectile.Center, (int)(250f * Projectile.scale));
+        hitbox = Helper.CenteredSquare(Projectile.Center, (int)(500f * Projectile.scale));
     }
 
     public override void AI() {
@@ -62,7 +62,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
                 for (int i = 0; i < skullCount; i++) {
                     Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center,
                         Vector2.UnitY.RotatedBy(MathHelper.TwoPi * i / skullCount) * SkullSpeed * 2f,
-                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), Projectile.damage, Projectile.knockBack);
+                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), Projectile.damage, Projectile.knockBack, Main.myPlayer);
                 }
             }
 
