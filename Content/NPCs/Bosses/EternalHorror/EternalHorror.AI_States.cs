@@ -470,7 +470,7 @@ sealed partial class EternalHorror : ModNPC {
             float dashProgress = boss.AICounter / DASHTIME;
             dashProgress = Helper.Clamp01(dashProgress);
 
-            if (boss.AICounter < 0f) {
+            if (boss.AICounter < -DASHTIME * 0.125f) {
                 if (boss.WasDoingCloneAttack && boss.AICounter % 1 == 0) {
                     boss.MakeTrailDust();
                 }
@@ -1333,7 +1333,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss.AICounter += boss.AICounter < LASERATTACKTIME * 0.5f ? 1f : 0.5f;
 
-                if (boss.AICounter >= -LASERATTACKTIME * 1.125f * MathHelper.Lerp(1.375f, 1.5f, 0.625f)) {
+                if (boss.AICounter >= -LASERATTACKTIME * 1.125f * MathHelper.Lerp(1.375f, 1.5f, 0.75f)) {
                     if (boss.WasDoingCloneAttack) {
                         boss.WasDoingCloneAttack = false;
                     }
