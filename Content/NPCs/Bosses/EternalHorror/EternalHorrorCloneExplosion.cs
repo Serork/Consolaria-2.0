@@ -41,7 +41,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
     }
 
     public override void ModifyDamageHitbox(ref Rectangle hitbox) {
-        hitbox = Helper.CenteredSquare(Projectile.Center, (int)(500f * Projectile.scale));
+        hitbox = Helper.CenteredSquare(Projectile.Center, (int)(375 * Projectile.scale));
     }
 
     public override void AI() {
@@ -70,7 +70,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
 
             ActivateShockwave(rippleCount: 3f * EXPLOSIONSCALEMODIFIER, rippleSize: 5f * EXPLOSIONSCALEMODIFIER, rippleSpeed: 10f * EXPLOSIONSCALEMODIFIER);
 
-            int size = (int)(250 * EXPLOSIONSCALEMODIFIER);
+            int size = (int)(375 * EXPLOSIONSCALEMODIFIER);
             Projectile.Resize(size, size);
 
             Color getColor() => EternalHorror.MainPurpleColor;
