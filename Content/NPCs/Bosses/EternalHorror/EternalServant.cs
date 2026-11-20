@@ -203,10 +203,10 @@ sealed class EternalServant : ModNPC {
     }
 
     public override void AI() {
-        NPC.TargetClosest();
-
         if (NPC.localAI[0] == 0f) {
             NPC.localAI[0] = 1 / 60f;
+
+            NPC.TargetClosest();
 
             InitializeCustomImmunityFrames();
 
@@ -316,6 +316,8 @@ sealed class EternalServant : ModNPC {
             //    this.ai[1] = 0f;
             //}
 
+            NPC.TargetClosest();
+
             NPC.velocity *= 0.99f;
             NPC.velocity *= 0.99f;
 
@@ -334,6 +336,8 @@ sealed class EternalServant : ModNPC {
             }
         }
         else {
+            NPC.TargetClosest();
+
             //if (justHit) {
             //    this.ai[0] = 2f;
             //    this.ai[1] = 0f;
