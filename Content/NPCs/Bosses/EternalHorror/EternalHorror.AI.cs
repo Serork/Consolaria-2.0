@@ -442,7 +442,7 @@ sealed partial class EternalHorror : ModNPC {
             cloneInfo.OldVisualPositions[0] = cloneInfo.VisualPosition;
             cloneInfo.OldRotations[0] = cloneInfo.Rotation;
 
-            cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.125f);
+            cloneInfo.LerpVelocityValue = Helper.Approach(cloneInfo.LerpVelocityValue, 1f, 0.125f * 0.125f);
 
             float lerpValueFactor = cloneInfo.LerpVelocityValue;
 
