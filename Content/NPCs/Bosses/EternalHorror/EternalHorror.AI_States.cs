@@ -146,8 +146,8 @@ sealed partial class EternalHorror : ModNPC {
 
     public readonly struct Phase1MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            boss.TargetPlayer();
-            npc.FaceTarget_New();
+            //boss.TargetPlayer();
+            //npc.FaceTarget_New();
 
             bool shouldDash = boss.HasActiveState<Phase1DashAttack>(),
                  shouldSpamLasers = boss.HasActiveState<Phase1LaserSpamAttack>(),
@@ -263,6 +263,8 @@ sealed partial class EternalHorror : ModNPC {
                 }
             }
             void prepareLasers() {
+                            //boss.TargetPlayer();
+            //npc.FaceTarget_New();
                 ref float laserRotation = ref boss.Phase1LaserRotation;
                 float newLaserRotation = npc.AngleTo(targetCenter);
                 laserRotation = Utils.AngleLerp(laserRotation, newLaserRotation, laserProgress_ForLaserRotation);
@@ -278,6 +280,9 @@ sealed partial class EternalHorror : ModNPC {
                 if (!shotLaser) {
                     return;
                 }
+
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
 
                 boss.PrepareLaserAttackForClones((ushort)(LASERATTACKTIME * 0.5f));
 
@@ -314,7 +319,10 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
@@ -323,6 +331,9 @@ sealed partial class EternalHorror : ModNPC {
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             void prepareAndSpawnClone() {
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
+
                 bool justStarted = boss.AICounter == 0f;
 
                 //bool justStarted = boss.AICounter == 0f;
@@ -681,6 +692,9 @@ sealed partial class EternalHorror : ModNPC {
                 return;
             }
 
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 Vector2 position = cloneInfo.VisualPosition;
                 float maxDistance = 600f;
@@ -762,7 +776,10 @@ sealed partial class EternalHorror : ModNPC {
             slowDownWhenShooting();
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
@@ -959,7 +976,10 @@ sealed partial class EternalHorror : ModNPC {
             }
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
@@ -967,6 +987,9 @@ sealed partial class EternalHorror : ModNPC {
         private static ushort PREPARATIONTIME => Helper.SecondsToFrames(2);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+
             boss.AICounter++;
 
             float attackProgress_ForSlowDown = boss.AICounter / PREPARATIONTIME;
@@ -1195,8 +1218,8 @@ sealed partial class EternalHorror : ModNPC {
 
     public readonly struct Phase2MoveToPlayer : IAIState {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            boss.TargetPlayer();
-            npc.FaceTarget_New();
+            //boss.TargetPlayer();
+            //npc.FaceTarget_New();
 
             bool shouldDash = boss.HasActiveState<Phase2DashAttack>(),
                  shouldSpamLasers = boss.HasActiveState<Phase2LaserSpamAttack>(),
@@ -1344,6 +1367,9 @@ sealed partial class EternalHorror : ModNPC {
                     return;
                 }
 
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
+
                 boss.ResetLaserAttack();
 
                 boss.PrepareLaserAttackForClones((ushort)(LASERATTACKTIME * 0.5f));
@@ -1394,6 +1420,9 @@ sealed partial class EternalHorror : ModNPC {
         }
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+
             boss.ResetLaserAttack();
 
             boss.AICounter = LASERATTACKTIME * 0.5f * 0.5f;
@@ -1684,6 +1713,9 @@ sealed partial class EternalHorror : ModNPC {
                 return;
             }
 
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+
             boss.OnIterateActiveCloneData((ref cloneInfo) => {
                 Vector2 position = cloneInfo.VisualPosition;
                 float maxDistance = 600f;
@@ -1782,7 +1814,10 @@ sealed partial class EternalHorror : ModNPC {
             slowDownWhenShooting();
         }
 
-        void IAIState.OnStart(NPC npc, EternalHorror boss) { }
+        void IAIState.OnStart(NPC npc, EternalHorror boss) {
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
+        }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
 
@@ -1791,6 +1826,9 @@ sealed partial class EternalHorror : ModNPC {
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             void prepareAndSpawnClone() {
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
+
                 bool justStarted = boss.AICounter == 0f;
 
                 if (justStarted) {
@@ -1873,8 +1911,8 @@ sealed partial class EternalHorror : ModNPC {
         public static float ATTACKPREPARATIONTIME => Helper.SecondsToFrames(1.5f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            boss.TargetPlayer();
-            npc.FaceTarget_New();
+            //boss.TargetPlayer();
+            //npc.FaceTarget_New();
 
             bool justStarted = boss.AICounter == 0f;
 
@@ -1933,6 +1971,9 @@ sealed partial class EternalHorror : ModNPC {
                 npc.dontTakeDamage = npc.Opacity < 0.75f;
             }
             else if (boss.Phase2ScytheAttackDirection != 0f) {
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
+
                 float to = -1f;
                 boss.AICounter = Helper.Approach(boss.AICounter, to, 1f);
 
@@ -2029,6 +2070,9 @@ sealed partial class EternalHorror : ModNPC {
 
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             boss.Phase2ScytheAttackDirection = 0f;
+
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
@@ -2161,6 +2205,9 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnStart(NPC npc, EternalHorror boss) {
             //boss.DeactivateState<Phase2MoveToPlayer>();
             boss._tempPosition = default;
+
+            boss.TargetPlayer();
+            npc.FaceTarget_New();
         }
         void IAIState.OnEnd(NPC npc, EternalHorror boss) { }
     }
@@ -2194,6 +2241,9 @@ sealed partial class EternalHorror : ModNPC {
 
             if (boss.AICounter == 20f) {
                 boss.PlayLaserDashSound();
+
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
             }
 
             boss.AICounter++;

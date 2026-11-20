@@ -221,6 +221,7 @@ sealed class ShaderLoader : ModSystem {
     public static Effect HorrorEffectShaderData2 { get; private set; } = null!;
     public static Effect HorrorEffectShaderData1 { get; private set; } = null!;
     public static Effect HorrorEffectShaderData3 { get; private set; } = null!;
+    public static Effect HorrorEffectShaderData4 { get; private set; } = null!;
 
     public static Asset<Effect> Distort => _loadedShaders["Distort"];
     public static Asset<Effect> Primitive => _loadedShaders["Primitive"];
@@ -230,6 +231,7 @@ sealed class ShaderLoader : ModSystem {
     public static Asset<Effect> HorrorLaser => _loadedShaders["HorrorLaser"];
     public static Asset<Effect> HorrorDeath => _loadedShaders["HorrorDeath"];
     public static Asset<Effect> HorrorChroma => _loadedShaders["HorrorChroma"];
+    public static Asset<Effect> HorrorLeave => _loadedShaders["HorrorChroma"];
 
     public static string HorrorEffectFilterName2 => nameof(Consolaria) + "EternalHorrorHorrorZone";
     public static Filter HorrorZoneFilter => Filters.Scene[HorrorEffectFilterName2];
@@ -239,6 +241,9 @@ sealed class ShaderLoader : ModSystem {
 
     public static string HorrorChromaFilterName => nameof(Consolaria) + "EternalHorrorChroma";
     public static Filter HorrorChromaFilter => Filters.Scene[HorrorChromaFilterName];
+
+    public static string HorrorLeaveFilterName => nameof(Consolaria) + "EternalHorrorLeave";
+    public static Filter HorrorLeaveFilter => Filters.Scene[HorrorLeaveFilterName];
 
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
@@ -284,6 +289,11 @@ sealed class ShaderLoader : ModSystem {
         HorrorEffectShaderData3 = horrorShader3.Value;
         Filters.Scene[HorrorChromaFilterName] = new Filter(new HorrorEffectShaderData3(horrorShader3, "HorrorChromaPass"), (EffectPriority)102);
         Filters.Scene[HorrorChromaFilterName].Load();
+
+        Asset<Effect> horrorShader4 = ModContent.Request<Effect>("Consolaria/Assets/Effects/HorrorLeave", AssetRequestMode.ImmediateLoad);
+        HorrorEffectShaderData4 = horrorShader4.Value;
+        Filters.Scene[HorrorLeaveFilterName] = new Filter(new HorrorEffectShaderData4(horrorShader4, "HorrorLeavePass"), (EffectPriority)102);
+        Filters.Scene[HorrorLeaveFilterName].Load();
 
         var tmodfile = (TmodFile)typeof(Consolaria).GetProperty("File", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(Consolaria.Instance);
         var files = (IDictionary<string, FileEntry>)typeof(TmodFile).GetField("files", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(tmodfile);
