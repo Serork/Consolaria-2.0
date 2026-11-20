@@ -65,7 +65,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
-        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded) {
+        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded || Dead) {
             return false;
         }
 
@@ -73,7 +73,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override bool CanHitNPC(NPC target) {
-        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded) {
+        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded || Dead) {
             return false;
         }
 
