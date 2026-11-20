@@ -81,6 +81,8 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         Projectile.penetrate = -1;
         Projectile.Opacity = 0f;
         Projectile.tileCollide = false;
+
+        Projectile.ignoreWater = true;
     }
 
     private void MakeTrailDust(Vector2 position, Vector2 velocity, Vector2 velocity2, float opacity) {

@@ -28,6 +28,8 @@ sealed class EternalHorrorLaser_Holdout : ModProjectile {
         Projectile.tileCollide = false;
         //Projectile.magic = true;
         Projectile.ignoreWater = true;
+
+        Projectile.ignoreWater = true;
     }
 
     public override void AI() {

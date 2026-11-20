@@ -42,6 +42,8 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
 
         //Projectile.light = 0.25f;
         //Projectile.scale = 0.6f;
+
+        Projectile.ignoreWater = true;
     }
 
     public override void AI() {

@@ -38,6 +38,8 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
         Projectile.hostile = true;
         Projectile.tileCollide = false;
 
+        Projectile.ignoreWater = true;
+
         Projectile.alpha = 255;
 
         Projectile.width = 6;
