@@ -206,7 +206,7 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
     public override bool PreDraw(ref Color lightColor) {
         if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             Texture2D texture = Projectile.GetTexture();
-            Vector2 position = Projectile.Center;
+            Vector2 position = Projectile.Center + Projectile.velocity;
             Rectangle clip = texture.Bounds;
             Color drawColor = Color.Lerp(lightColor, Color.White, 0.5f);
             float rotation = Projectile.rotation;
@@ -218,7 +218,7 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
             Vector2 drawOrigin = clip.Centered();
 
             for (int k = 0; k < Projectile.oldPos.Length - 1; k += 1) {
-                Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
+                Vector2 drawPos = Projectile.oldPos[k] + new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition + Projectile.velocity;
                 position = drawPos;
 
                 float scaleFactor = Helper.Wave(0.75f, 1.5f, 20f, k * 10);
