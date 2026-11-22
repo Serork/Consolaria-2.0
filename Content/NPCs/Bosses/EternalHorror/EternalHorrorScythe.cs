@@ -201,7 +201,7 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
-        => target.AddBuff(BuffID.ShadowFlame, 180);
+        => target.AddBuff(BuffID.ShadowFlame, 300);
 
     public override Color? GetAlpha(Color lightColor)
         => new Color(255, 255, 255, 200);
