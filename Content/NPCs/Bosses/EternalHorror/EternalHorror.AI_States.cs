@@ -335,8 +335,11 @@ sealed partial class EternalHorror : ModNPC {
                 boss.TargetPlayer();
                 npc.FaceTarget_New();
 
-                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f) {
+                boss._ai4 += 1f;
+
+                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f + boss._ai4) {
                     boss.AICounter = 1f;
+                    boss._ai4 = 0f;
                 }
 
                 return;
@@ -1869,8 +1872,11 @@ sealed partial class EternalHorror : ModNPC {
                 boss.TargetPlayer();
                 npc.FaceTarget_New();
 
-                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f) {
+                boss._ai4 += 1f;
+
+                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f + boss._ai4) {
                     boss.AICounter = 1f;
+                    boss._ai4 = 0f;
                 }
 
                 return;
