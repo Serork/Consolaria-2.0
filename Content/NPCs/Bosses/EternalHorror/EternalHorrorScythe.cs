@@ -12,7 +12,7 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
-    private static ushort TIMELEFT => 150;
+    private static ushort TIMELEFT => 300;
 
     private static Asset<Texture2D> _glowTexture = null!;
 
