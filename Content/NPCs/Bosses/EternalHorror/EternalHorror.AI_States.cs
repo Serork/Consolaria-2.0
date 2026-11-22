@@ -165,7 +165,8 @@ sealed partial class EternalHorror : ModNPC {
                 if (shouldDash) {
                     return;
                 }
-                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, 1f, 0.025f);
+                float to = 1f + 1.5f * Ease.CubeIn(Helper.Clamp01(npc.Distance(baseTargetCenter) / 1200f));
+                boss.SmoothFactor = Helper.Approach(boss.SmoothFactor, to, 0.025f);
             }
             void lookAtTarget() {
                 float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
@@ -330,11 +331,22 @@ sealed partial class EternalHorror : ModNPC {
         public static float SHADOWSPAWNTIME => Helper.SecondsToFrames(1);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            if (boss.AICounter == 0f) {
+                boss.TargetPlayer();
+                npc.FaceTarget_New();
+
+                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f) {
+                    boss.AICounter = 1f;
+                }
+
+                return;
+            }
+
             void prepareAndSpawnClone() {
                 boss.TargetPlayer();
                 npc.FaceTarget_New();
 
-                bool justStarted = boss.AICounter == 0f;
+                bool justStarted = boss.AICounter <= 1f;
 
                 //bool justStarted = boss.AICounter == 0f;
                 if (justStarted) {
@@ -348,7 +360,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 float preparationSlowDown = Utils.Remap(1f - dustProgress, 0f, 1f, 0.75f, 1f, true);
 
-                npc.velocity *= preparationSlowDown;
+                //npc.velocity *= preparationSlowDown;
 
                 ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f/* * 2f*/);
 
