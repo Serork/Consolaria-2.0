@@ -1893,7 +1893,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 float preparationSlowDown = Utils.Remap(1f - dustProgress, 0f, 1f, 0.75f, 1f, true);
 
-                npc.velocity *= preparationSlowDown;
+                //npc.velocity *= preparationSlowDown;
 
                 ShakeStrength = Helper.Approach(ShakeStrength, dustProgress, 0.125f * 2f);
 
