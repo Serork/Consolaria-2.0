@@ -249,6 +249,9 @@ sealed partial class EternalHorror : ModNPC {
         if (NPC.GetTargetPlayer().dead) {
             NPC.KillNPC();
         }
+
+        NPC.damage = GetFinalBodyDamage(NPC.defDamage);
+        NPC.defense = (int)(NPC.defDefense * (IsInSecondPhase ? DEFENSEFACTOR_PHASE2 : 1f));
     }
 
     public override bool CheckDead() {

@@ -11,12 +11,14 @@ sealed partial class EternalHorror : ModNPC {
     public int DEFENSE => 100;
     public int DAMAGE_BODY => 50;
 
-    public static int HP_SERVANT => 1250;
+    public static int HP_SERVANT => 1000;
     public static int DEFENSE_SERVANT => 50;
     public static int DAMAGE_BODY_SERVANT => 50;
 
     public static float DAMAGEFACTOR_BODY_ONDASH => 1.5f;
     public static float DAMAGEFACTOR_SKULLEXPLOSION => 0.75f;
+
+    public static float DEFENSEFACTOR_PHASE2 => 0.75f;
 
     public int GetFinalBodyDamage(int defDamage) {
         bool flag2 = Main.expertMode;
