@@ -18,7 +18,7 @@ sealed partial class EternalHorror : ModNPC {
     public static float DAMAGEFACTOR_BODY_ONDASH => 1.5f;
     public static float DAMAGEFACTOR_SKULLEXPLOSION => 0.75f;
 
-    public static float DEFENSEFACTOR_PHASE2 => 0.75f;
+    public static float DEFENSEFACTOR_PHASE2 => 1.25f;
 
     public int GetFinalBodyDamage(int defDamage) {
         bool flag2 = Main.expertMode;
