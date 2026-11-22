@@ -175,7 +175,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public bool IsInSecondPhase => EternalHorrorSummonHandler.BlinkProgress_Out >= 1f && IsInSecondPhase_Base;
-    public bool IsInSecondPhase_Base => Dead || NPC.life < NPC.lifeMax * 0.666f;
+    public bool IsInSecondPhase_Base => Dead || NPC.life < NPC.lifeMax * 0.5f;
     public bool Dead => HasActiveState<DeathState>();
 
     public bool Phase1CloneSpawn_ShouldDashAfter {
