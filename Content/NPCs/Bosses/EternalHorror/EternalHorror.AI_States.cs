@@ -2084,7 +2084,7 @@ sealed partial class EternalHorror : ModNPC {
                             boss.MakeTrailDust(velocityFactor: 1f);
                         }
 
-                        boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: false, angleShiftToPlayer: boss.Phase2ScytheAttackAngle + baseDirection * -MathHelper.PiOver2);
+                        boss.SpawnScythe(Vector2.Zero, shootBasedOnRotation: false, angleShiftToPlayer: (boss.Phase2ScytheAttackAngle + 0.15f * baseDirection) + baseDirection * -MathHelper.PiOver2);
                     }
 
                     if (boss.Phase2ScytheAttackAngle == 0f) {
