@@ -135,7 +135,7 @@ sealed class SerorkMask : ModItem {
                             glowMaskTexture = _maskGlowTexture2.Value;
                             drawData = GetHeadGlowMask(ref drawInfo, glowMaskTexture, glowMaskColor);
                             glowMaskColor = Color.White * 0.9f;
-                            glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow * GetEffectOpacity(drawInfo.drawPlayer.GetPlayerCorePoint(), drawInfo.drawPlayer.socialIgnoreLight));
+                            glowMaskColor = drawinfo.drawPlayer.GetImmuneAlphaPure(glowMaskColor, (float)drawinfo.shadow) * GetEffectOpacity(drawInfo.drawPlayer.GetPlayerCorePoint(), drawInfo.drawPlayer.socialIgnoreLight);
                             drawData.color = glowMaskColor;
                             drawData.shader = drawinfo.cHead;
                             drawinfo.DrawDataCache.Add(drawData);
