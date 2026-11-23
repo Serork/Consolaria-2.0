@@ -385,6 +385,12 @@ sealed class EternalServant : ModNPC {
         NPC.OffsetTheSameNPC(0.1f);
     }
 
+    public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
+        cooldownSlot = ImmunityCooldownID.Bosses;
+
+        return base.CanHitPlayer(target, ref cooldownSlot);
+    }
+
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
         if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             drawColor = NPC.GetNPCColorTintedByBuffs(npcColor: drawColor);
