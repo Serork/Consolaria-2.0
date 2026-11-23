@@ -1209,7 +1209,7 @@ sealed partial class EternalHorror : ModNPC {
 
             boss.ResetCounters();
 
-            boss.ResetLaserAttack(applyExtraIncreasedDelay: true);
+            boss.ResetLaserAttack(applyExtraIncreasedDelay: true, applyExtraIncreasedDelay2: true);
 
             boss.ActivateState<Phase2MoveToPlayer>();
             boss.ActivateState<Phase2BurstLaserAttack>();
