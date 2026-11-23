@@ -1962,8 +1962,7 @@ Mods: {
 					SeasonalEvents: Eventos Sazonais
 					Miscellaneous: Outros
 					WorldGeneration: Geração de Mundo
-					// special: Special
-					// Special: Special Header
+					// Special: Special
 				}
 
 				easterEnabled: {

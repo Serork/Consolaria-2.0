@@ -1977,8 +1977,7 @@ Mods: {
 					SeasonalEvents: Eventos Estacionales
 					Miscellaneous: Misceláneos
 					WorldGeneration: Generación de mundo
-					// special: Special
-					// Special: Special Header
+					// Special: Special
 				}
 
 				easterEnabled: {

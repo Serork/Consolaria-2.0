@@ -1871,8 +1871,7 @@ Mods: {
 					SeasonalEvents: Сезонные события
 					Miscellaneous: Другое
 					WorldGeneration: Создание мира
-					// special: Special
-					// Special: Special Header
+					// Special: Special
 				}
 
 				easterEnabled: {

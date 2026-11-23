@@ -1871,8 +1871,7 @@ Mods: {
 					SeasonalEvents: Seasonal Events
 					Miscellaneous: Miscellaneous
 					WorldGeneration: World Generation
-					special: Special
-					Special: Special Header
+					Special: Special
 				}
 
 				easterEnabled: {
