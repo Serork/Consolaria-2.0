@@ -289,6 +289,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
+        IntiAmbientSounds();
+
         PlaySoundOnSpawn();
 
         InitializeCustomImmunityFrames();

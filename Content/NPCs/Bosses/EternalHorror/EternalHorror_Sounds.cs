@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -7,6 +8,8 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed partial class EternalHorror : ModNPC {
+    private record struct AmbientSoundInfo(float SlotID, float Time);
+
     private float _breatheSoundSlot;
     private float _roarSoundSlot;
     private float _cloneSoundSlot;
@@ -15,6 +18,7 @@ sealed partial class EternalHorror : ModNPC {
     private float _laserDashSoundSlot;
     private float _deathRoarSoundSlot;
     private float _spiralSoundSlot;
+    private AmbientSoundInfo[] _ambientSoundSlots;
 
     public static SoundStyle HitSound() => SoundID.NPCHit18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
     public static SoundStyle DeathSound() => SoundID.NPCDeath18 with { Pitch = -MathHelper.Lerp(0.125f, 0.25f, 0.5f) };
@@ -64,15 +68,29 @@ sealed partial class EternalHorror : ModNPC {
         _explosionPreparationSoundSlot2 = SoundEngine.PlaySound(CloneExplosionPreparation2(), NPC.Center).ToFloat();
     }
 
-    private bool SoundUpdateCallback_Ambient(ActiveSound soundInstance) {
-        soundInstance.Position = NPC.Center;
-
-        return true;
+    private void IntiAmbientSounds() {
+        _ambientSoundSlots = new AmbientSoundInfo[25];
     }
 
     private void TryToPlayAmbientSounds() {
+        if (!Init) {
+            return;
+        }
+
+        int index = 0;
+        for (int i = 0; i < _ambientSoundSlots.Length; i++) {
+            if (_ambientSoundSlots[i].Time <= 0) {
+                index = i;
+                break;
+            }
+            else {
+                _ambientSoundSlots[i].Time--;
+            }
+        }
+
+        Player localPlayer = Main.LocalPlayer;
         if (Main.rand.Next(50) == 0) {
-            SoundEngine.PlaySound(Main.rand.NextBool() ? AmbientSound1() : AmbientSound2(), NPC.Center, SoundUpdateCallback_Ambient);
+            _ambientSoundSlots[index] = new AmbientSoundInfo(SoundEngine.PlaySound(Main.rand.NextBool() ? AmbientSound1() : AmbientSound2(), localPlayer.Center).ToFloat(), Helper.SecondsToFrames(7));
         }
     }
 
@@ -121,5 +139,12 @@ sealed partial class EternalHorror : ModNPC {
         Helper.GetSoundAndAdjust(_spiralSoundSlot, (result) => {
             result.Position = NPC.Center;
         });
+        for (int i = 0; i < _ambientSoundSlots.Length; i++) {
+            if (_ambientSoundSlots[i].Time > 0) {
+                Helper.GetSoundAndAdjust(_ambientSoundSlots[i].SlotID, (result) => {
+                    result.Position = NPC.Center;
+                });
+            }
+        }
     }
 }
