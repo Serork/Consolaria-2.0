@@ -15,7 +15,7 @@ sealed partial class EternalHorror : ModNPC {
     public static int DAMAGE_BODY_SERVANT => 50;
 
     public static float DAMAGEFACTOR_BODY_ONDASH => 1.5f;
-    public static float DAMAGEFACTOR_SKULLEXPLOSION => 0.75f;
+    public static float DAMAGEFACTOR_EXPLOSIONSKULL => 0.75f;
 
     public static float DEFENSEFACTOR_PHASE2 => 1.25f;
 

@@ -64,7 +64,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
                 for (int i = 0; i < skullCount; i++) {
                     Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center,
                         Vector2.UnitY.RotatedBy(MathHelper.TwoPi * i / skullCount) * SkullSpeed * 2f,
-                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), (int)(Projectile.damage * EternalHorror.DAMAGEFACTOR_SKULLEXPLOSION), Projectile.knockBack, Main.myPlayer);
+                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), (int)(Projectile.damage * EternalHorror.DAMAGEFACTOR_EXPLOSIONSKULL), Projectile.knockBack, Main.myPlayer);
                 }
             }
 
