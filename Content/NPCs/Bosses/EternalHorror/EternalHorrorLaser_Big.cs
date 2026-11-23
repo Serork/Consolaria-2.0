@@ -86,7 +86,6 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
 
         Projectile.ignoreWater = true;
 
-
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 

@@ -34,7 +34,7 @@ sealed partial class EternalHorror : ModNPC {
     public int GetLaserDamage_Phase2() => GetDamage(1f);
     public float GetLaserKnockback_Phase2() => 0f;
 
-    public int GetBigLaserDamage() => GetDamage(2f);
+    public int GetBigLaserDamage() => GetDamage(1.5f);
     public float GetBigLaserKnockback() => 0f;
 
     public int GetExplosionDamage_Phase1() => GetDamage(1.5f);
