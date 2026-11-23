@@ -2,9 +2,10 @@ using Consolaria.Common;
 using Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 using Microsoft.Xna.Framework;
-
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.Items.Summons {
@@ -28,6 +29,15 @@ namespace Consolaria.Content.Items.Summons {
 
             Item.useStyle = ItemUseStyleID.HoldUp;
             //Item.consumable = true;
+        }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips) {
+            if (!EternalHorror.CanEternalHorrorExistInAWorld) {
+                int index = tooltips.FindIndex(x => x.Name == "Tooltip0");
+                if (index != -1) {
+                    tooltips[index].Text = Language.GetTextValue("Mods.Consolaria.CantUseSusSkull");
+                }
+            }
         }
 
         public override bool CanUseItem(Player player)
