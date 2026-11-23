@@ -77,19 +77,19 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
-        int index = 0;
-        for (int i = 0; i < _ambientSoundSlots.Length; i++) {
-            if (_ambientSoundSlots[i].Time <= 0) {
-                index = i;
-                break;
-            }
-            else {
-                _ambientSoundSlots[i].Time--;
-            }
-        }
-
         Player localPlayer = Main.LocalPlayer;
         if (Main.rand.Next(50) == 0) {
+            int index = 0;
+            for (int i = 0; i < _ambientSoundSlots.Length; i++) {
+                if (_ambientSoundSlots[i].Time <= 0) {
+                    index = i;
+                    break;
+                }
+                else {
+                    _ambientSoundSlots[i].Time--;
+                }
+            }
+
             _ambientSoundSlots[index] = new AmbientSoundInfo(SoundEngine.PlaySound(Main.rand.NextBool() ? AmbientSound1() : AmbientSound2(), localPlayer.Center).ToFloat(), Helper.SecondsToFrames(7));
         }
     }
@@ -142,7 +142,7 @@ sealed partial class EternalHorror : ModNPC {
         for (int i = 0; i < _ambientSoundSlots.Length; i++) {
             if (_ambientSoundSlots[i].Time > 0) {
                 Helper.GetSoundAndAdjust(_ambientSoundSlots[i].SlotID, (result) => {
-                    result.Position = NPC.Center;
+                    result.Position = Main.LocalPlayer.Center;
                 });
             }
         }

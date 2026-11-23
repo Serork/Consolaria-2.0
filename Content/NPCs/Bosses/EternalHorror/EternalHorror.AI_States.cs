@@ -335,7 +335,7 @@ sealed partial class EternalHorror : ModNPC {
                 boss.TargetPlayer();
                 npc.FaceTarget_New();
 
-                boss._ai4 += 2f;
+                boss._ai4 += 3f;
 
                 if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f + boss._ai4) {
                     boss.AICounter = 1f;
@@ -1872,7 +1872,7 @@ sealed partial class EternalHorror : ModNPC {
                 boss.TargetPlayer();
                 npc.FaceTarget_New();
 
-                boss._ai4 += 2f;
+                boss._ai4 += 3f;
 
                 if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f + boss._ai4) {
                     boss.AICounter = 1f;
@@ -2260,7 +2260,7 @@ sealed partial class EternalHorror : ModNPC {
                 foreach (Player player in Main.ActivePlayers) {
                     float lerpValue = 0.5f;
                     lerpValue *= 1 / 60f;
-                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / (maxDistance * 1.5f));
+                    lerpValue *= Helper.Clamp01(boss._tempPosition.Distance(player.Center) / (maxDistance * 1.25f));
                     player.Center = Vector2.Lerp(player.Center, boss._tempPosition, lerpValue * EternalHorrorSummonHandler.FilterOpacity);
                 }
             }
