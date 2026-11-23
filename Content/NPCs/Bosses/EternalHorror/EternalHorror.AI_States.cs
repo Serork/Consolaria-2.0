@@ -27,6 +27,10 @@ sealed partial class EternalHorror : ModNPC {
         public static float SLOWTIME => Helper.SecondsToFrames(3f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
+            boss.LaserRotation = 0f;
+
+            boss.DestroyLaser();
+
             boss.AICounter++;
 
             float attackProgress = boss.AICounter / SLOWTIME;
@@ -2411,11 +2415,7 @@ sealed partial class EternalHorror : ModNPC {
             }
 
             if (attackProgress >= 1.5f) {
-                foreach (Projectile projectile in Main.ActiveProjectiles) {
-                    if (projectile.type == laser && projectile.ai[2] == npc.whoAmI) {
-                        projectile.ai[1] = -1f;
-                    }
-                }
+                boss.DestroyLaser();
             }
             else {
                 ShakeStrength = Helper.Approach(ShakeStrength, Helper.Wave(0f, 1f, 2.5f, npc.whoAmI) * attackProgress2, 0.125f);

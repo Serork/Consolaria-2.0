@@ -388,6 +388,10 @@ sealed class EternalServant : ModNPC {
     public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
         cooldownSlot = ImmunityCooldownID.Bosses;
 
+        if (NPC.dontTakeDamage) {
+            return false;
+        }
+
         return base.CanHitPlayer(target, ref cooldownSlot);
     }
 

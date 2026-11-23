@@ -67,6 +67,10 @@ sealed partial class EternalHorror : ModNPC {
     public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
         cooldownSlot = ImmunityCooldownID.Bosses;
 
+        if (NPC.dontTakeDamage) {
+            return false;
+        }
+
         if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded || Dead) {
             return false;
         }

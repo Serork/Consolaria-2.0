@@ -1015,4 +1015,12 @@ sealed partial class EternalHorror : ModNPC {
             }
         });
     }
+
+    private void DestroyLaser() {
+        foreach (Projectile projectile in Main.ActiveProjectiles) {
+            if (projectile.type == ModContent.ProjectileType<EternalHorrorLaser_Holdout>() && projectile.ai[2] == NPC.whoAmI) {
+                projectile.ai[1] = -1f;
+            }
+        }
+    }
 }
