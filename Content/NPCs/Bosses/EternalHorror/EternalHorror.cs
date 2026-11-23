@@ -11,7 +11,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 [AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
-    public static byte IMMUNETIMEINTICKS => 0;
+    public static byte IMMUNETIMEINTICKS => 10;
 
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
@@ -29,39 +29,45 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
-        //if (Init && player.whoAmI >= 0) {
-        //    if (_customImmunityFrames[player.whoAmI] <= 0) {
-        //        _customImmunityFrames[player.whoAmI] = IMMUNETIMEINTICKS;
-        //    }
-        //}
+        if (item.CountsAsClass(DamageClass.Summon)) {
+            return;
+        }
+
+        if (Init && player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                _customImmunityFrames[player.whoAmI] = IMMUNETIMEINTICKS;
+            }
+        }
     }
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
-        //if (Init && projectile.owner >= 0) {
-        //    if (_customImmunityFrames[projectile.owner] <= 0) {
-        //        _customImmunityFrames[projectile.owner] = IMMUNETIMEINTICKS;
-        //    }
-        //}
+        if (projectile.CountsAsClass(DamageClass.Summon)) {
+            return;
+        }
+
+        if (Init && projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                _customImmunityFrames[projectile.owner] = IMMUNETIMEINTICKS;
+            }
+        }
     }
 
     public override bool? CanBeHitByProjectile(Projectile projectile) {
-        return base.CanBeHitByProjectile(projectile);
-        //if (Init && projectile.owner >= 0) {
-        //    if (_customImmunityFrames[projectile.owner] <= 0) {
-        //        return base.CanBeHitByProjectile(projectile);
-        //    }
-        //}
+        if (Init && projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                return base.CanBeHitByProjectile(projectile);
+            }
+        }
 
         return false;
     }
 
     public override bool? CanBeHitByItem(Player player, Item item) {
-        return base.CanBeHitByItem(player, item);
-        //if (Init && player.whoAmI >= 0) {
-        //    if (_customImmunityFrames[player.whoAmI] <= 0) {
-        //        return base.CanBeHitByItem(player, item);
-        //    }
-        //}
+        if (Init && player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                return base.CanBeHitByItem(player, item);
+            }
+        }
 
         return false;
     }

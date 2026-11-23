@@ -63,11 +63,15 @@ sealed class EternalServant : ModNPC {
             return;
         }
 
-        //if (player.whoAmI >= 0) {
-        //    if (_customImmunityFrames[player.whoAmI] <= 0) {
-        //        _customImmunityFrames[player.whoAmI] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 1);
-        //    }
-        //}
+        if (item.CountsAsClass(DamageClass.Summon)) {
+            return;
+        }
+
+        if (player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                _customImmunityFrames[player.whoAmI] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 1);
+            }
+        }
     }
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
@@ -75,11 +79,15 @@ sealed class EternalServant : ModNPC {
             return;
         }
 
-        //if (projectile.owner >= 0) {
-        //    if (_customImmunityFrames[projectile.owner] <= 0) {
-        //        _customImmunityFrames[projectile.owner] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 1);
-        //    }
-        //}
+        if (projectile.CountsAsClass(DamageClass.Summon)) {
+            return;
+        }
+
+        if (projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                _customImmunityFrames[projectile.owner] = (ushort)(EternalHorror.IMMUNETIMEINTICKS / 1);
+            }
+        }
     }
 
     public override bool? CanBeHitByProjectile(Projectile projectile) {
@@ -87,13 +95,11 @@ sealed class EternalServant : ModNPC {
             return false;
         }
 
-        return base.CanBeHitByProjectile(projectile);
-
-        //if (projectile.owner >= 0) {
-        //    if (_customImmunityFrames[projectile.owner] <= 0) {
-        //        return base.CanBeHitByProjectile(projectile);
-        //    }
-        //}
+        if (projectile.owner >= 0) {
+            if (_customImmunityFrames[projectile.owner] <= 0) {
+                return base.CanBeHitByProjectile(projectile);
+            }
+        }
 
         return false;
     }
@@ -103,13 +109,11 @@ sealed class EternalServant : ModNPC {
             return false;
         }
 
-        return base.CanBeHitByItem(player, item);
-
-        //if (player.whoAmI >= 0) {
-        //    if (_customImmunityFrames[player.whoAmI] <= 0) {
-        //        return base.CanBeHitByItem(player, item);
-        //    }
-        //}
+        if (player.whoAmI >= 0) {
+            if (_customImmunityFrames[player.whoAmI] <= 0) {
+                return base.CanBeHitByItem(player, item);
+            }
+        }
 
         return false;
     }
