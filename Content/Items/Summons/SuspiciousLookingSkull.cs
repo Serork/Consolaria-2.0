@@ -1,7 +1,7 @@
+using Consolaria.Common;
+using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Consolaria.Content.NPCs.Bosses.Ocram;
-
 using Microsoft.Xna.Framework;
-
 using Terraria;
 using Terraria.Chat;
 using Terraria.ID;
@@ -32,7 +32,7 @@ namespace Consolaria.Content.Items.Summons {
         }
 
         public override bool CanUseItem(Player player)
-            => !Main.IsItDay() && !NPC.AnyNPCs(ModContent.NPCType<Ocram>());
+            => (!EternalHorror.CanEternalHorrorExistInAWorld || !(!EternalHorror.CanEternalHorrorExistInAWorld && ModContent.GetInstance<ConsolariaConfig>().Ocram)) && !Main.IsItDay() && !NPC.AnyNPCs(ModContent.NPCType<Ocram>());
 
         public override bool? UseItem(Player player) {
             int type = ModContent.NPCType<Ocram>();
