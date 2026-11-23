@@ -27,8 +27,6 @@ sealed partial class EternalHorror : ModNPC {
         public static float SLOWTIME => Helper.SecondsToFrames(3f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            boss.LaserRotation = 0f;
-
             boss.DestroyLaser();
 
             boss.AICounter++;
@@ -136,6 +134,7 @@ sealed partial class EternalHorror : ModNPC {
             }
             if (Whitening_ForDeath >= 1f) {
                 boss._ai4 = 1f;
+                boss.LaserRotation = 0f;
             }
         }
 
