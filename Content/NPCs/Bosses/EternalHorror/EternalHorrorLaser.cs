@@ -217,6 +217,22 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
         }
     }
 
+    public override void OnHitPlayer(Player target, Player.HurtInfo info) {
+        if (!Reflected) {
+            return;
+        }
+
+        target.AddBuff(BuffID.ShadowFlame, 600);
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) {
+        if (!Reflected) {
+            return;
+        }
+
+        target.AddBuff(BuffID.ShadowFlame, 600);
+    }
+
     public override bool PreDraw(ref Color lightColor) {
         if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/Projectiles/LightTrail_1");

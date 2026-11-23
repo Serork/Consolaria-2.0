@@ -279,6 +279,13 @@ sealed class EternalHorrorLaser_Big : ModProjectile, IEternalHorrorProjectile {
         Utils.PlotTileLine(Projectile.Center, Projectile.Center + Projectile.velocity * Projectile.localAI[1], (float)Projectile.width * Projectile.scale, DelegateMethods.CastLight);
     }
 
+    public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        => target.AddBuff(BuffID.ShadowFlame, 600);
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) {
+        target.AddBuff(BuffID.ShadowFlame, 600);
+    }
+
     public override bool ShouldUpdatePosition() => false;
 
     private static int _segment;

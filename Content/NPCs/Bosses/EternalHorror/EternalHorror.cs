@@ -79,6 +79,10 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override bool CanHitNPC(NPC target) {
+        if (NPC.dontTakeDamage) {
+            return false;
+        }
+
         if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded || Dead) {
             return false;
         }
