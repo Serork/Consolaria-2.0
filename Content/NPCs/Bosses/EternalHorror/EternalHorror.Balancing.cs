@@ -1,6 +1,5 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using ThoriumMod.Empowerments;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
