@@ -11,26 +11,6 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 [AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
-    public static byte IMMUNETIMEINTICKS(DamageClass damageClass) {
-        if (damageClass.CountsAsClass(DamageClass.Ranged)) {
-            return 7;
-        }
-        if (damageClass.CountsAsClass(DamageClass.Melee) ||
-            damageClass.CountsAsClass(DamageClass.MeleeNoSpeed)) {
-            return 10;
-        }
-        if (damageClass.CountsAsClass(DamageClass.Summon) ||
-            damageClass.CountsAsClass(DamageClass.SummonMeleeSpeed) ||
-            damageClass.CountsAsClass(DamageClass.MagicSummonHybrid)) {
-            return 0;
-        }
-        if (damageClass.CountsAsClass(DamageClass.Magic)) {
-            return 3;
-        }
-
-        return 10;
-    }
-
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
     private ushort[] _customImmunityFrames;
