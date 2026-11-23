@@ -55,5 +55,10 @@ namespace Consolaria.Common {
         [DefaultValue(false)]
         [ReloadRequired]
         public bool pyramidMessageLoot;
+
+        [Header("Bosses")]
+        [DefaultValue(false)]
+        [ReloadRequired]
+        public bool Ocram;
     }
 }

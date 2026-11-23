@@ -10,27 +10,27 @@ namespace Consolaria.Content.Items.Summons {
     public class SuspiciousLookingSkull_EternalHorror : ModItem {
         public override void SetStaticDefaults() {
             Item.ResearchUnlockCount = 3;
-            ItemID.Sets.SortingPriorityBossSpawns[Type] = 12;
+            ItemID.Sets.SortingPriorityBossSpawns[Type] = 33;
         }
 
         public override void SetDefaults() {
             int width = 18; int height = 22;
             Item.Size = new Vector2(width, height);
 
-            Item.maxStack = 9999;
+            Item.maxStack = Item.CommonMaxStack;
 
-            Item.value = Item.sellPrice(silver: 1);
-            Item.rare = ItemRarityID.Lime;
+            Item.value = Item.sellPrice(gold: 10);
+            Item.rare = ItemRarityID.Red;
 
-            Item.useAnimation = 30;
-            Item.useTime = 30;
+            Item.useAnimation = 45;
+            Item.useTime = 45;
 
             Item.useStyle = ItemUseStyleID.HoldUp;
-            Item.consumable = true;
+            //Item.consumable = true;
         }
 
         public override bool CanUseItem(Player player)
-            => !NPC.AnyNPCs(ModContent.NPCType<EternalHorror>());
+            => (!EternalHorrorSummonHandler.EternalHorrorSummonStarted || EternalHorrorSummonHandler.EternalHorrorSummonEnded) && !NPC.AnyNPCs(ModContent.NPCType<EternalHorror>());
 
         public override bool? UseItem(Player player) {
             int type = ModContent.NPCType<EternalHorror>();

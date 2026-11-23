@@ -1434,8 +1434,8 @@ Mods: {
 			}
 
 			SuspiciousLookingSkull_EternalHorror: {
-				// DisplayName: Suspicious Looking Skull_ Emperor of Darkness
-				// Tooltip: ""
+				// DisplayName: Suspicious Looking Skull
+				// Tooltip: Summons Emperor of Darkness
 			}
 
 			SerorkBreastplate: {
@@ -1871,6 +1871,7 @@ Mods: {
 					SeasonalEvents: Сезонные события
 					Miscellaneous: Другое
 					WorldGeneration: Создание мира
+					// Bosses: Bosses
 				}
 
 				easterEnabled: {
@@ -1936,6 +1937,11 @@ Mods: {
 				pyramidMessageLoot: {
 					Label: Особые предметы в пирамиде
 					Tooltip: При создании мира в сундуке тайной комнаты пирамиды появится зашифрованное сообщение.
+				}
+
+				Ocram: {
+					// Label: Ocram True Form
+					// Tooltip: If enabled, Ocram's true form will show up in regular worlds
 				}
 			}
 		}
