@@ -1871,7 +1871,8 @@ Mods: {
 					SeasonalEvents: Seasonal Events
 					Miscellaneous: Miscellaneous
 					WorldGeneration: World Generation
-					Bosses: Bosses
+					special: Special
+					Special: Special Header
 				}
 
 				easterEnabled: {
@@ -1948,8 +1949,8 @@ Mods: {
 				}
 
 				Ocram: {
-					Label: Ocram
-					Tooltip: If enabled, Ocram's true form will show up in regular worlds
+					Label: Ocram's True Form
+					Tooltip: Ocram's true form will be active in all worlds
 				}
 			}
 		}

@@ -92,7 +92,7 @@ sealed partial class EternalHorror : ModNPC {
 
     public EternalHorror Self => NPC.As<EternalHorror>();
 
-    public static bool CanEternalHorrorExistInAWorld => Main.getGoodWorld;
+    public static bool CanEternalHorrorExistInAWorld => Main.getGoodWorld || ModContent.GetInstance<ConsolariaConfig>().Ocram;
 
     public override void Load() {
         Load_BackgroundHooks();

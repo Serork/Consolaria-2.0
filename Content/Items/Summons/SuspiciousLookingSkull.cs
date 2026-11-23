@@ -32,7 +32,7 @@ namespace Consolaria.Content.Items.Summons {
         }
 
         public override bool CanUseItem(Player player)
-            => (!EternalHorror.CanEternalHorrorExistInAWorld || !(!EternalHorror.CanEternalHorrorExistInAWorld && ModContent.GetInstance<ConsolariaConfig>().Ocram)) && !Main.IsItDay() && !NPC.AnyNPCs(ModContent.NPCType<Ocram>());
+            => !EternalHorror.CanEternalHorrorExistInAWorld && !Main.IsItDay() && !NPC.AnyNPCs(ModContent.NPCType<Ocram>());
 
         public override bool? UseItem(Player player) {
             int type = ModContent.NPCType<Ocram>();

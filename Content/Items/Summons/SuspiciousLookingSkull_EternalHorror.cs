@@ -31,7 +31,7 @@ namespace Consolaria.Content.Items.Summons {
         }
 
         public override bool CanUseItem(Player player)
-            => (EternalHorror.CanEternalHorrorExistInAWorld || (!EternalHorror.CanEternalHorrorExistInAWorld && ModContent.GetInstance<ConsolariaConfig>().Ocram)) && !EternalHorrorSummonHandler.EternalHorrorSummonStarted && !EternalHorrorSummonHandler.EternalHorrorSummonEnded && !NPC.AnyNPCs(ModContent.NPCType<EternalHorror>());
+            => EternalHorror.CanEternalHorrorExistInAWorld && !EternalHorrorSummonHandler.EternalHorrorSummonStarted && !EternalHorrorSummonHandler.EternalHorrorSummonEnded && !NPC.AnyNPCs(ModContent.NPCType<EternalHorror>());
 
         public override bool? UseItem(Player player) {
             int type = ModContent.NPCType<EternalHorror>();

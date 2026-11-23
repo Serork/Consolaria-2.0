@@ -19,6 +19,15 @@ namespace Consolaria.Common {
         [ReloadRequired]
         public bool smallEventsEnabled;
 
+        [Header("WorldGeneration")]
+        [DefaultValue(false)]
+        [ReloadRequired]
+        public bool pyramidEnabled;
+
+        [DefaultValue(false)]
+        [ReloadRequired]
+        public bool pyramidMessageLoot;
+
         [Header("Miscellaneous")]
         [DefaultValue(false)]
         public bool vanillaBossMusicEnabled;
@@ -47,16 +56,7 @@ namespace Consolaria.Common {
         [ReloadRequired]
         public bool tizonaZenithIntegrationEnabled;
 
-        [Header("WorldGeneration")]
-        [DefaultValue(false)]
-        [ReloadRequired]
-        public bool pyramidEnabled;
-
-        [DefaultValue(false)]
-        [ReloadRequired]
-        public bool pyramidMessageLoot;
-
-        [Header("Bosses")]
+        [Header("Special")]
         [DefaultValue(false)]
         [ReloadRequired]
         public bool Ocram;
