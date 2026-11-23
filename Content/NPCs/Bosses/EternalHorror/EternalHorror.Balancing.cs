@@ -45,7 +45,7 @@ sealed partial class EternalHorror : ModNPC {
     public int GetScytheDamage() => GetDamage(1.25f);
     public float GetScytheKnockback() => 0f;
 
-    public int GetDamage(float modifier = 1f) => NPC.GetAttackDamage_ForProjectiles((int)(50 * modifier * 2f), (int)(30 * modifier * 2f));
+    public int GetDamage(float modifier = 1f) => NPC.GetAttackDamage_ForProjectiles((int)(50 * modifier * 1.5f), (int)(30 * modifier * 1.5f));
 
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
         NPC.lifeMax = (int)((double)NPC.lifeMax * 0.7 * (double)balance * (double)bossAdjustment);
