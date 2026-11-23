@@ -11,7 +11,25 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 [AutoloadBossHead]
 sealed partial class EternalHorror : ModNPC {
-    public static byte IMMUNETIMEINTICKS => 10;
+    public static byte IMMUNETIMEINTICKS(DamageClass damageClass) {
+        if (damageClass.CountsAsClass(DamageClass.Ranged)) {
+            return 7;
+        }
+        if (damageClass.CountsAsClass(DamageClass.Melee) ||
+            damageClass.CountsAsClass(DamageClass.MeleeNoSpeed)) {
+            return 10;
+        }
+        if (damageClass.CountsAsClass(DamageClass.Summon) ||
+            damageClass.CountsAsClass(DamageClass.SummonMeleeSpeed) ||
+            damageClass.CountsAsClass(DamageClass.MagicSummonHybrid)) {
+            return 0;
+        }
+        if (damageClass.CountsAsClass(DamageClass.Magic)) {
+            return 3;
+        }
+
+        return 10;
+    }
 
     public static string EERIEOCRAM_MUSICPATH => "Assets/Music/EerieOcram";
 
@@ -29,25 +47,17 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone) {
-        if (item.CountsAsClass(DamageClass.Summon)) {
-            return;
-        }
-
         if (Init && player.whoAmI >= 0) {
             if (_customImmunityFrames[player.whoAmI] <= 0) {
-                _customImmunityFrames[player.whoAmI] = IMMUNETIMEINTICKS;
+                _customImmunityFrames[player.whoAmI] = IMMUNETIMEINTICKS(item.DamageType);
             }
         }
     }
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone) {
-        if (projectile.CountsAsClass(DamageClass.Summon)) {
-            return;
-        }
-
         if (Init && projectile.owner >= 0) {
             if (_customImmunityFrames[projectile.owner] <= 0) {
-                _customImmunityFrames[projectile.owner] = IMMUNETIMEINTICKS;
+                _customImmunityFrames[projectile.owner] = IMMUNETIMEINTICKS(projectile.DamageType);
             }
         }
     }
