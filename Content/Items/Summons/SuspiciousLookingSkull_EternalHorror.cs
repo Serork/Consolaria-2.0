@@ -51,16 +51,31 @@ namespace Consolaria.Content.Items.Summons {
             int type = ModContent.NPCType<EternalHorror>();
 
             if (Main.netMode != NetmodeID.MultiplayerClient) {
-                int num9 = NPC.NewNPC(NPC.GetBossSpawnSource(player.whoAmI), (int)player.Center.X, (int)player.Center.Y, type);
-                Main.npc[num9].target = player.whoAmI;
-                string typeName2 = Main.npc[num9].TypeName;
-                //if (Main.netMode == 0)
-                //    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName2), 175, 75);
-                //else if (Main.netMode == 2)
-                //    ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", Main.npc[num9].GetTypeNetName()), new Color(175, 75, 255));
+                int targetPlayerIndex = player.whoAmI;
+
+                int num = 200;
+                num = NPC.NewNPC(player.GetSource_ItemUse(Item), (int)player.Center.X, (int)player.Center.Y, type, 1);
+
+                if (num != 200) {
+                    Main.npc[num].target = targetPlayerIndex;
+                    Main.npc[num].timeLeft *= 20;
+                    string typeName = Main.npc[num].TypeName;
+                    if (Main.netMode == 2 && num < 200)
+                        NetMessage.SendData(23, -1, -1, null, num);
+                }
             }
 
-            return true;
+            //if (Main.netMode != NetmodeID.MultiplayerClient) {
+            //    //int num9 = NPC.NewNPC(NPC.GetBossSpawnSource(player.whoAmI), (int)player.Center.X, (int)player.Center.Y, type);
+            //    //Main.npc[num9].target = player.whoAmI;
+            //    //string typeName2 = Main.npc[num9].TypeName;
+            //    //if (Main.netMode == 0)
+            //    //    Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName2), 175, 75);
+            //    //else if (Main.netMode == 2)
+            //    //    ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", Main.npc[num9].GetTypeNetName()), new Color(175, 75, 255));
+            //}
+
+            return base.UseItem(player);
         }
     }
 }

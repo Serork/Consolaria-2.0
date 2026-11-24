@@ -169,8 +169,8 @@ sealed partial class EternalHorror : ModNPC {
         NPC.SetDefaultsToEnemy(lifeMax: HP,
                                damage: DAMAGE_BODY, 
                                defense: DEFENSE, 
-                               spawnSlots: 20f,
-                               boss: true);
+                               spawnSlots: 20f
+                               , boss: true);
 
         NPC.SetHitSounds(hitSound: HitSound(),
                          deathSound: DeathSound());
@@ -185,6 +185,10 @@ sealed partial class EternalHorror : ModNPC {
         NPC.BossBar = ModContent.GetInstance<EternalHorrorBossBar>();
 
         NPC.netAlways = true;
+
+        if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded && !EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned) {
+            NPC.boss = false;
+        }
     }
 
     private void SetMusic() {

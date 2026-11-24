@@ -228,8 +228,13 @@ sealed partial class EternalHorror : ModNPC {
 
             EternalHorrorSummonHandler.StartSummoningEternalHorror();
             NPC.KillNPC();
+
+            NPC.boss = false;
+
             return;
         }
+
+        NPC.boss = true;
 
         OnSpawn();
         MakeMidnight(speedFactor: 1f, secondPhase: IsInSecondPhase);
