@@ -55,6 +55,10 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
     }
 
     public override void AI() {
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return;
+        }
+
         Projectile.timeLeft = 2;
 
         if (Projectile.localAI[0] < 0f) {
@@ -184,10 +188,18 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
     }
 
     public override void OnKill(int timeLeft) {
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return;
+        }
+
         DeactivateShockwave();
     }
 
     public override bool PreDraw(ref Color lightColor) {
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return false;
+        }
+
         if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             SpriteBatch mySpriteBatch = Main.spriteBatch;
             Matrix Transform = Main.Transform;

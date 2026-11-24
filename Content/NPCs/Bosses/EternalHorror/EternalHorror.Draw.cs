@@ -599,6 +599,10 @@ sealed partial class EternalHorror : ModNPC {
                     continue;
                 }
 
+                if (Main.myPlayer != cloneInfo.PlayerIndex) {
+                    continue;
+                }
+
                 float explosionProgress = cloneInfo.ExplosionProgress;
 
                 float explosionProgress2 = cloneInfo.ExplosionProgress2;
