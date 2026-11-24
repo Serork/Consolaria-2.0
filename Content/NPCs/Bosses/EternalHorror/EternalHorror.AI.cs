@@ -141,6 +141,8 @@ sealed partial class EternalHorror : ModNPC {
 
     private float _ai4, _ai5;
 
+    private bool _allPlayersAreDead;
+
     public Vector2 EyeVelocity => _eyeVelocity;
 
     public float LaserRotation { get; private set; }
@@ -245,6 +247,22 @@ sealed partial class EternalHorror : ModNPC {
 
         SomeSecondPhaseShitCode();
         UpdateCustomImmunityFrames();
+
+        if (!_allPlayersAreDead) {
+            if (NPC.GetTargetPlayer().dead || !NPC.HasValidTarget) {
+                TargetPlayer();
+                NPC.FaceTarget_New();
+                if (NPC.GetTargetPlayer().dead || !NPC.HasValidTarget) {
+                    _allPlayersAreDead = true;
+                }
+            }
+        }
+        else {
+            EternalHorrorSummonHandler.Blackening_ForDeath = Helper.Approach(EternalHorrorSummonHandler.Blackening_ForDeath, 1f, 1 / 60f * 0.75f);
+            if (EternalHorrorSummonHandler.Blackening_ForDeath >= 1f) {
+                NPC.KillNPC();
+            }
+        }
 
         NPC.damage = GetFinalBodyDamage(NPC.defDamage);
         NPC.defense = (int)(NPC.defDefense * (IsInSecondPhase ? DEFENSEFACTOR_PHASE2 : 1f));

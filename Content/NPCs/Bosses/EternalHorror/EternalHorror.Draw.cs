@@ -216,6 +216,10 @@ sealed partial class EternalHorror : ModNPC {
     private void On_MoonlordDeathDrama_Update(On_MoonlordDeathDrama.orig_Update orig) {
         orig();
 
+        if (!NPC.AnyNPCs(EternalHorror.SelfType)) {
+            EternalHorrorSummonHandler.Blackening_ForDeath = Helper.Approach(EternalHorrorSummonHandler.Blackening_ForDeath, 0f, 1 / 60f);
+        }
+
         if (!Main.gameMenu && !Main.dedServ) {
             {
                 string filterName = ShaderLoader.HorrorEffectFilterName1;
@@ -329,6 +333,11 @@ sealed partial class EternalHorror : ModNPC {
 
     private void On_MoonlordDeathDrama_DrawWhite(On_MoonlordDeathDrama.orig_DrawWhite orig, SpriteBatch spriteBatch) {
         orig(spriteBatch);
+
+        if (EternalHorrorSummonHandler.Blackening_ForDeath != 0f) {
+            Color color = MainPurpleColor.ModifyRGB(0.5f) * EternalHorrorSummonHandler.Blackening_ForDeath;
+            spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
+        }
     }
 
     private void On_Main_UpdateTime(On_Main.orig_UpdateTime orig) {

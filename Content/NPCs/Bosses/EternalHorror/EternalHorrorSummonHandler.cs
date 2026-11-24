@@ -87,6 +87,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     public static bool EternalHorror_SecondPhaseStarted;
 
+    public static float Blackening_ForDeath;
+
     public delegate void OverBlinkingDrawDelegate(SpriteBatch spriteBatch);
     public static event OverBlinkingDrawDelegate OverBlinkingDrawEvent = null!;
 
