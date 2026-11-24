@@ -252,7 +252,7 @@ sealed class ShaderLoader : ModSystem {
     private static HashSet<byte> _shockwaveTaken;
 
     public static void TakeShockwave(out byte takenIndex) {
-        int count = _shockwaveTaken.Count();
+        int count = _shockwaveTaken.Count;
         takenIndex = (byte)count;
         _shockwaveTaken.Add(takenIndex);
     }

@@ -172,6 +172,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
             DeactivateShockwave();
 
             Projectile.Kill();
+
+            ShaderLoader.RemoveShockwave((byte)_explosionIndex);
         }
     }
 

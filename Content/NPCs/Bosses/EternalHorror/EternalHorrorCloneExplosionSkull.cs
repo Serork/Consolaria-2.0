@@ -25,6 +25,8 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
         ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
 
         ProjectileID.Sets.CanHitPastShimmer[Type] = true;
+
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 600;
     }
 
     public override void SetDefaults() {
