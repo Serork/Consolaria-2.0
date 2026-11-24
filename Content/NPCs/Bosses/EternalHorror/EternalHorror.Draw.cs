@@ -333,11 +333,6 @@ sealed partial class EternalHorror : ModNPC {
 
     private void On_MoonlordDeathDrama_DrawWhite(On_MoonlordDeathDrama.orig_DrawWhite orig, SpriteBatch spriteBatch) {
         orig(spriteBatch);
-
-        if (EternalHorrorSummonHandler.Blackening_ForDeath != 0f) {
-            Color color = MainPurpleColor.ModifyRGB(MathHelper.Lerp(0.25f, 0.375f, 0.75f)) * EternalHorrorSummonHandler.Blackening_ForDeath;
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
-        }
     }
 
     private void On_Main_UpdateTime(On_Main.orig_UpdateTime orig) {
@@ -1473,5 +1468,10 @@ sealed partial class EternalHorror : ModNPC {
 
         //    boss_modNPC.Draw(spriteBatch, screenPos, drawColor2 * boss.Opacity, drawColor2, rayOpacity: 0f, solid: true);
         //}
+
+        if (EternalHorrorSummonHandler.Blackening_ForDeath != 0f) {
+            Color color = MainPurpleColor.ModifyRGB(MathHelper.Lerp(0.25f, 0.375f, 0.875f)) * EternalHorrorSummonHandler.Blackening_ForDeath;
+            spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-2, -2, Main.screenWidth + 4, Main.screenHeight + 4), new Rectangle(0, 0, 1, 1), color);
+        }
     }
 }
