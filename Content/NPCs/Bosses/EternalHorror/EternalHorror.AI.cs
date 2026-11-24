@@ -246,10 +246,6 @@ sealed partial class EternalHorror : ModNPC {
         SomeSecondPhaseShitCode();
         UpdateCustomImmunityFrames();
 
-        if (NPC.GetTargetPlayer().dead) {
-            NPC.KillNPC();
-        }
-
         NPC.damage = GetFinalBodyDamage(NPC.defDamage);
         NPC.defense = (int)(NPC.defDefense * (IsInSecondPhase ? DEFENSEFACTOR_PHASE2 : 1f));
     }
