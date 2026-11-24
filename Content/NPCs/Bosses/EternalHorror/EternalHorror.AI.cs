@@ -261,6 +261,11 @@ sealed partial class EternalHorror : ModNPC {
             EternalHorrorSummonHandler.Blackening_ForDeath = Helper.Approach(EternalHorrorSummonHandler.Blackening_ForDeath, 1f, 1 / 60f * 0.75f);
             if (EternalHorrorSummonHandler.Blackening_ForDeath >= 1f) {
                 NPC.KillNPC();
+                foreach (NPC npc in Main.ActiveNPCs) {
+                    if (npc.type == ModContent.NPCType<EternalServant>()) {
+                        npc.KillNPC();
+                    }
+                }
             }
         }
 
