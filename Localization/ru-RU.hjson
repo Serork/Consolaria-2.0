@@ -1,7 +1,7 @@
 Mods: {
 	Consolaria: {
-		// OcramSummonCondition: Normal worlds
-		// EternalHorrorSummonCondition: Legendary worlds
+		// OcramSummonCondition: Normal world
+		// EternalHorrorSummonCondition: Legendary world
 		// CantUseSusSkull: "'It has no effect in this world'"
 		// ConsolariaDev: "'Great for impersonating Consolaria devs? Sure!'"
 		// Credits: Consolaria Credits
