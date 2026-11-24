@@ -64,8 +64,6 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
         if (Projectile.localAI[0] == 0f) {
             Projectile.localAI[0] = 1f;
 
-            SoundEngine.PlaySound(EternalHorror.ExplosionSound(), Projectile.Center);
-
             if (!Helper.IsClient()) {
                 int skullCount = SKULLCOUNT;
                 const float SkullSpeed = 12f;
@@ -77,6 +75,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
             }
 
             if (!(PlayerIndex >= 0 && PlayerIndex != Main.myPlayer)) {
+                SoundEngine.PlaySound(EternalHorror.ExplosionSound(), Projectile.Center);
+
                 Projectile.scale = 0f;
 
                 ShaderLoader.TakeShockwave(out byte takenIndex);
