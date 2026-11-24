@@ -18,7 +18,7 @@ sealed partial class EternalHorror : ModNPC {
             return 0;
         }
         if (damageClass.CountsAsClass(DamageClass.Magic)) {
-            return 4;
+            return 6;
         }
 
         return 10;
