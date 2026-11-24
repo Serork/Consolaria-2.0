@@ -20,7 +20,7 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
         set => ReflectedValue = value.ToInt();
     }
 
-    public int PlayerIndex => (int)(Projectile.ai[1]);
+    public int PlayerIndex => (int)(Projectile.ai[0]);
 
     public override void SetStaticDefaults() {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 16;
@@ -32,7 +32,7 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
     }
 
     public override void SetDefaults() {
-        Projectile.SetSizeValues(40);
+        Projectile.SetSizeValues(35);
 
         Projectile.aiStyle = -1;
 

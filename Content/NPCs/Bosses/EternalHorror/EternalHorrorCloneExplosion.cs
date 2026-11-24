@@ -55,10 +55,6 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
     }
 
     public override void AI() {
-        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
-            return;
-        }
-
         Projectile.timeLeft = 2;
 
         if (Projectile.localAI[0] < 0f) {
@@ -76,99 +72,105 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
                 for (int i = 0; i < skullCount; i++) {
                     Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center,
                         Vector2.UnitY.RotatedBy(MathHelper.TwoPi * i / skullCount) * SkullSpeed * 2f,
-                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), (int)(Projectile.damage * EternalHorror.DAMAGEFACTOR_EXPLOSIONSKULL), Projectile.knockBack, Main.myPlayer, ai1: PlayerIndex);
+                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), (int)(Projectile.damage * EternalHorror.DAMAGEFACTOR_EXPLOSIONSKULL), Projectile.knockBack, Main.myPlayer, ai0: PlayerIndex);
                 }
             }
 
-            Projectile.scale = 0f;
+            if (!(PlayerIndex >= 0 && PlayerIndex != Main.myPlayer)) {
+                Projectile.scale = 0f;
 
-            ShaderLoader.TakeShockwave(out byte takenIndex);
-            _explosionIndex = takenIndex;
+                ShaderLoader.TakeShockwave(out byte takenIndex);
+                _explosionIndex = takenIndex;
 
-            ActivateShockwave(rippleCount: 3f * EXPLOSIONSCALEMODIFIER, rippleSize: 5f * EXPLOSIONSCALEMODIFIER, rippleSpeed: 10f * EXPLOSIONSCALEMODIFIER);
+                ActivateShockwave(rippleCount: 3f * EXPLOSIONSCALEMODIFIER, rippleSize: 5f * EXPLOSIONSCALEMODIFIER, rippleSpeed: 10f * EXPLOSIONSCALEMODIFIER);
 
-            int size = (int)(375 * EXPLOSIONSCALEMODIFIER);
-            Projectile.Resize(size, size);
+                int size = (int)(375 * EXPLOSIONSCALEMODIFIER);
+                Projectile.Resize(size, size);
 
-            Color getColor() => EternalHorror.MainPurpleColor;
+                Color getColor() => EternalHorror.MainPurpleColor;
 
-            Color color1 = EternalHorror.MainPurpleColor;
-            Color color2 = EternalHorror.MainPurpleColor;
-            Color color3 = EternalHorror.MainPurpleColor;
+                Color color1 = EternalHorror.MainPurpleColor;
+                Color color2 = EternalHorror.MainPurpleColor;
+                Color color3 = EternalHorror.MainPurpleColor;
 
-            float dustSpeedModifier = 1.5f * EXPLOSIONSCALEMODIFIER;
+                float dustSpeedModifier = 1.5f * EXPLOSIONSCALEMODIFIER;
 
-            for (int num949 = 0; num949 < 8; num949++) {
-                if (!Main.dedServ) {
-                    Gore gore6 = Gore.NewGoreDirect(Projectile.GetSource_FromThis(), Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * 0.125f, Vector2.Zero, 61 + Main.rand.Next(3));
-                    gore6.velocity = ((float)Math.PI * 2f * (float)num949 / 8f).ToRotationVector2() * Main.rand.NextFloat() * 8f;
+                for (int num949 = 0; num949 < 8; num949++) {
+                    if (!Main.dedServ) {
+                        Gore gore6 = Gore.NewGoreDirect(Projectile.GetSource_FromThis(), Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * 0.125f, Vector2.Zero, 61 + Main.rand.Next(3));
+                        gore6.velocity = ((float)Math.PI * 2f * (float)num949 / 8f).ToRotationVector2() * Main.rand.NextFloat() * 8f;
 
-                    gore6.velocity *= dustSpeedModifier;
-                }
-            }
-            for (int num950 = 0; num950 < 40; num950++) {
-                Dust dust59 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, 31);
-                dust59.velocity = Projectile.DirectionTo(dust59.position).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat() * 8f;
-
-                dust59.velocity *= dustSpeedModifier;
-            }
-
-            for (float num5 = 0f; num5 < 1f; num5 += 1f / 15f) {
-                Color colorTint = Main.rand.NextFromList([color1, color2, color3]) with { A = 127 };
-                Dust dust = Dust.NewDustPerfect(Projectile.Center, 267, Vector2.Zero, 0, colorTint, 2f);
-                dust.noGravity = true;
-                dust.velocity = new Vector2(0f, 12f).RotatedBy((float)Math.PI * 2f * num5) * Main.rand.NextFloat() * 2f;
-
-                dust.velocity *= dustSpeedModifier;
-            }
-
-            Vector2 position = Projectile.Center;
-            if (!Main.dedServ) {
-                for (float num2 = 0f; num2 < 1f; num2 += 0.04f) {
-                    float num3 = 25f;
-                    float num4 = (float)Math.PI * 2f * num2;
-                    FadingParticle fadingParticle5 = ParticlePools.ParticleOrchestrator__poolFading(null).RequestParticle();
-                    Color colorTint = Main.rand.NextFromList([color1, color2, color3]) with { A = 20 };
-                    fadingParticle5.SetBasicInfo(TextureAssets.Extra[89], null, num4.ToRotationVector2() * (4f + 7f * Main.rand.NextFloat()), position + num4.ToRotationVector2() * (10f + 90f * Main.rand.NextFloat()));
-                    fadingParticle5.Velocity *= Main.rand.NextFloat(1f, 1.5f);
-                    fadingParticle5.SetTypeInfo(num3);
-                    fadingParticle5.AccelerationPerFrame = fadingParticle5.Velocity * (-1f / num3);
-                    fadingParticle5.LocalPosition -= fadingParticle5.Velocity * 4f;
-                    fadingParticle5.ColorTint = colorTint;
-                    fadingParticle5.Rotation = num4 + (float)Math.PI / 2f;
-                    fadingParticle5.FadeInNormalizedTime = 0.2f;
-                    fadingParticle5.FadeOutNormalizedTime = 0.3f;
-                    fadingParticle5.Scale = new Vector2(0.4f, 0.8f) * (0.6f + 0.6f * Main.rand.NextFloat());
-
-                    fadingParticle5.Velocity *= dustSpeedModifier;
-
-                    Main.ParticleSystem_World_OverPlayers.Add(fadingParticle5);
-                }
-
-                for (int num915 = 0; num915 < 30; num915++) {
-                    Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.TintableDustLighted);
-                    //dust.position = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) / 2f * Projectile.scale;
-                    dust.noGravity = true;
-                    dust.scale = 1.4f;
-                    dust.velocity.Y += 1f * Main.rand.NextFloat();
-                    dust.velocity.X *= Main.rand.NextFloat();
-                    dust.alpha = 100;
-                    dust.color = getColor();
-                    dust.fadeIn = 0.4f + Main.rand.NextFloat() * 0.15f;
-                    //while (Projectile.Hitbox.Contains(dust.position.ToPoint())) {
-                    //    dust.position -= dust.position.DirectionTo(Projectile.Center);
-                    //}
-                    //dust.position += dust.position.DirectionTo(Projectile.Center) * 10f * Main.rand.NextFloat();
-                    if (Main.rand.NextBool()) {
-                        dust.velocity *= new Vector2(Main.rand.NextFloat(), Main.rand.NextFloat());
+                        gore6.velocity *= dustSpeedModifier;
                     }
-                    dust.velocity = Projectile.DirectionTo(dust.position).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat() * 8f;
+                }
+                for (int num950 = 0; num950 < 40; num950++) {
+                    Dust dust59 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, 31);
+                    dust59.velocity = Projectile.DirectionTo(dust59.position).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat() * 8f;
+
+                    dust59.velocity *= dustSpeedModifier;
+                }
+
+                for (float num5 = 0f; num5 < 1f; num5 += 1f / 15f) {
+                    Color colorTint = Main.rand.NextFromList([color1, color2, color3]) with { A = 127 };
+                    Dust dust = Dust.NewDustPerfect(Projectile.Center, 267, Vector2.Zero, 0, colorTint, 2f);
+                    dust.noGravity = true;
+                    dust.velocity = new Vector2(0f, 12f).RotatedBy((float)Math.PI * 2f * num5) * Main.rand.NextFloat() * 2f;
 
                     dust.velocity *= dustSpeedModifier;
                 }
-            }
 
-            Projectile.Resize(30, 30);
+                Vector2 position = Projectile.Center;
+                if (!Main.dedServ) {
+                    for (float num2 = 0f; num2 < 1f; num2 += 0.04f) {
+                        float num3 = 25f;
+                        float num4 = (float)Math.PI * 2f * num2;
+                        FadingParticle fadingParticle5 = ParticlePools.ParticleOrchestrator__poolFading(null).RequestParticle();
+                        Color colorTint = Main.rand.NextFromList([color1, color2, color3]) with { A = 20 };
+                        fadingParticle5.SetBasicInfo(TextureAssets.Extra[89], null, num4.ToRotationVector2() * (4f + 7f * Main.rand.NextFloat()), position + num4.ToRotationVector2() * (10f + 90f * Main.rand.NextFloat()));
+                        fadingParticle5.Velocity *= Main.rand.NextFloat(1f, 1.5f);
+                        fadingParticle5.SetTypeInfo(num3);
+                        fadingParticle5.AccelerationPerFrame = fadingParticle5.Velocity * (-1f / num3);
+                        fadingParticle5.LocalPosition -= fadingParticle5.Velocity * 4f;
+                        fadingParticle5.ColorTint = colorTint;
+                        fadingParticle5.Rotation = num4 + (float)Math.PI / 2f;
+                        fadingParticle5.FadeInNormalizedTime = 0.2f;
+                        fadingParticle5.FadeOutNormalizedTime = 0.3f;
+                        fadingParticle5.Scale = new Vector2(0.4f, 0.8f) * (0.6f + 0.6f * Main.rand.NextFloat());
+
+                        fadingParticle5.Velocity *= dustSpeedModifier;
+
+                        Main.ParticleSystem_World_OverPlayers.Add(fadingParticle5);
+                    }
+
+                    for (int num915 = 0; num915 < 30; num915++) {
+                        Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.TintableDustLighted);
+                        //dust.position = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) / 2f * Projectile.scale;
+                        dust.noGravity = true;
+                        dust.scale = 1.4f;
+                        dust.velocity.Y += 1f * Main.rand.NextFloat();
+                        dust.velocity.X *= Main.rand.NextFloat();
+                        dust.alpha = 100;
+                        dust.color = getColor();
+                        dust.fadeIn = 0.4f + Main.rand.NextFloat() * 0.15f;
+                        //while (Projectile.Hitbox.Contains(dust.position.ToPoint())) {
+                        //    dust.position -= dust.position.DirectionTo(Projectile.Center);
+                        //}
+                        //dust.position += dust.position.DirectionTo(Projectile.Center) * 10f * Main.rand.NextFloat();
+                        if (Main.rand.NextBool()) {
+                            dust.velocity *= new Vector2(Main.rand.NextFloat(), Main.rand.NextFloat());
+                        }
+                        dust.velocity = Projectile.DirectionTo(dust.position).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat() * 8f;
+
+                        dust.velocity *= dustSpeedModifier;
+                    }
+                }
+
+                Projectile.Resize(30, 30);
+            }
+        }
+
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return;
         }
 
         HandleShockwave(distortStrength: 100f * (1f - Projectile.scale) * EXPLOSIONSCALEMODIFIER, progress: Projectile.scale * EXPLOSIONSCALEMODIFIER);
