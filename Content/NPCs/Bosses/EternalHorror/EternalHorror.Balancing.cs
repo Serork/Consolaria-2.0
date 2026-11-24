@@ -6,7 +6,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 sealed partial class EternalHorror : ModNPC {
     public static byte IMMUNETIMEINTICKS(DamageClass damageClass) {
         if (damageClass.CountsAsClass(DamageClass.Ranged)) {
-            return 5;
+            return 6;
         }
         if (damageClass.CountsAsClass(DamageClass.Melee) ||
             damageClass.CountsAsClass(DamageClass.MeleeNoSpeed)) {
@@ -18,7 +18,7 @@ sealed partial class EternalHorror : ModNPC {
             return 0;
         }
         if (damageClass.CountsAsClass(DamageClass.Magic)) {
-            return 5;
+            return 4;
         }
 
         return 10;
@@ -37,7 +37,7 @@ sealed partial class EternalHorror : ModNPC {
     public static float DAMAGEFACTOR_BODY_ONDASH => 1.5f;
     public static float DAMAGEFACTOR_EXPLOSIONSKULL => 0.75f;
 
-    public static float DEFENSEFACTOR_PHASE2 => 1.25f;
+    public static float DEFENSEFACTOR_PHASE2 => 1.5f;
 
     public int GetFinalBodyDamage(int defDamage) {
         bool flag2 = Main.expertMode;
