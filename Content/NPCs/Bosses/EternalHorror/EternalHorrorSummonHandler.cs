@@ -204,8 +204,8 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 if (npc.ShouldUpdateFilterPosition) {
                     FilterMoveFactor = Helper.Approach(FilterMoveFactor, 1f, 1 / 60f);
 
-                    Vector2 to = npc.NPC.GetTargetPlayer().Center;
-                    to = Main.LocalPlayer.Center;
+                    //Vector2 to = npc.NPC.GetTargetPlayer().Center;
+                    Vector2 to = Main.LocalPlayer.Center;
                     if (FilterPosition == Vector2.Zero) {
                         FilterPosition = to;
                     }

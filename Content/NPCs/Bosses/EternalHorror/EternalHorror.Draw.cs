@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
 using Terraria.Graphics.Effects;
@@ -655,7 +656,7 @@ sealed partial class EternalHorror : ModNPC {
 
                 float rotation = cloneInfo.Rotation;
 
-                Player target = NPC.GetTargetPlayer();
+                //Player target = NPC.GetTargetPlayer();
                 Vector2 clonePosition = cloneInfo.VisualPosition;
                 Color cloneColor = drawColor2;
                 float timeLeftProgress = cloneInfo.TimeLeftProgress;
@@ -840,7 +841,11 @@ sealed partial class EternalHorror : ModNPC {
         Vector2 rotationVector2 = Vector2.UnitY.RotatedBy(NPC.rotation);
         int starCount = IsInSecondPhase ? 2 : 3;
         for (int i = 0; i < starCount; i++) {
-            Vector2 starPosition = NPC.Center.DirectionTo(NPC.GetTargetPlayer().Center);
+            NPCAimedTarget targetData10 = NPC.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? NPC.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? NPC.velocity : targetData10.Velocity);
+
+            Vector2 starPosition = NPC.Center.DirectionTo(targetPosition);
             float starMaxRotation = (float)num153 * ((float)Math.PI * 2f / num149) * 1.5f;
 
             starMaxRotation *= ((i + 1) % 2 == 0).ToDirectionInt();

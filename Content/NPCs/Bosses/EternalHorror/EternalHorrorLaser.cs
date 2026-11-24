@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -158,8 +159,13 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
             HashSet<EternalHorror.CloneInfo> cloneData = boss.GetActiveCloneData();
             float bossRotation = npc.rotation;
-            Player bossTarget = npc.GetTargetPlayer();
-            Vector2 bossTargetCenter = bossTarget.Center + bossTarget.velocity * Projectile.velocity.Length() / 2f;
+            //Player bossTarget = npc.GetTargetPlayer();
+
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+
+            Vector2 bossTargetCenter = targetPosition + targetVelocity * Projectile.velocity.Length() / 2f;
             foreach (EternalHorror.CloneInfo cloneInfo in cloneData) {
                 if (cloneInfo.Opacity < 0.5f) {
                     continue;

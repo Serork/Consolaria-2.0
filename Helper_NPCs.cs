@@ -52,7 +52,13 @@ public static class Helper_NPCs {
         }
     }
 
-    public static void FaceTarget_New(this NPC npc) => npc.direction = (npc.Center.X < npc.GetTargetPlayer().Center.X).ToDirectionInt();
+    public static void FaceTarget_New(this NPC npc) {
+        NPCAimedTarget targetData10 = npc.GetTargetData();
+        Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+        Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+
+        npc.direction = (npc.Center.X < targetPosition.X).ToDirectionInt();
+    }
 
     public static bool IsFacingLeft(this NPC npc) => npc.direction < 0;
 

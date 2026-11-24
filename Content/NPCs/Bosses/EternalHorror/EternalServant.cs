@@ -5,6 +5,7 @@ using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -255,8 +256,13 @@ sealed class EternalServant : ModNPC {
 
         NPC.localAI[2] = Helper.Approach(NPC.localAI[2], Helper.Wave(0.875f, 1.125f, 5f, NPC.whoAmI), 0.1f);
 
-        Player target = NPC.GetTargetPlayer();
-        Vector2 targetCenter = target.Center;
+        //Player target = NPC.GetTargetPlayer();
+
+        NPCAimedTarget targetData10 = NPC.GetTargetData();
+        Vector2 targetPosition = (targetData10.Invalid ? NPC.Center : targetData10.Center);
+        Vector2 targetVelocity = (targetData10.Invalid ? NPC.velocity : targetData10.Velocity);
+
+        Vector2 targetCenter = targetPosition;
         targetCenter -= NPC.Size / 2f;
 
         NPC.noTileCollide = true;
@@ -444,8 +450,13 @@ sealed class EternalServant : ModNPC {
             //float opacity = 1f;
             //opacity *= 1f - Utils.GetLerpValue(0.75f, 1f, timeLeftProgress, true);
 
-            Player target = NPC.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            //Player target = NPC.GetTargetPlayer();
+
+            NPCAimedTarget targetData10 = NPC.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? NPC.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? NPC.velocity : targetData10.Velocity);
+
+            Vector2 targetCenter = targetPosition;
             targetCenter -= NPC.Size / 2f;
             float targetAngle = NPC.AngleTo(targetCenter) - MathHelper.PiOver2;
 
@@ -499,7 +510,7 @@ sealed class EternalServant : ModNPC {
             ShaderLoader.ApplyEffect(ShaderLoader.DistortShader.Effect, spriteBatch, () => {
                 NPC.QuickDraw(spriteBatch, screenPos, drawColor, texture: texture, effect: flip, scale: scale);
                 NPC.QuickDraw(spriteBatch, screenPos, drawColor, rotation: 0f, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale,
-                    position: NPC.Center + NPC.DirectionTo(NPC.GetTargetPlayer().Center) * 5f);
+                    position: NPC.Center + NPC.DirectionTo(targetPosition) * 5f);
             });
 
             //EternalHorror.DrawContext drawContext = new(spriteBatch, position, texture, NPC.frame, drawColor, 0f, default, screenPos);
@@ -530,7 +541,7 @@ sealed class EternalServant : ModNPC {
                 color2 *= Utils.GetLerpValue(0f, 0.125f, appearanceFactor, true);
                 NPC.QuickDraw(spriteBatch, screenPos, color2, texture: _glowTexture.Value, effect: flip, scale: scale2);
                 NPC.QuickDraw(spriteBatch, screenPos, color2, rotation: 0f, frameBox: pupilClip, texture: _eyeTexture.Value, effect: flip, scale: scale2,
-                    position: NPC.Center + NPC.DirectionTo(NPC.GetTargetPlayer().Center) * 5f);
+                    position: NPC.Center + NPC.DirectionTo(targetPosition) * 5f);
             });
         }
 
