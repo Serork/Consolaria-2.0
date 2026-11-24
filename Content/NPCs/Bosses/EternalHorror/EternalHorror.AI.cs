@@ -394,20 +394,20 @@ sealed partial class EternalHorror : ModNPC {
                 continue;
             }
             float aggro = Main.player[i].aggro;
-            int insertPos = taken;
+            int index = taken;
             for (int j = 0; j < taken; j++) {
                 if (aggro > Main.player[playerIndexes[j]].aggro) {
-                    insertPos = j;
+                    index = j;
                     break;
                 }
             }
-            if (insertPos >= max) {
+            if (index >= max) {
                 continue;
             }
-            for (int j = Math.Min(taken, max - 1); j > insertPos; j--) {
+            for (int j = Math.Min(taken, max - 1); j > index; j--) {
                 playerIndexes[j] = playerIndexes[j - 1];
             }
-            playerIndexes[insertPos] = i;
+            playerIndexes[index] = i;
             if (taken < max) {
                 taken++;
             }
