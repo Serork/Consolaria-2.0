@@ -1944,13 +1944,12 @@ Mods: {
 			SirenSeaCreature.DisplayName: Criatura Marina de Sirena
 			AlbinoRunt.DisplayName: Cría Albina
 			// .DisplayName: ""
-			// EternalHorrorLaser1.DisplayName: Emperor of Darkness Laser1
-			// EternalHorrorLaser.DisplayName: Emperor of Darkness Laser
-			// EternalHorrorCloneExplosion.DisplayName: Emperor of Darkness Clone Explosion
-			// EternalHorrorCloneExplosionSkull.DisplayName: Emperor of Darkness Clone Explosion Skull
-			// EternalHorrorScythe.DisplayName: Emperor of Darkness Scythe
-			// EternalHorrorLaser_Big.DisplayName: EEmperor of Darkness Laser_ Big
-			// EternalHorrorLaser_Holdout.DisplayName: Emperor of Darkness Laser_ Holdout
+			// EternalHorrorLaser.DisplayName: Death Laser
+			// EternalHorrorCloneExplosion.DisplayName: Demonic Explosion
+			// EternalHorrorCloneExplosionSkull.DisplayName: Dread Skull
+			// EternalHorrorScythe.DisplayName: Supreme Demon Scythe
+			// EternalHorrorLaser_Big.DisplayName: Lethal Laser
+			// EternalHorrorLaser_Holdout.DisplayName: ""
 			// ConfettiGun_UI_Shot.DisplayName: Confetti Gun
 		}
 
