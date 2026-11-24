@@ -386,11 +386,37 @@ sealed partial class EternalHorror : ModNPC {
         foreach (Player player in Main.ActivePlayers) {
             activePlayerCount++;
         }
-        byte[] playerIndexes = new byte[Math.Min(4, activePlayerCount)];
-        for (int i = 0; i < playerIndexes.Length; i++) {
-            ref byte index = ref playerIndexes[i];
+        int max = Math.Min(4, activePlayerCount);
+        int[] playerIndexes = new int[max];
+        int taken = 0;
+        for (int i = 0; i < Main.player.Length; i++) {
+            if (!Main.player[i].active) {
+                continue;
+            }
+            float aggro = Main.player[i].aggro;
+            int insertPos = taken;
+            for (int j = 0; j < taken; j++) {
+                if (aggro > Main.player[playerIndexes[j]].aggro) {
+                    insertPos = j;
+                    break;
+                }
+            }
+            if (insertPos >= max) {
+                continue;
+            }
+            for (int j = Math.Min(taken, max - 1); j > insertPos; j--) {
+                playerIndexes[j] = playerIndexes[j - 1];
+            }
+            playerIndexes[insertPos] = i;
+            if (taken < max) {
+                taken++;
+            }
         }
-        foreach (byte playerIndex in playerIndexes) {
+        for (int k = 0; k < taken; k++) {
+            int playerIndex = playerIndexes[k];
+            if (playerIndex == -1) {
+                continue;
+            }
             int nextCloneAddedIndex = 0;
             OnIterateActiveCloneData((ref cloneInfo) => nextCloneAddedIndex++);
             if (nextCloneAddedIndex >= CLONECOUNTAVAILABLE) {
