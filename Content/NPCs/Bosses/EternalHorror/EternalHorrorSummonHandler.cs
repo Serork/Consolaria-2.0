@@ -66,6 +66,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
     private static float _delay,
                          _speedFactor;
 
+    public static int PlayerIndexWhoSummon;
+
+    public static Player PlayerWhoSummon => Main.player[PlayerIndexWhoSummon];
+
     private static int _bossSpawnCounter;
 
     public static bool ShouldBlinkOut;
@@ -97,7 +101,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        _spawnSoundSlotID = SoundEngine.PlaySound(EternalHorror.RitualSound(), Main.LocalPlayer.Center);
+        _spawnSoundSlotID = SoundEngine.PlaySound(EternalHorror.RitualSound(), PlayerWhoSummon.Center);
 
         EternalHorrorSummonStarted = true;
         _eyeData = new EyeInfo[400];
@@ -159,7 +163,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
 
     public override void PostUpdateNPCs() {
         if (_spawnSoundSlotID is not null && SoundEngine.TryGetActiveSound(_spawnSoundSlotID.Value, out ActiveSound result)) {
-            result.Position = Main.LocalPlayer.Center;
+            result.Position = PlayerWhoSummon.Center;
         }
 
         HandleBlinking();
@@ -199,6 +203,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                     FilterMoveFactor = Helper.Approach(FilterMoveFactor, 1f, 1 / 60f);
 
                     Vector2 to = npc.NPC.GetTargetPlayer().Center;
+                    to = Main.LocalPlayer.Center;
                     if (FilterPosition == Vector2.Zero) {
                         FilterPosition = to;
                     }
@@ -308,7 +313,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             }
 
             if (bossSpawnProgress >= 0f && !_soulWhooshPlayed) {
-                SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound_Whoosh(), Main.LocalPlayer.Center);
+                SoundEngine.PlaySound(EternalHorror.SoulAbsorptionSound_Whoosh(), PlayerWhoSummon.Center);
 
                 _soulWhooshPlayed = true;
             }
@@ -317,7 +322,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 if (!EternalHorrorShouldBeSummoned) {
                     EternalHorrorShouldBeSummoned = true;
 
-                    NPC.SpawnOnPlayer(Main.LocalPlayer.whoAmI, EternalHorror.SelfType);
+                    NPC.SpawnOnPlayer(PlayerWhoSummon.whoAmI, EternalHorror.SelfType);
                 }
             }
 
@@ -336,7 +341,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             _eyeSpawnCD = -spawnTime * 12;
         }
 
-        Player player = Main.LocalPlayer;
+        Player player = PlayerWhoSummon;
         Vector2 playerCenter = player.Center;
 
         if (_eyeSpawnCD > spawnTime) {
@@ -396,7 +401,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        Player player = Main.LocalPlayer;
+        Player player = PlayerWhoSummon;
         Vector2 playerCenter = player.Center;
 
         Vector2 velocity = position.DirectionTo(playerCenter) * 5f;
@@ -429,7 +434,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        Player player = Main.LocalPlayer;
+        Player player = PlayerWhoSummon;
         Vector2 playerCenter = player.Center;
 
         Vector2 position = eyeInfo.VisualPosition;
@@ -461,7 +466,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        Player player = Main.LocalPlayer;
+        Player player = PlayerWhoSummon;
         Vector2 playerCenter = player.Center;
 
         SpriteBatch batch = spriteBatch;
@@ -710,7 +715,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        Player player = Main.LocalPlayer;
+        Player player = PlayerWhoSummon;
 
         ulong seed = 0u;
 
@@ -814,7 +819,7 @@ sealed class EternalHorrorSummonHandler : ModSystem {
             return;
         }
 
-        Player player = Main.LocalPlayer;
+        Player player = PlayerWhoSummon;
 
         bool bossSpawned = EternalHorrorShouldBeSummoned;
 

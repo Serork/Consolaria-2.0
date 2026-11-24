@@ -221,6 +221,11 @@ sealed partial class EternalHorror : ModNPC {
 
     public override void AI() {
         if (!EternalHorrorSummonHandler.EternalHorrorSummonEnded && !EternalHorrorSummonHandler.EternalHorrorShouldBeSummoned) {
+            TargetPlayer();
+            NPC.FaceTarget_New();
+
+            EternalHorrorSummonHandler.PlayerIndexWhoSummon = NPC.GetTargetPlayer().whoAmI;
+
             EternalHorrorSummonHandler.StartSummoningEternalHorror();
             NPC.KillNPC();
             return;
