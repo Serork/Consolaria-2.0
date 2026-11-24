@@ -14,9 +14,10 @@ using Consolaria.Content.Items.Vanity;
 using Consolaria.Content.Items.Weapons.Melee;
 using Consolaria.Content.Items.Weapons.Ranged;
 using Consolaria.Content.Items.Weapons.Throwing;
-
+using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Consolaria.Common;
@@ -322,6 +323,7 @@ sealed class ConsolariaRecipes : ModSystem {
         item.AddIngredient(ItemID.SoulofSight, 5);
         item.AddTile(TileID.DemonAltar);
         item.SortAfterFirstRecipesOf(ItemID.MechanicalSkull);
+        item.AddCondition(Language.GetOrRegister("Mods.Consolaria.OcramSummonCondition"), () => !EternalHorror.CanEternalHorrorExistInAWorld);
         item.Register();
         
         // eternal horror summon
@@ -333,6 +335,7 @@ sealed class ConsolariaRecipes : ModSystem {
         item.AddIngredient(ItemID.SoulofSight, 5);
         item.AddTile(TileID.DemonAltar);
         item.SortAfterFirstRecipesOf(ItemID.CelestialSigil);
+        item.AddCondition(Language.GetOrRegister("Mods.Consolaria.EternalHorrorSummonCondition"), () => EternalHorror.CanEternalHorrorExistInAWorld);
         item.Register();
 
         // threads

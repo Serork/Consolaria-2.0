@@ -36,6 +36,10 @@ namespace Consolaria.Content.Items.Summons {
                 int index = tooltips.FindIndex(x => x.Name == "Tooltip0");
                 if (index != -1) {
                     tooltips[index].Text = Language.GetTextValue("Mods.Consolaria.CantUseSusSkull");
+                    index = tooltips.FindIndex(x => x.Name == "Consumable");
+                    if (index != -1) {
+                        tooltips[index].Hide();
+                    }
                 }
             }
         }
