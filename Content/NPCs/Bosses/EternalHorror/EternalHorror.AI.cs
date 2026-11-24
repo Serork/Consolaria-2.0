@@ -3,6 +3,7 @@ using Consolaria.Common.Particles;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
@@ -11,6 +12,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.Events;
 using Terraria.Graphics.Renderers;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -139,6 +141,36 @@ sealed partial class EternalHorror : ModNPC {
     private float _shouldBurstLaserAfter;
 
     private float _ai4, _ai5;
+
+    public override void SendExtraAI(BinaryWriter writer) {
+        writer.Write(_ai4);
+        writer.Write(_ai5);
+
+        writer.Write(_shouldDoScytheAttackValue);
+        writer.Write(_shouldDoSpiralAttackValue);
+        writer.Write(_shouldDoBigLaserAttackValue);
+        writer.Write(_shouldBurstLaserAfter);
+
+        writer.WriteVector2(_dashVelocity);
+        writer.WriteVector2(_tempPosition);
+
+        writer.Write(_allPlayersAreDead);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader) {
+        _ai4 = reader.ReadSingle();
+        _ai5 = reader.ReadSingle();
+
+        _shouldDoScytheAttackValue = reader.ReadSingle();
+        _shouldDoSpiralAttackValue = reader.ReadSingle();
+        _shouldDoBigLaserAttackValue = reader.ReadSingle();
+        _shouldBurstLaserAfter = reader.ReadSingle();
+
+        _dashVelocity = reader.ReadVector2();
+        _tempPosition = reader.ReadVector2();
+
+        _allPlayersAreDead = reader.ReadBoolean();
+    }
 
     private bool _allPlayersAreDead;
 
