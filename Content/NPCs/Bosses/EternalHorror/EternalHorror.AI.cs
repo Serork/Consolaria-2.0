@@ -13,6 +13,7 @@ using Terraria.GameContent.Events;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -560,7 +561,7 @@ sealed partial class EternalHorror : ModNPC {
                     cloneInfo.TimeLeft = 0;
 
                     Vector2 position = cloneInfo.VisualPosition;
-                    SpawnCloneExplosion(position);
+                    SpawnCloneExplosion(position, cloneInfo.PlayerIndex);
                 }
             }
 
@@ -664,7 +665,7 @@ sealed partial class EternalHorror : ModNPC {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
                     _eyeEffectOpacity = 1f;
-                    ShootLaser(shootBasedOnRotation: true, clonePosition: cloneEyePosition, reflectedFromStart: true, targetPosition: target.Center, targetVelocity: target.velocity);
+                    ShootLaser(shootBasedOnRotation: true, clonePosition: cloneEyePosition, reflectedFromStart: true, targetPosition: target.Center, targetVelocity: target.velocity, playerIndex: cloneInfo.PlayerIndex);
 
                     if (Main.rand.NextBool()) {
                         cloneInfo.AddStar(cloneEyePosition);
@@ -864,7 +865,7 @@ sealed partial class EternalHorror : ModNPC {
         Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
     }
 
-    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false, Vector2? clonePosition = null, Vector2? targetPosition = null, Vector2? targetVelocity = null) {
+    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false, Vector2? clonePosition = null, Vector2? targetPosition = null, Vector2? targetVelocity = null, int playerIndex = -1) {
         //if (!NPC.HasPlayerTarget) {
         //    return;
         //}
@@ -930,7 +931,7 @@ sealed partial class EternalHorror : ModNPC {
         int damage = IsInSecondPhase ? GetLaserDamage_Phase2() : GetLaserDamage_Phase1();
         float knockBack = IsInSecondPhase ? GetLaserKnockback_Phase2() : GetLaserKnockback_Phase1();
         Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser>(),
-            damage, knockBack, Owner: Main.myPlayer, ai2: reflectedFromStart.ToInt());
+            damage, knockBack, Owner: Main.myPlayer, ai2: reflectedFromStart.ToInt(), ai1: playerIndex);
     }
 
     private void MakeTrailDust(float velocityFactor = 1f, float rotation = float.MaxValue) {
@@ -1000,14 +1001,14 @@ sealed partial class EternalHorror : ModNPC {
         //});
     }
 
-    private void SpawnCloneExplosion(Vector2 position) {
+    private void SpawnCloneExplosion(Vector2 position, int playerIndex) {
         if (!Helper.IsClient()) {
             IEntitySource source = NPC.GetSource_FromAI();
             Vector2 velocity = Vector2.Zero;
             int type = ModContent.ProjectileType<EternalHorrorCloneExplosion>();
             int damage = IsInSecondPhase ? GetExplosionDamage_Phase2() : GetExplosionDamage_Phase1();
             float knockBack = IsInSecondPhase ? GetExplosionKnockback_Phase2() : GetExplosionKnockback_Phase1();
-            Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack, owner: Main.myPlayer);
+            Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockBack, owner: Main.myPlayer, ai1: playerIndex);
         }
     }
 

@@ -21,6 +21,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
 
     private int _explosionIndex;
 
+    public int PlayerIndex => (int)(Projectile.ai[1] - 1);
+
     public override string Texture => "Consolaria/Assets/Textures/Empty";
 
     public override void SetStaticDefaults() {
@@ -42,6 +44,10 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
         Projectile.manualDirectionChange = true;
 
         CooldownSlot = ImmunityCooldownID.Bosses;
+    }
+
+    public override bool CanHitPlayer(Player target) {
+        return PlayerIndex < 0 || target.whoAmI == PlayerIndex;
     }
 
     public override void ModifyDamageHitbox(ref Rectangle hitbox) {
@@ -66,7 +72,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
                 for (int i = 0; i < skullCount; i++) {
                     Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center,
                         Vector2.UnitY.RotatedBy(MathHelper.TwoPi * i / skullCount) * SkullSpeed * 2f,
-                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), (int)(Projectile.damage * EternalHorror.DAMAGEFACTOR_EXPLOSIONSKULL), Projectile.knockBack, Main.myPlayer);
+                        ModContent.ProjectileType<EternalHorrorCloneExplosionSkull>(), (int)(Projectile.damage * EternalHorror.DAMAGEFACTOR_EXPLOSIONSKULL), Projectile.knockBack, Main.myPlayer, ai1: PlayerIndex);
                 }
             }
 

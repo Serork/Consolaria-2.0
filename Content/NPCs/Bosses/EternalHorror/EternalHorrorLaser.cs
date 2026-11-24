@@ -22,6 +22,8 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
     public ref float ReflectedValue => ref Projectile.ai[2];
 
+    public int PlayerIndex => (int)(Projectile.ai[1] - 1);
+
     public bool Reflected {
         get => ReflectedValue != 0f;
         set => ReflectedValue = value.ToInt();
@@ -61,12 +63,20 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override bool PreAI() {
-        Projectile.ai[1] = 1f;
+        //Projectile.ai[1] = 1f;
 
         return true;
     }
 
+    public override bool CanHitPlayer(Player target) {
+        return PlayerIndex < 0 || target.whoAmI == PlayerIndex;
+    }
+
     public override void AI() {
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return;
+        }
+
         if (Projectile.localAI[2] == 0f) {
             Projectile.localAI[2] = 1f;
 
@@ -246,6 +256,10 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override bool PreDraw(ref Color lightColor) {
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return false;
+        }
+
         if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/Projectiles/LightTrail_1");
             Vector2 position = Projectile.Center;

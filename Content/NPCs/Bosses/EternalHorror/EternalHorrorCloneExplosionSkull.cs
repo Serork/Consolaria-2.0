@@ -20,6 +20,8 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
         set => ReflectedValue = value.ToInt();
     }
 
+    public int PlayerIndex => (int)(Projectile.ai[1] - 1);
+
     public override void SetStaticDefaults() {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 16;
         ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
@@ -49,8 +51,16 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
+    public override bool CanHitPlayer(Player target) {
+        return PlayerIndex < 0 || target.whoAmI == PlayerIndex;
+    }
+
     public override void AI() {
         Projectile.direction = Projectile.spriteDirection = (Projectile.velocity.X > 0).ToDirectionInt();
+
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return;
+        }
 
         if (Projectile.localAI[2] == 0f) {
             Projectile.localAI[2] = 1f;
@@ -224,6 +234,10 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
     }
 
     public override bool PreDraw(ref Color lightColor) {
+        if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            return false;
+        }
+
         if (EternalHorror.CanDrawOnTopOfBlinking || !NPC.AnyNPCs(EternalHorror.SelfType)) {
             Texture2D texture = Projectile.GetTexture();
             Vector2 position = Projectile.Center + Projectile.velocity;
