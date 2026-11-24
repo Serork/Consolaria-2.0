@@ -46,6 +46,11 @@ sealed class EternalServant : ModNPC {
         }
     }
 
+    public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
+        NPC.lifeMax = (int)((float)NPC.lifeMax * balance * bossAdjustment);
+        NPC.damage = (int)((double)NPC.damage * 1.15);
+    }
+
     private ushort[] _customImmunityFrames;
 
     private void InitializeCustomImmunityFrames() {

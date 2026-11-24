@@ -295,13 +295,16 @@ sealed partial class EternalHorror : ModNPC {
         }
     }
 
+    string ShockwaveName => ShaderLoader.EternalHorrorShockwaveFilterName_Base + 4;
+    Filter ShockwaveFilter => Filters.Scene[ShockwaveName];
+
     void HandleShockwave(float distortStrength, float progress) {
         if (Helper.IsServer()) {
             return;
         }
 
-        if (ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
-            var shaderData = ShaderLoader.EternalHorrorShockwaveFilter.GetShader();
+        if (ShockwaveFilter.IsActive()) {
+            var shaderData = ShockwaveFilter.GetShader();
 
             shaderData
                 .UseProgress(progress)
@@ -314,8 +317,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
-        if (!ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
-            var shaderData = Filters.Scene.Activate(ShaderLoader.EternalHorrorShockwaveFilterName, ChromaPosition).GetShader();
+        if (!ShockwaveFilter.IsActive()) {
+            var shaderData = Filters.Scene.Activate(ShockwaveName, ChromaPosition).GetShader();
 
             shaderData
                 .UseColor(rippleCount, rippleSize, rippleSpeed)
@@ -328,8 +331,8 @@ sealed partial class EternalHorror : ModNPC {
             return;
         }
 
-        if (ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
-            ShaderLoader.EternalHorrorShockwaveFilter.Deactivate();
+        if (ShockwaveFilter.IsActive()) {
+            ShockwaveFilter.Deactivate();
         }
     }
 

@@ -78,9 +78,9 @@ public static class Helper_NPCs {
         }
     }
 
-    public static bool ShouldTargetPlayer(this NPC npc) => npc.target < 0 || npc.target == 255 || npc.GetTargetPlayer().dead || !npc.GetTargetPlayer().active;
+    public static bool ShouldTargetPlayer(this NPC npc) => npc.target < 0 || npc.target == 255 || !npc.HasValidTarget/*npc.GetTargetPlayer().dead || !npc.GetTargetPlayer().active*/;
 
-    public static Player GetTargetPlayer(this NPC npc) => npc.target >= 0 && npc.target <= Main.player.Length ? Main.player[npc.target] : null;
+    //public static Player GetTargetPlayer(this NPC npc) => npc.target >= 0 && npc.target <= Main.player.Length ? Main.player[npc.target] : null;
 
     public static T As<T>(this NPC npc) where T : ModNPC => npc.ModNPC as T;
 

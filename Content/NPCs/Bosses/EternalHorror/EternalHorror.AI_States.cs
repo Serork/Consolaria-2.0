@@ -156,8 +156,13 @@ sealed partial class EternalHorror : ModNPC {
                  shouldSpamLasers = boss.HasActiveState<Phase1LaserSpamAttack>(),
                  shouldSpawnSummons = boss.HasActiveState<Phase1SummonSpawnAttack>();
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            //Player target = npc.GetTargetPlayer();
+
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
 
             boss._cloneTargetPosition = targetCenter;
@@ -251,8 +256,11 @@ sealed partial class EternalHorror : ModNPC {
         public static byte LASERATTACKCOUNT => 3;
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            //Player target = npc.GetTargetPlayer();
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition;
 
             boss._cloneTargetPosition = targetCenter;
 
@@ -338,9 +346,13 @@ sealed partial class EternalHorror : ModNPC {
                 boss.TargetPlayer();
                 npc.FaceTarget_New();
 
+                NPCAimedTarget targetData10 = npc.GetTargetData();
+                Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+                Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+
                 boss._ai4 += 3f;
 
-                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f + boss._ai4) {
+                if (npc.Distance(targetPosition) <= 600f + boss._ai4) {
                     boss.AICounter = 1f;
                     boss._ai4 = 0f;
                 }
@@ -380,12 +392,15 @@ sealed partial class EternalHorror : ModNPC {
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
-                    boss.SpawnClone(insta: true);
+                    boss.SpawnClones(insta: true);
 
                     npc.ResetTrails();
 
-                    Player target = npc.GetTargetPlayer();
-                    Vector2 targetCenter = target.Center;
+                    //Player target = npc.GetTargetPlayer();
+                    NPCAimedTarget targetData10 = npc.GetTargetData();
+                    Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+                    Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+                    Vector2 targetCenter = targetPosition;
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     dashDirection *= -1;
                     boss._dashVelocity = dashDirection * Phase2DashAttack.DASHSTRENGTH;
@@ -496,8 +511,11 @@ sealed partial class EternalHorror : ModNPC {
         //public static SoundStyle DashSound => SoundID.Roar with { PitchVariance = 0.15f, MaxInstances = 0 };
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            //Player target = npc.GetTargetPlayer();
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition;
 
             float dashProgress = boss.AICounter / DASHTIME;
             dashProgress = Helper.Clamp01(dashProgress);
@@ -759,8 +777,11 @@ sealed partial class EternalHorror : ModNPC {
             attackProgress_ForSlowDown = Helper.Clamp01(attackProgress_ForSlowDown);
             float preparationSlowDown = Utils.Remap(1f - attackProgress_ForSlowDown, 0f, 1f, PPEPARATIONSLOWLASTFACTOR, 1f, true);
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            //Player target = npc.GetTargetPlayer();
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition;
 
             boss._cloneTargetPosition = targetCenter;
 
@@ -827,8 +848,11 @@ sealed partial class EternalHorror : ModNPC {
         // sometimes i just wanna make stuff in game
         // not writing a ton of code
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            //Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
 
             boss._cloneTargetPosition = targetCenter;
@@ -1050,8 +1074,11 @@ sealed partial class EternalHorror : ModNPC {
                 boss.SpawnPreparationDust_Shadow(Helper.YoYo(progress));
             }
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            //Player target = npc.GetTargetPlayer();
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
             float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
 
@@ -1264,8 +1291,11 @@ sealed partial class EternalHorror : ModNPC {
 
             shouldSpawnSummons = false;
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            //Player target = npc.GetTargetPlayer();
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
 
             boss._cloneTargetPosition = targetCenter;
@@ -1366,8 +1396,11 @@ sealed partial class EternalHorror : ModNPC {
         public static byte LASERATTACKCOUNT => (byte)(Phase2DashAttack.LASERATTACKCOUNTNEEDED + 1);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            //Player target = npc.GetTargetPlayer();
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition;
 
             boss._cloneTargetPosition = targetCenter;
 
@@ -1480,8 +1513,11 @@ sealed partial class EternalHorror : ModNPC {
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
             HorrorEffectShaderData2.TimeFactor = Helper.Approach(HorrorEffectShaderData2.TimeFactor, 1 / 60f, 1 / 60f * 0.125f);
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            //Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = targetPosition;
 
             float smoothFactor = boss.SmoothFactor/*Ease.SineIn(boss.SmoothFactor)*/;
             smoothFactor = 1f;
@@ -1801,8 +1837,11 @@ sealed partial class EternalHorror : ModNPC {
             attackProgress_ForSlowDown = Helper.Clamp01(attackProgress_ForSlowDown);
             float preparationSlowDown = Utils.Remap(1f - attackProgress_ForSlowDown, 0f, 1f, PPEPARATIONSLOWLASTFACTOR, 1f, true);
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            //Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = targetPosition;
 
             boss._cloneTargetPosition = targetCenter;
 
@@ -1881,7 +1920,11 @@ sealed partial class EternalHorror : ModNPC {
 
                 boss._ai4 += 3f;
 
-                if (npc.Distance(npc.GetTargetPlayer().Center) <= 600f + boss._ai4) {
+                NPCAimedTarget targetData10 = npc.GetTargetData();
+                Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+                Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+
+                if (npc.Distance(targetPosition) <= 600f + boss._ai4) {
                     boss.AICounter = 1f;
                     boss._ai4 = 0f;
                 }
@@ -1920,12 +1963,16 @@ sealed partial class EternalHorror : ModNPC {
                 if (shadowSpawnProgress) {
                     boss.ResetCounters();
 
-                    boss.SpawnClone(insta: true);
+                    boss.SpawnClones(insta: true);
 
                     npc.ResetTrails();
 
-                    Player target = npc.GetTargetPlayer();
-                    Vector2 targetCenter = target.Center;
+                    NPCAimedTarget targetData10 = npc.GetTargetData();
+                    Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+                    Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+
+                    //Player target = npc.GetTargetPlayer();
+                    Vector2 targetCenter = targetPosition;
                     Vector2 dashDirection = npc.DirectionTo(targetCenter);
                     dashDirection *= -1;
                     boss._dashVelocity = dashDirection * Phase2DashAttack.DASHSTRENGTH;
@@ -1988,8 +2035,11 @@ sealed partial class EternalHorror : ModNPC {
                 boss.Phase2ScytheAttackDirection = 0f;
             }
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            //Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
 
             bool ended = boss.AICounter >= ATTACKPREPARATIONTIME;
@@ -2154,8 +2204,11 @@ sealed partial class EternalHorror : ModNPC {
             float attackProgress = boss.AICounter / ATTACKPREPARATIONTIME;
             float attackProgress2 = Helper.Clamp01(attackProgress);
 
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            //Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
             float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
 
@@ -2292,8 +2345,11 @@ sealed partial class EternalHorror : ModNPC {
         public static float ATTACKTIME => Helper.SecondsToFrames(1.5f);
 
         void IAIState.OnActiveUpdate(NPC npc, EternalHorror boss) {
-            Player target = npc.GetTargetPlayer();
-            Vector2 targetCenter = target.Center,
+            NPCAimedTarget targetData10 = npc.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? npc.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? npc.velocity : targetData10.Velocity);
+            //Player target = npc.GetTargetPlayer();
+            Vector2 targetCenter = targetPosition,
                     baseTargetCenter = targetCenter;
             float angleToTarget = npc.AngleTo(baseTargetCenter) - MathHelper.PiOver2;
 

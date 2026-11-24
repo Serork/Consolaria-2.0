@@ -19,6 +19,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
 
     public static float EXPLOSIONSCALEMODIFIER => 1.5f;
 
+    private int _explosionIndex;
+
     public override string Texture => "Consolaria/Assets/Textures/Empty";
 
     public override void SetStaticDefaults() {
@@ -69,6 +71,9 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
             }
 
             Projectile.scale = 0f;
+
+            ShaderLoader.TakeShockwave(out byte takenIndex);
+            _explosionIndex = takenIndex;
 
             ActivateShockwave(rippleCount: 3f * EXPLOSIONSCALEMODIFIER, rippleSize: 5f * EXPLOSIONSCALEMODIFIER, rippleSpeed: 10f * EXPLOSIONSCALEMODIFIER);
 
@@ -206,13 +211,16 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
         return base.PreDraw(ref lightColor);
     }
 
+    private string ShockwaveName => ShaderLoader.EternalHorrorShockwaveFilterName_Base + _explosionIndex;
+    private Filter ShockwaveFilter => Filters.Scene[ShockwaveName];
+
     private void HandleShockwave(float distortStrength, float progress) {
         if (Helper.IsServer()) {
             return;
         }
 
-        if (ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
-            var shaderData = ShaderLoader.EternalHorrorShockwaveFilter.GetShader();
+        if (ShockwaveFilter.IsActive()) {
+            var shaderData = ShockwaveFilter.GetShader();
 
             shaderData
                 .UseProgress(progress)
@@ -225,8 +233,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
             return;
         }
 
-        if (!ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
-            var shaderData = Filters.Scene.Activate(ShaderLoader.EternalHorrorShockwaveFilterName, Projectile.Center).GetShader();
+        if (!ShockwaveFilter.IsActive()) {
+            var shaderData = Filters.Scene.Activate(ShockwaveName, Projectile.Center).GetShader();
 
             shaderData
                 .UseColor(rippleCount, rippleSize, rippleSpeed)
@@ -239,8 +247,8 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
             return;
         }
 
-        if (ShaderLoader.EternalHorrorShockwaveFilter.IsActive()) {
-            ShaderLoader.EternalHorrorShockwaveFilter.Deactivate();
+        if (ShockwaveFilter.IsActive()) {
+            ShockwaveFilter.Deactivate();
         }
     }
 }

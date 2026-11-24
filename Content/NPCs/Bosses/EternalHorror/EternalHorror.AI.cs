@@ -17,7 +17,7 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed partial class EternalHorror : ModNPC {
-    private static byte CLONECOUNTAVAILABLE => 3;
+    public static byte CLONECOUNTAVAILABLE => 4;
     private static ushort CLONEACTIVETIME => Helper.SecondsToFrames(10);
     private static byte RAYCOUNTMAX => 10;
     private static byte SPAWNRAYCOUNTONSPAWN => RAYCOUNTMAX;
@@ -55,7 +55,8 @@ sealed partial class EternalHorror : ModNPC {
                                                                              bool ShouldDoLaserAttack = false,
                                                                              ushort LaserAttackTime_Current = 0,
                                                                              ushort LaserAttackTime_Max = 0,
-                                                                             bool ShouldSlowdown = false) {
+                                                                             bool ShouldSlowdown = false,
+                                                                             int PlayerIndex = -1) {
         public static float OPACITYMAXTIMELEFTFACTOR => 0.75f;
         public static ushort EXPLOSIONTIME => Helper.SecondsToFrames(2f);
 
@@ -224,7 +225,7 @@ sealed partial class EternalHorror : ModNPC {
             TargetPlayer();
             NPC.FaceTarget_New();
 
-            EternalHorrorSummonHandler.PlayerIndexWhoSummon = NPC.GetTargetPlayer().whoAmI;
+            EternalHorrorSummonHandler.PlayerIndexWhoSummon = Main.player[NPC.target].whoAmI;
 
             EternalHorrorSummonHandler.StartSummoningEternalHorror();
 
@@ -267,10 +268,10 @@ sealed partial class EternalHorror : ModNPC {
         UpdateCustomImmunityFrames();
 
         if (!_allPlayersAreDead) {
-            if (NPC.GetTargetPlayer().dead || !NPC.HasValidTarget) {
+            if (/*NPC.GetTargetPlayer().dead || */!NPC.HasValidTarget) {
                 TargetPlayer();
                 NPC.FaceTarget_New();
-                if (NPC.GetTargetPlayer().dead || !NPC.HasValidTarget) {
+                if (/*NPC.GetTargetPlayer().dead || */!NPC.HasValidTarget) {
                     _allPlayersAreDead = true;
                 }
             }
@@ -363,8 +364,8 @@ sealed partial class EternalHorror : ModNPC {
         _cloneData = new CloneInfo[CLONECOUNTAVAILABLE];
     }
 
-    private Vector2 GetCloneSpawnPosition() {
-        Player target = NPC.GetTargetPlayer();
+    private Vector2 GetCloneSpawnPosition(Player player) {
+        Player target = player/*NPC.GetTargetPlayer()*/;
         Vector2 npcCenter = NPC.Center,
                 targetCenter = target.Center;
         float offsetFromBoss = 650f;
@@ -377,34 +378,45 @@ sealed partial class EternalHorror : ModNPC {
         return result;
     }
 
-    private void SpawnClone(bool insta = false) {
-        int nextCloneAddedIndex = 0;
-        OnIterateActiveCloneData((ref cloneInfo) => nextCloneAddedIndex++);
-        if (nextCloneAddedIndex >= CLONECOUNTAVAILABLE) {
-            return;
+    private void SpawnClones(bool insta = false) {
+        //if (!NPC.HasPlayerTarget) {
+        //    return;
+        //}
+        int activePlayerCount = 0;
+        foreach (Player player in Main.ActivePlayers) {
+            activePlayerCount++;
         }
-        if (!NPC.HasPlayerTarget) {
-            return;
+        byte[] playerIndexes = new byte[Math.Min(4, activePlayerCount)];
+        for (int i = 0; i < playerIndexes.Length; i++) {
+            ref byte index = ref playerIndexes[i];
         }
-        Player target = NPC.GetTargetPlayer();
-        Vector2 targetCenter = target.Center;
-        Vector2 clonePosition = GetCloneSpawnPosition();
-        ushort cloneActiveTime = CLONEACTIVETIME;
-        _cloneData[nextCloneAddedIndex] = new CloneInfo(Position: clonePosition,
-                                                        TargetPosition: targetCenter,
-                                                        TimeLeft: cloneActiveTime,
-                                                        MaxTimeLeft: cloneActiveTime,
-                                                        VisualPosition: NPC.Center,
-                                                        Rotation: NPC.rotation,
-                                                        Velocity: default,
-                                                        ShouldUpdateVisualPosition: false,
-                                                        OldVisualPositions: new Vector2[NPC.oldPos.Length],
-                                                        OldRotations: new float[NPC.oldRot.Length],
-                                                        DashOpacity: 0f,
-                                                        CloneStarData: new CloneStarInfo[100]);
-        if (insta) {
-            _cloneData[nextCloneAddedIndex].TimeLeft = (ushort)(_cloneData[nextCloneAddedIndex].MaxTimeLeft * MathHelper.Lerp(CloneInfo.OPACITYMAXTIMELEFTFACTOR, 1f, 0.75f));
-            //_cloneData[nextCloneAddedIndex].LerpVelocityValue = 0f;
+        foreach (byte playerIndex in playerIndexes) {
+            int nextCloneAddedIndex = 0;
+            OnIterateActiveCloneData((ref cloneInfo) => nextCloneAddedIndex++);
+            if (nextCloneAddedIndex >= CLONECOUNTAVAILABLE) {
+                continue;
+            }
+            Player target = Main.player[playerIndex];
+            Vector2 targetCenter = target.Center;
+            Vector2 clonePosition = GetCloneSpawnPosition(target);
+            ushort cloneActiveTime = CLONEACTIVETIME;
+            _cloneData[nextCloneAddedIndex] = new CloneInfo(Position: clonePosition,
+                                                            TargetPosition: targetCenter,
+                                                            TimeLeft: cloneActiveTime,
+                                                            MaxTimeLeft: cloneActiveTime,
+                                                            VisualPosition: NPC.Center,
+                                                            Rotation: NPC.rotation,
+                                                            Velocity: default,
+                                                            ShouldUpdateVisualPosition: false,
+                                                            OldVisualPositions: new Vector2[NPC.oldPos.Length],
+                                                            OldRotations: new float[NPC.oldRot.Length],
+                                                            DashOpacity: 0f,
+                                                            CloneStarData: new CloneStarInfo[100],
+                                                            PlayerIndex: target.whoAmI);
+            if (insta) {
+                _cloneData[nextCloneAddedIndex].TimeLeft = (ushort)(_cloneData[nextCloneAddedIndex].MaxTimeLeft * MathHelper.Lerp(CloneInfo.OPACITYMAXTIMELEFTFACTOR, 1f, 0.75f));
+                //_cloneData[nextCloneAddedIndex].LerpVelocityValue = 0f;
+            }
         }
     }
 
@@ -474,7 +486,7 @@ sealed partial class EternalHorror : ModNPC {
                 continue;
             }
 
-            Player target = NPC.GetTargetPlayer();
+            Player target = Main.player[cloneInfo.PlayerIndex];
 
             for (int num7 = cloneInfo.OldVisualPositions.Length - 1; num7 > 0; num7--) {
                 cloneInfo.OldVisualPositions[num7] = cloneInfo.OldVisualPositions[num7 - 1];
@@ -531,7 +543,7 @@ sealed partial class EternalHorror : ModNPC {
                     if (/*IsInSecondPhase && */cloneInfo.Opacity < 1f/*(IsInSecondPhase ? 1f : 0.375f)*/ && cloneInfo.ExplosionTime == -1) {
                         Vector2 targetCenter = target.Center;
 
-                        cloneInfo.Position = GetCloneSpawnPosition();
+                        cloneInfo.Position = GetCloneSpawnPosition(target);
                         cloneInfo.TargetPosition = targetCenter;
                     }
                 }
@@ -599,7 +611,7 @@ sealed partial class EternalHorror : ModNPC {
 
             //if (!cloneInfo.ShouldUpdateVisualPosition)
             {
-                Vector2 targetCenter = _cloneTargetPosition,
+                Vector2 targetCenter = target.Center/*_cloneTargetPosition*/,
                         clonePosition = cloneInfo.VisualPosition;
                 float angleToTarget = clonePosition.AngleTo(targetCenter) - MathHelper.PiOver2;
                 cloneInfo.Rotation = cloneInfo.Rotation.AngleLerp(angleToTarget, ROTATIONLERP * 0.5f/* * lerpValueFactor*/);
@@ -626,7 +638,7 @@ sealed partial class EternalHorror : ModNPC {
                     Vector2 cloneEyePosition = cloneInfo.VisualPosition;
                     cloneEyePosition += Vector2.UnitY.RotatedBy(cloneInfo.Rotation) * -45f;
                     _eyeEffectOpacity = 1f;
-                    ShootLaser(shootBasedOnRotation: true, clonePosition: cloneEyePosition, reflectedFromStart: true);
+                    ShootLaser(shootBasedOnRotation: true, clonePosition: cloneEyePosition, reflectedFromStart: true, targetPosition: target.Center, targetVelocity: target.velocity);
 
                     if (Main.rand.NextBool()) {
                         cloneInfo.AddStar(cloneEyePosition);
@@ -668,6 +680,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void TargetPlayer(bool faceTarget = false) {
+        NPC.TargetClosest(faceTarget: faceTarget);
         if (NPC.ShouldTargetPlayer()) {
             NPC.TargetClosest(faceTarget: faceTarget);
         }
@@ -675,7 +688,7 @@ sealed partial class EternalHorror : ModNPC {
 
     private void SpawnFromAbove() {
         Vector2 spawnOffset = new(0f, SPAWNOFFSETY);
-        NPC.Center = NPC.GetTargetPlayer().Center + spawnOffset;
+        NPC.Center = NPC.GetTargetData().Center + spawnOffset;
     }
 
     private void ResetLaserAttack(bool applyIncreasedDelay = false,
@@ -747,12 +760,15 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     public void SpawnScythe(Vector2 spawnOffset, bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, Vector2? clonePosition = null, Vector2? speed = null) {
-        if (!NPC.HasPlayerTarget) {
-            return;
-        }
+        //if (!NPC.HasPlayerTarget) {
+        //    return;
+        //}
 
         const float Speed = 12f;
-        Player target = NPC.GetTargetPlayer();
+        //Player target = NPC.GetTargetPlayer();
+        NPCAimedTarget targetData10 = NPC.GetTargetData();
+        Vector2 targetPosition = (targetData10.Invalid ? NPC.Center : targetData10.Center);
+        Vector2 targetVelocity = (targetData10.Invalid ? NPC.velocity : targetData10.Velocity);
 
         clonePosition ??= GetEyePosition();
 
@@ -764,7 +780,7 @@ sealed partial class EternalHorror : ModNPC {
 
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
-            rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 1f/*2f*/);
+            rotation = vector8.AngleTo(targetPosition + targetVelocity * Speed / 1f/*2f*/);
         }
 
         rotation += angleShiftToPlayer;
@@ -822,10 +838,10 @@ sealed partial class EternalHorror : ModNPC {
         Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
     }
 
-    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false, Vector2? clonePosition = null) {
-        if (!NPC.HasPlayerTarget) {
-            return;
-        }
+    private void ShootLaser(bool shootBasedOnRotation = true, float angleShiftToPlayer = 0f, bool reflectedFromStart = false, Vector2? clonePosition = null, Vector2? targetPosition = null, Vector2? targetVelocity = null) {
+        //if (!NPC.HasPlayerTarget) {
+        //    return;
+        //}
 
         const float Speed = 12f;
 
@@ -833,11 +849,16 @@ sealed partial class EternalHorror : ModNPC {
 
         Vector2 vector8 = clonePosition.Value;
 
-        Player target = NPC.GetTargetPlayer();
+        //target ??= NPC.GetTargetPlayer();
+
+        NPCAimedTarget targetData10 = NPC.GetTargetData();
+        targetPosition ??= (targetData10.Invalid ? NPC.Center : targetData10.Center);
+        targetVelocity ??= (targetData10.Invalid ? NPC.velocity : targetData10.Velocity);
+
         //SoundEngine.PlaySound(SoundID.Item33, vector8);
         float rotation = NPC.rotation + MathHelper.PiOver2;
         if (shootBasedOnRotation) {
-            rotation = vector8.AngleTo(target.Center + target.velocity * Speed / 2f);
+            rotation = vector8.AngleTo(targetPosition.Value + targetVelocity.Value * Speed / 2f);
         }
 
         rotation += angleShiftToPlayer;
@@ -1040,9 +1061,13 @@ sealed partial class EternalHorror : ModNPC {
         Vector3 lightColor = MainPurpleColor_Dynamic.ToVector3() * rayAlpha;
         Lighting.AddLight(NPC.Center, lightColor);
 
-        if (NPC.HasPlayerTarget) {
-            Player target = NPC.GetTargetPlayer();
-            Vector2 targetCenter = target.Center;
+        //if (NPC.HasPlayerTarget)
+        {
+            //Player target = NPC.GetTargetPlayer();
+            NPCAimedTarget targetData10 = NPC.GetTargetData();
+            Vector2 targetPosition = (targetData10.Invalid ? NPC.Center : targetData10.Center);
+            Vector2 targetVelocity = (targetData10.Invalid ? NPC.velocity : targetData10.Velocity);
+            Vector2 targetCenter = targetPosition;
             Lighting.AddLight(targetCenter, lightColor);
         }
 

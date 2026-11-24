@@ -248,8 +248,21 @@ sealed class ShaderLoader : ModSystem {
     public static string EternalHorrorShakeFilterName => nameof(Consolaria) + "EternalHorrorShake";
     public static Filter EternalHorrorShakeFilter => Filters.Scene[EternalHorrorShakeFilterName];
 
-    public static string EternalHorrorShockwaveFilterName => nameof(Consolaria) + "EternalHorrorShockwave";
-    public static Filter EternalHorrorShockwaveFilter => Filters.Scene[EternalHorrorShockwaveFilterName];
+    public static byte ShockwaveMaxCount => (byte)(EternalHorror.CLONECOUNTAVAILABLE + 1);
+    private static HashSet<byte> _shockwaveTaken;
+
+    public static void TakeShockwave(out byte takenIndex) {
+        int count = _shockwaveTaken.Count();
+        takenIndex = (byte)count;
+        _shockwaveTaken.Add(takenIndex);
+    }
+
+    public static void RemoveShockwave(byte indexToRemove) {
+        _shockwaveTaken.Remove(indexToRemove);
+    }
+
+    public static string EternalHorrorShockwaveFilterName_Base => nameof(Consolaria) + "EternalHorrorShockwave";
+    //public static Filter EternalHorrorShockwaveFilter => Filters.Scene[EternalHorrorShockwaveFilterName];
 
     public static string EternalHorrorTintFilterName => nameof(Consolaria) + "EternalHorrorTint";
     public static Filter EternalHorrorTintFilter => Filters.Scene[EternalHorrorTintFilterName];
@@ -261,6 +274,8 @@ sealed class ShaderLoader : ModSystem {
         if (Main.dedServ) {
             return;
         }
+
+        _shockwaveTaken = [];
 
         SkyManager.Instance["ConsolariaCreditsRoll"] = new ConsolariaCreditsSky();
         SkyManager.Instance["ConsolariaCreditsRoll"].Load();
@@ -279,8 +294,10 @@ sealed class ShaderLoader : ModSystem {
         Filters.Scene[EternalHorrorShakeFilterName].Load();
 
         Asset<Effect> shockwaveShader = ModContent.Request<Effect>("Consolaria/Assets/Effects/Shockwave", AssetRequestMode.ImmediateLoad);
-        Filters.Scene[EternalHorrorShockwaveFilterName] = new Filter(new ScreenShaderData(shockwaveShader, "ShockwavePass"), EffectPriority.VeryHigh);
-        Filters.Scene[EternalHorrorShockwaveFilterName].Load();
+        for (int i = 0; i < ShockwaveMaxCount; i++) {
+            Filters.Scene[EternalHorrorShockwaveFilterName_Base + i] = new Filter(new ScreenShaderData(shockwaveShader, "ShockwavePass"), EffectPriority.VeryHigh);
+            Filters.Scene[EternalHorrorShockwaveFilterName_Base + i].Load();
+        }
 
         Filters.Scene[EternalHorrorTintFilterName] = new Filter(new EternalHorrorScreenShaderData("FilterMoonLord", aimAtPlayer: false).UseColor(EternalHorror.MainPurpleColor), EffectPriority.VeryHigh);
         Filters.Scene[EternalHorrorTintFilterName].Load();
