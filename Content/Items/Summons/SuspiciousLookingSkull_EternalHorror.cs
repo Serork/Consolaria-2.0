@@ -3,7 +3,6 @@ using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent.Items;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -29,6 +28,7 @@ namespace Consolaria.Content.Items.Summons {
             orig();
 
             int numAvailableRecipes = 0;
+
             for (int i = 0; i < Main.availableRecipe.Length; i++) {
                 int j = Main.availableRecipe[i];
                 if (j <= 0) {
