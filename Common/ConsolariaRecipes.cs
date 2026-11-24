@@ -323,7 +323,7 @@ sealed class ConsolariaRecipes : ModSystem {
         item.AddIngredient(ItemID.SoulofSight, 5);
         item.AddTile(TileID.DemonAltar);
         item.SortAfterFirstRecipesOf(ItemID.MechanicalSkull);
-        item.AddCondition(Language.GetOrRegister("Mods.Consolaria.OcramSummonCondition"), () => !EternalHorror.CanEternalHorrorExistInAWorld);
+        //item.AddCondition(SuspiciousLookingSkull.ThisItemCondition);
         item.Register();
         
         // eternal horror summon
@@ -335,7 +335,7 @@ sealed class ConsolariaRecipes : ModSystem {
         item.AddIngredient(ItemID.SoulofSight, 5);
         item.AddTile(TileID.DemonAltar);
         item.SortAfterFirstRecipesOf(ItemID.CelestialSigil);
-        item.AddCondition(Language.GetOrRegister("Mods.Consolaria.EternalHorrorSummonCondition"), () => EternalHorror.CanEternalHorrorExistInAWorld);
+        //item.AddCondition(SuspiciousLookingSkull_EternalHorror.ThisItemCondition);
         item.Register();
 
         // threads

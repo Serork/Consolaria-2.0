@@ -6,15 +6,20 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Chat;
+using Terraria.GameContent.Items;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.Items.Summons {
     public class SuspiciousLookingSkull : ModItem {
+        public static Condition ThisItemCondition => new Condition(Language.GetOrRegister("Mods.Consolaria.OcramSummonCondition"), () => !EternalHorror.CanEternalHorrorExistInAWorld);
+
         public override void SetStaticDefaults() {
             Item.ResearchUnlockCount = 3;
             ItemID.Sets.SortingPriorityBossSpawns[Type] = 12;
+
+            //ItemVariants.AddVariant(Type, ItemVariants.EnabledVariant, ThisItemCondition);
         }
 
         public override void SetDefaults() {

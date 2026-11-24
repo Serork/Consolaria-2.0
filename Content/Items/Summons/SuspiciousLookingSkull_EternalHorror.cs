@@ -1,18 +1,68 @@
-using Consolaria.Common;
 using Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.GameContent.Items;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Consolaria.Content.Items.Summons {
     public class SuspiciousLookingSkull_EternalHorror : ModItem {
+        public static Condition ThisItemCondition => new Condition(Language.GetOrRegister("Mods.Consolaria.EternalHorrorSummonCondition"), () => !EternalHorror.CanEternalHorrorExistInAWorld);
+
         public override void SetStaticDefaults() {
             Item.ResearchUnlockCount = 3;
             ItemID.Sets.SortingPriorityBossSpawns[Type] = 33;
+
+            //ItemVariants.AddVariant(Type, ItemVariants.EnabledVariant, ThisItemCondition);
+        }
+
+        public override void Load() {
+            On_Recipe.PlayerMeetsEnvironmentConditions += On_Recipe_PlayerMeetsEnvironmentConditions;
+            On_Recipe.AddToAvailableRecipes += On_Recipe_AddToAvailableRecipes;
+            On_Recipe.CollectGuideRecipes += On_Recipe_CollectGuideRecipes;
+        }
+
+        private void On_Recipe_CollectGuideRecipes(On_Recipe.orig_CollectGuideRecipes orig) {
+            orig();
+
+            int numAvailableRecipes = 0;
+            for (int i = 0; i < Main.availableRecipe.Length; i++) {
+                int j = Main.availableRecipe[i];
+                if (j <= 0) {
+                    continue;
+                }
+                Recipe recipe = Main.recipe[j];
+                if (recipe.createItem.type == ModContent.ItemType<SuspiciousLookingSkull_EternalHorror>() && !EternalHorror.CanEternalHorrorExistInAWorld) {
+                    continue;
+                }
+                if (recipe.createItem.type == ModContent.ItemType<SuspiciousLookingSkull>() && EternalHorror.CanEternalHorrorExistInAWorld) {
+                    continue;
+                }
+
+                Main.availableRecipe[numAvailableRecipes++] = j;
+            }
+
+            Main.numAvailableRecipes = numAvailableRecipes;
+        }
+
+        private void On_Recipe_AddToAvailableRecipes(On_Recipe.orig_AddToAvailableRecipes orig, int recipeIndex) {
+            orig(recipeIndex);
+        }
+
+        private bool On_Recipe_PlayerMeetsEnvironmentConditions(On_Recipe.orig_PlayerMeetsEnvironmentConditions orig, Player player, Recipe tempRec) {
+            bool result = orig(player, tempRec);
+
+            if (tempRec.createItem.type == ModContent.ItemType<SuspiciousLookingSkull_EternalHorror>()) {
+                return result && EternalHorror.CanEternalHorrorExistInAWorld;
+            }
+            if (tempRec.createItem.type == ModContent.ItemType<SuspiciousLookingSkull>()) {
+                return result && !EternalHorror.CanEternalHorrorExistInAWorld;
+            }
+
+            return result;
         }
 
         public override void SetDefaults() {
