@@ -6,7 +6,7 @@ namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 sealed partial class EternalHorror : ModNPC {
     public static byte IMMUNETIMEINTICKS(DamageClass damageClass) {
         if (damageClass.CountsAsClass(DamageClass.Ranged)) {
-            return 7;
+            return 5;
         }
         if (damageClass.CountsAsClass(DamageClass.Melee) ||
             damageClass.CountsAsClass(DamageClass.MeleeNoSpeed)) {
@@ -18,7 +18,7 @@ sealed partial class EternalHorror : ModNPC {
             return 0;
         }
         if (damageClass.CountsAsClass(DamageClass.Magic)) {
-            return 3;
+            return 5;
         }
 
         return 10;
