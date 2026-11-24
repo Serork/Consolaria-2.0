@@ -34,7 +34,7 @@ namespace Consolaria.Common.ModSystems {
         private void On_UIWorldListItem_AddTmlElements(On_UIWorldListItem.orig_AddTmlElements orig, UIWorldListItem self, Terraria.IO.WorldFileData data, ref float offset) {
             orig(self, data, ref offset);
 
-            if (self.Data.TryGetHeaderData<DownedBossSystem>(out TagCompound tag) && tag.ContainsKey("downedEternalHorror"))
+            if (self.Data.TryGetHeaderData<DownedBossSystem>(out TagCompound tag) && tag.ContainsKey("downedEternalHorror") && _canAppendNewUIElement.ContainsKey(data.UniqueId))
             //if (data.DefeatedMoonlord)
             {
                 //if (!_canAppendNewUIElement[data.UniqueId])
