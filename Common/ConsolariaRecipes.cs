@@ -328,11 +328,12 @@ sealed class ConsolariaRecipes : ModSystem {
         
         // eternal horror summon
         item = Recipe.Create(ModContent.ItemType<SuspiciousLookingSkull_EternalHorror>(), 1);
-        item.AddIngredient(ItemID.LunarBar, 15);
+        item.AddIngredient(ItemID.Bone, 15);
         item.AddIngredient(ItemID.Ectoplasm, 5);
-        item.AddIngredient(ItemID.SoulofFright, 5);
-        item.AddIngredient(ItemID.SoulofMight, 5);
-        item.AddIngredient(ItemID.SoulofSight, 5);
+        item.AddIngredient(ItemID.LunarBar, 15);
+        //item.AddIngredient(ItemID.SoulofFright, 5);
+        //item.AddIngredient(ItemID.SoulofMight, 5);
+        //item.AddIngredient(ItemID.SoulofSight, 5);
         item.AddTile(TileID.DemonAltar);
         item.SortAfterFirstRecipesOf(ItemID.CelestialSigil);
         //item.AddCondition(SuspiciousLookingSkull_EternalHorror.ThisItemCondition);
