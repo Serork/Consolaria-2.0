@@ -2595,7 +2595,7 @@ sealed partial class EternalHorror : ModNPC {
     private void AddState<T>() where T : struct, IAIState => _states.TryAdd(typeof(T), new T());
 
     private void ActivateState<T>() where T : struct, IAIState {
-        if (!Init) {
+        if (!Init || _states is null || _activeStates is null) {
             return;
         }
         AddState<T>();
@@ -2610,7 +2610,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void DeactivateState<T>() where T : IAIState {
-        if (!Init) {
+        if (!Init || _states is null || _activeStates is null) {
             return;
         }
         IAIState stateToDeactivate = _states[typeof(T)];
@@ -2622,7 +2622,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void DeactivateAllStates() {
-        if (!Init) {
+        if (!Init || _states is null || _activeStates is null) {
             return;
         }
 
@@ -2630,7 +2630,7 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private bool HasActiveState<T>() where T : IAIState {
-        if (!Init) {
+        if (!Init || _states is null || _activeStates is null) {
             return false;
         }
         if (_states.TryGetValue(typeof(T), out IAIState state)) {
