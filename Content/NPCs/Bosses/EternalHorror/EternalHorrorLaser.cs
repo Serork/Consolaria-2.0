@@ -100,6 +100,10 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     private void MakeMovementSparkle() {
+        if (Main.dedServ) {
+            return;
+        }
+
         Color colorTint = Reflected ? EternalHorror.MainPurpleColor : EternalHorror.MainRedColor_Dynamic;
 
         Vector2 position = Projectile.Center;
@@ -192,24 +196,26 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
                     SoundEngine.PlaySound(ReflectSound, Projectile.Center);
 
-                    int num5 = Main.rand.Next(20, 40);
-                    Vector2 positionInWorld = Projectile.Center;
-                    Vector2 movementVector = Projectile.velocity;
-                    PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
-                    prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
-                    prettySparkleParticle.LocalPosition = positionInWorld;
-                    prettySparkleParticle.Rotation = (float)Math.PI / 2f;
-                    prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
-                    prettySparkleParticle.FadeInNormalizedTime = 0.1f;
-                    prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
-                    prettySparkleParticle.TimeToLive = num5;
-                    prettySparkleParticle.FadeOutEnd = num5;
-                    prettySparkleParticle.FadeInEnd = num5 / 2;
-                    prettySparkleParticle.FadeOutStart = num5 / 2;
-                    prettySparkleParticle.AdditiveAmount = 0.35f;
-                    prettySparkleParticle.Velocity = movementVector;
-                    prettySparkleParticle.Velocity *= 0.3f;
-                    Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+                    if (!Main.dedServ) {
+                        int num5 = Main.rand.Next(20, 40);
+                        Vector2 positionInWorld = Projectile.Center;
+                        Vector2 movementVector = Projectile.velocity;
+                        PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+                        prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+                        prettySparkleParticle.LocalPosition = positionInWorld;
+                        prettySparkleParticle.Rotation = (float)Math.PI / 2f;
+                        prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+                        prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+                        prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+                        prettySparkleParticle.TimeToLive = num5;
+                        prettySparkleParticle.FadeOutEnd = num5;
+                        prettySparkleParticle.FadeInEnd = num5 / 2;
+                        prettySparkleParticle.FadeOutStart = num5 / 2;
+                        prettySparkleParticle.AdditiveAmount = 0.35f;
+                        prettySparkleParticle.Velocity = movementVector;
+                        prettySparkleParticle.Velocity *= 0.3f;
+                        Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+                    }
 
                     return;
                 }

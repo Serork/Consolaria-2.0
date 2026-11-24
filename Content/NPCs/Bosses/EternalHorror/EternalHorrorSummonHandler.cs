@@ -107,7 +107,9 @@ sealed class EternalHorrorSummonHandler : ModSystem {
         _eyeData = new EyeInfo[400];
         _soulData = new SoulInfo[400];
 
-        Helper.NewMessage(Language.GetTextValue("Mods.Consolaria.EternalHorrorSpawnMessage"), new Color(50, 255, 130));
+        if (!Helper.IsServer()) {
+            Helper.NewMessage(Language.GetTextValue("Mods.Consolaria.EternalHorrorSpawnMessage"), new Color(50, 255, 130));
+        }
     }
 
     public override void Load() {
@@ -322,7 +324,10 @@ sealed class EternalHorrorSummonHandler : ModSystem {
                 if (!EternalHorrorShouldBeSummoned) {
                     EternalHorrorShouldBeSummoned = true;
 
-                    NPC.SpawnOnPlayer(PlayerWhoSummon.whoAmI, EternalHorror.SelfType);
+                    //NPC.SpawnOnPlayer(PlayerWhoSummon.whoAmI, EternalHorror.SelfType);
+                    if (!Helper.IsClient()) {
+                        NPC.SpawnBoss((int)PlayerWhoSummon.Center.X, (int)PlayerWhoSummon.Center.Y, EternalHorror.SelfType, PlayerWhoSummon.whoAmI);
+                    }
                 }
             }
 

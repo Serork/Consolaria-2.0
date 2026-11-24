@@ -1,5 +1,5 @@
 using Consolaria.Content.Items.Armor.Ranged;
-
+using Consolaria.Content.NPCs.Bosses.EternalHorror;
 using System.IO;
 
 using Terraria;
@@ -9,7 +9,8 @@ using Terraria.ModLoader;
 namespace Consolaria {
     public partial class Consolaria : Mod {
         internal enum MessageType : byte {
-            TitanPower
+            TitanPower,
+            EternalHorrorSummon
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
@@ -25,6 +26,14 @@ namespace Consolaria {
                             // Forward the changes to the other clients
                             examplePlayer.SyncPlayer(-1, whoAmI, false);
                         }
+                    }
+                    break;
+                case MessageType.EternalHorrorSummon: {
+                        byte playerNumber = reader.ReadByte();
+
+                        EternalHorrorSummonHandler.PlayerIndexWhoSummon = playerNumber;
+
+                        EternalHorrorSummonHandler.StartSummoningEternalHorror();
                     }
                     break;
                 default:

@@ -260,6 +260,10 @@ sealed class EternalServant : ModNPC {
 
         if (Main.rand.NextChance(NPC.velocity.Length() / 30f) && Main.rand.NextBool(10)) {
             void makeSpawnDust() {
+                if (Main.dedServ) {
+                    return;
+                }
+
                 Color colorTint = EternalHorror.MainPurpleColor * 0.5f;
 
                 Vector2 position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) * 0.5f;

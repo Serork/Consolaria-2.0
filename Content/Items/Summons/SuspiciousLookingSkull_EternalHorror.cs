@@ -50,9 +50,9 @@ namespace Consolaria.Content.Items.Summons {
         public override bool? UseItem(Player player) {
             int type = ModContent.NPCType<EternalHorror>();
 
-            if (Main.netMode != NetmodeID.MultiplayerClient) {
-                int targetPlayerIndex = player.whoAmI;
+            int targetPlayerIndex = player.whoAmI;
 
+            if (!Helper.IsClient()) {
                 int num = 200;
                 num = NPC.NewNPC(player.GetSource_ItemUse(Item), (int)player.Center.X, (int)player.Center.Y, type, 1);
 

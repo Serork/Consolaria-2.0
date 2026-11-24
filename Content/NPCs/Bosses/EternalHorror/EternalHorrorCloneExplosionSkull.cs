@@ -52,24 +52,26 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
         if (Projectile.localAI[2] == 0f) {
             Projectile.localAI[2] = 1f;
 
-            int num5 = Main.rand.Next(20, 40);
-            Vector2 positionInWorld = Projectile.Center;
-            Vector2 movementVector = Projectile.velocity;
-            PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
-            prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
-            prettySparkleParticle.LocalPosition = positionInWorld;
-            prettySparkleParticle.Rotation = (float)Math.PI / 2f;
-            prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
-            prettySparkleParticle.FadeInNormalizedTime = 0.1f;
-            prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
-            prettySparkleParticle.TimeToLive = num5;
-            prettySparkleParticle.FadeOutEnd = num5;
-            prettySparkleParticle.FadeInEnd = num5 / 2;
-            prettySparkleParticle.FadeOutStart = num5 / 2;
-            prettySparkleParticle.AdditiveAmount = 0.35f;
-            prettySparkleParticle.Velocity = movementVector;
-            prettySparkleParticle.Velocity *= 0.3f;
-            Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+            if (!Main.dedServ) {
+                int num5 = Main.rand.Next(20, 40);
+                Vector2 positionInWorld = Projectile.Center;
+                Vector2 movementVector = Projectile.velocity;
+                PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+                prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+                prettySparkleParticle.LocalPosition = positionInWorld;
+                prettySparkleParticle.Rotation = (float)Math.PI / 2f;
+                prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+                prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+                prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+                prettySparkleParticle.TimeToLive = num5;
+                prettySparkleParticle.FadeOutEnd = num5;
+                prettySparkleParticle.FadeInEnd = num5 / 2;
+                prettySparkleParticle.FadeOutStart = num5 / 2;
+                prettySparkleParticle.AdditiveAmount = 0.35f;
+                prettySparkleParticle.Velocity = movementVector;
+                prettySparkleParticle.Velocity *= 0.3f;
+                Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+            }
         }
 
         if (Projectile.timeLeft <= 895) Projectile.alpha = 50;
@@ -79,6 +81,10 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
 
         if (Main.rand.NextBool(2)) {
             void makeSpawnDust() {
+                if (Main.dedServ) {
+                    return;
+                }
+
                 Color colorTint = EternalHorror.MainPurpleColor * 0.75f;
 
                 Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * 0.5f;
@@ -116,6 +122,10 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
     }
 
     private void MakeMovementSparkle() {
+        if (Main.dedServ) {
+            return;
+        }
+
         Color colorTint = true ? EternalHorror.MainPurpleColor : EternalHorror.MainRedColor_Dynamic;
 
         Vector2 position = Projectile.Center;
@@ -178,24 +188,26 @@ sealed class EternalHorrorCloneExplosionSkull : ModProjectile, IEternalHorrorPro
 
                     Reflected = true;
 
-                    int num5 = Main.rand.Next(20, 40);
-                    Vector2 positionInWorld = Projectile.Center;
-                    Vector2 movementVector = Projectile.velocity;
-                    PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
-                    prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
-                    prettySparkleParticle.LocalPosition = positionInWorld;
-                    prettySparkleParticle.Rotation = (float)Math.PI / 2f;
-                    prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
-                    prettySparkleParticle.FadeInNormalizedTime = 0.1f;
-                    prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
-                    prettySparkleParticle.TimeToLive = num5;
-                    prettySparkleParticle.FadeOutEnd = num5;
-                    prettySparkleParticle.FadeInEnd = num5 / 2;
-                    prettySparkleParticle.FadeOutStart = num5 / 2;
-                    prettySparkleParticle.AdditiveAmount = 0.35f;
-                    prettySparkleParticle.Velocity = movementVector;
-                    prettySparkleParticle.Velocity *= 0.3f;
-                    Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+                    if (!Main.dedServ) {
+                        int num5 = Main.rand.Next(20, 40);
+                        Vector2 positionInWorld = Projectile.Center;
+                        Vector2 movementVector = Projectile.velocity;
+                        PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+                        prettySparkleParticle.ColorTint = EternalHorror.MainPurpleColor.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+                        prettySparkleParticle.LocalPosition = positionInWorld;
+                        prettySparkleParticle.Rotation = (float)Math.PI / 2f;
+                        prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+                        prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+                        prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+                        prettySparkleParticle.TimeToLive = num5;
+                        prettySparkleParticle.FadeOutEnd = num5;
+                        prettySparkleParticle.FadeInEnd = num5 / 2;
+                        prettySparkleParticle.FadeOutStart = num5 / 2;
+                        prettySparkleParticle.AdditiveAmount = 0.35f;
+                        prettySparkleParticle.Velocity = movementVector;
+                        prettySparkleParticle.Velocity *= 0.3f;
+                        Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
+                    }
 
                     return;
                 }

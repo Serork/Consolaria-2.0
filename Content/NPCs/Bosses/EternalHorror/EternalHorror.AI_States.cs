@@ -947,6 +947,10 @@ sealed partial class EternalHorror : ModNPC {
 
                     Vector2 getPosition() => npc.Center + Main.rand.NextVector2Circular(npc.width, npc.height) * 0f;
                     void makeSpawnDust() {
+                        if (Main.dedServ) {
+                            return;
+                        }
+
                         Color colorTint = MainPurpleColor * 0.5f;
 
                         Vector2 position = getPosition() + Main.rand.NextVector2Circular(npc.width, npc.height) * 0.25f;

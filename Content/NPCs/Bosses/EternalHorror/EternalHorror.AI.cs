@@ -227,6 +227,14 @@ sealed partial class EternalHorror : ModNPC {
             EternalHorrorSummonHandler.PlayerIndexWhoSummon = NPC.GetTargetPlayer().whoAmI;
 
             EternalHorrorSummonHandler.StartSummoningEternalHorror();
+
+            if (Helper.IsServer()) {
+                ModPacket packet = Mod.GetPacket();
+                packet.Write((byte)Consolaria.MessageType.EternalHorrorSummon);
+                packet.Write((byte)EternalHorrorSummonHandler.PlayerIndexWhoSummon);
+                packet.Send();
+            }
+
             NPC.KillNPC();
 
             NPC.boss = false;
@@ -544,46 +552,48 @@ sealed partial class EternalHorror : ModNPC {
 
             int dustCount = 1;
             dustCount += (int)MathF.Floor(cloneInfo.ExplosionProgress2 * 2);
-            for (int k = 0; k < dustCount; k++) {
-                float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity * 1f) * (cloneInfo.ExplosionProgress2 > 0f ? 1f : 0.875f);
-                if (Main.rand.NextChance(/*IsInSecondPhase ? */opacityChance/* : MathF.Max(0.5f, MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH))*/) 
-                    && Main.rand.NextBool(1)) {
-                    Color colorTint = MainPurpleColor * 0.375f;
-                    colorTint *= opacityChance;
+            if (!Main.dedServ) {
+                for (int k = 0; k < dustCount; k++) {
+                    float opacityChance = MathF.Max(cloneInfo.ExplosionProgress2 * 0.75f, cloneInfo.Opacity * 1f) * (cloneInfo.ExplosionProgress2 > 0f ? 1f : 0.875f);
+                    if (Main.rand.NextChance(/*IsInSecondPhase ? */opacityChance/* : MathF.Max(0.5f, MathF.Max(cloneInfo.DashOpacity, cloneInfo.Velocity.Length() / Phase1DashAttack.DASHSTRENGTH))*/)
+                        && Main.rand.NextBool(1)) {
+                        Color colorTint = MainPurpleColor * 0.375f;
+                        colorTint *= opacityChance;
 
-                    Vector2 offset = new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
-                    offset *= Utils.Remap(1f - cloneInfo.ExplosionProgress2, 0f, 1f, 0.5f, 1f, true);
-                    offset = offset.RotatedBy(cloneInfo.Rotation);
-                    Vector2 position = cloneInfo.VisualPosition + offset;
-                    Vector2 velocity = cloneInfo.Velocity;
-                    position += velocity;
-                    velocity *= 0.2f;
+                        Vector2 offset = new Vector2(NPC.width, NPC.height) * new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
+                        offset *= Utils.Remap(1f - cloneInfo.ExplosionProgress2, 0f, 1f, 0.5f, 1f, true);
+                        offset = offset.RotatedBy(cloneInfo.Rotation);
+                        Vector2 position = cloneInfo.VisualPosition + offset;
+                        Vector2 velocity = cloneInfo.Velocity;
+                        position += velocity;
+                        velocity *= 0.2f;
 
-                    velocity += position.DirectionFrom(cloneInfo.VisualPosition) * MathHelper.Lerp(7.5f, 10f, cloneInfo.ExplosionProgress2) * MathF.Max(0.125f * 0.875f, cloneInfo.ExplosionProgress2);
+                        velocity += position.DirectionFrom(cloneInfo.VisualPosition) * MathHelper.Lerp(7.5f, 10f, cloneInfo.ExplosionProgress2) * MathF.Max(0.125f * 0.875f, cloneInfo.ExplosionProgress2);
 
-                    FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
-                    fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
-                    float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
-                    fadingParticle.SetTypeInfo(num);
-                    fadingParticle.AccelerationPerFrame = velocity / num;
-                    fadingParticle.ColorTint = colorTint;
-                    fadingParticle.FadeInNormalizedTime = 0.5f;
-                    fadingParticle.FadeOutNormalizedTime = 0.5f;
-                    fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
-                    fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat() + cloneInfo.ExplosionProgress2 * 0.375f) * 1.25f;
-                    Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
-                    FadingParticle fadingParticle2 = fadingParticle;
-                    fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
-                    fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
-                    fadingParticle.SetTypeInfo(num);
-                    fadingParticle.AccelerationPerFrame = velocity / num;
-                    fadingParticle.ColorTint = colorTint;
-                    fadingParticle.ColorTint.A = 30;
-                    fadingParticle.FadeInNormalizedTime = 0.5f;
-                    fadingParticle.FadeOutNormalizedTime = 0.5f;
-                    fadingParticle.Rotation = fadingParticle2.Rotation;
-                    fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
-                    Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                        FadingParticle fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                        fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                        float num = 25f/* * Main.rand.NextFloat(0.5f, 1f)*/;
+                        fadingParticle.SetTypeInfo(num);
+                        fadingParticle.AccelerationPerFrame = velocity / num;
+                        fadingParticle.ColorTint = colorTint;
+                        fadingParticle.FadeInNormalizedTime = 0.5f;
+                        fadingParticle.FadeOutNormalizedTime = 0.5f;
+                        fadingParticle.Rotation = Main.rand.NextFloat() * ((float)Math.PI * 2f);
+                        fadingParticle.Scale = Vector2.One * (0.5f + 0.5f * Main.rand.NextFloat() + cloneInfo.ExplosionProgress2 * 0.375f) * 1.25f;
+                        Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                        FadingParticle fadingParticle2 = fadingParticle;
+                        fadingParticle = ParticlePools.FadingParticlePool.RequestParticle();
+                        fadingParticle.SetBasicInfo(TextureAssets.Star[0], null, velocity, position);
+                        fadingParticle.SetTypeInfo(num);
+                        fadingParticle.AccelerationPerFrame = velocity / num;
+                        fadingParticle.ColorTint = colorTint;
+                        fadingParticle.ColorTint.A = 30;
+                        fadingParticle.FadeInNormalizedTime = 0.5f;
+                        fadingParticle.FadeOutNormalizedTime = 0.5f;
+                        fadingParticle.Rotation = fadingParticle2.Rotation;
+                        fadingParticle.Scale = fadingParticle2.Scale * 0.5f;
+                        Main.ParticleSystem_World_OverPlayers.Add(fadingParticle);
+                    }
                 }
             }
 
@@ -779,6 +789,10 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void SpawnEyeParticle(Vector2 center, Vector2 velocity) {
+        if (Main.dedServ) {
+            return;
+        }
+
         Color color = MainPurpleColor;
 
         int num5 = Main.rand.Next(20, 40);
@@ -835,31 +849,33 @@ sealed partial class EternalHorror : ModNPC {
 
         Color color = !reflectedFromStart ? MainRedColor_Dynamic : MainPurpleColor;
 
-        int num5 = Main.rand.Next(20, 40);
-        Vector2 positionInWorld = center;
-        Vector2 movementVector = velocity * Main.rand.NextFloatDirection();
-        PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
-        prettySparkleParticle.ColorTint = color.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
-        prettySparkleParticle.LocalPosition = positionInWorld;
-        prettySparkleParticle.Rotation = NPC.rotation + (float)Math.PI / 2f;
-        prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
-        prettySparkleParticle.FadeInNormalizedTime = 0.1f;
-        prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
-        prettySparkleParticle.TimeToLive = num5;
-        prettySparkleParticle.FadeOutEnd = num5;
-        prettySparkleParticle.FadeInEnd = num5 / 2;
-        prettySparkleParticle.FadeOutStart = num5 / 2;
-        prettySparkleParticle.AdditiveAmount = 0.35f;
-        prettySparkleParticle.Velocity = movementVector;
+        if (!Main.dedServ) {
+            int num5 = Main.rand.Next(20, 40);
+            Vector2 positionInWorld = center;
+            Vector2 movementVector = velocity * Main.rand.NextFloatDirection();
+            PrettySparkleParticle prettySparkleParticle = ParticlePools.PrettySparkleParticlePool.RequestParticle();
+            prettySparkleParticle.ColorTint = color.ModifyRGB(Main.rand.NextFloat(0.5f, 1f)) with { A = 20 };
+            prettySparkleParticle.LocalPosition = positionInWorld;
+            prettySparkleParticle.Rotation = NPC.rotation + (float)Math.PI / 2f;
+            prettySparkleParticle.Scale = new Vector2(8f, 0.4f);
+            prettySparkleParticle.FadeInNormalizedTime = 0.1f;
+            prettySparkleParticle.FadeOutNormalizedTime = 0.5f;
+            prettySparkleParticle.TimeToLive = num5;
+            prettySparkleParticle.FadeOutEnd = num5;
+            prettySparkleParticle.FadeInEnd = num5 / 2;
+            prettySparkleParticle.FadeOutStart = num5 / 2;
+            prettySparkleParticle.AdditiveAmount = 0.35f;
+            prettySparkleParticle.Velocity = movementVector;
 
-        if (IsInSecondPhase) {
-            prettySparkleParticle.Velocity *= 0f;
+            if (IsInSecondPhase) {
+                prettySparkleParticle.Velocity *= 0f;
 
-            prettySparkleParticle.Scale *= Main.rand.NextFloat(1f, 1.5f);
+                prettySparkleParticle.Scale *= Main.rand.NextFloat(1f, 1.5f);
+            }
+
+            prettySparkleParticle.Velocity *= 0.3f;
+            Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
         }
-
-        prettySparkleParticle.Velocity *= 0.3f;
-        Main.ParticleSystem_World_OverPlayers.Add(prettySparkleParticle);
 
         if (Helper.IsClient()) {
             return;
@@ -867,10 +883,14 @@ sealed partial class EternalHorror : ModNPC {
         int damage = IsInSecondPhase ? GetLaserDamage_Phase2() : GetLaserDamage_Phase1();
         float knockBack = IsInSecondPhase ? GetLaserKnockback_Phase2() : GetLaserKnockback_Phase1();
         Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser>(),
-            damage, knockBack, Main.myPlayer, ai2: reflectedFromStart.ToInt());
+            damage, knockBack, Owner: Main.myPlayer, ai2: reflectedFromStart.ToInt());
     }
 
     private void MakeTrailDust(float velocityFactor = 1f, float rotation = float.MaxValue) {
+        if (Main.dedServ) {
+            return;
+        }
+
         Color colorTint = MainPurpleColor * 0.25f;
 
         Vector2 position = NPC.Center + Main.rand.NextVector2Circular(NPC.width, NPC.height) * 0.25f;
@@ -945,6 +965,10 @@ sealed partial class EternalHorror : ModNPC {
     }
 
     private void SpawnPreparationDust_Shadow(float progress) {
+        if (Main.dedServ) {
+            return;
+        }
+
         for (int i = 0; i < 1; i++) {
             if (Main.rand.NextChance(Ease.CubeOut(progress)) && Main.rand.NextBool()) {
                 Color colorTint = Color.Lerp(MainRedColor_Dynamic, MainPurpleColor, 1f/*Main.rand.NextFloat()*/) * 0.5f;

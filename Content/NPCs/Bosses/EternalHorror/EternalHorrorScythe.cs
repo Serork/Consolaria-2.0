@@ -84,6 +84,10 @@ sealed class EternalHorrorScythe : ModProjectile, IEternalHorrorProjectile {
 
         if (Main.rand.NextBool(2)) {
             void makeSpawnDust() {
+                if (Main.dedServ) {
+                    return;
+                }
+
                 Color colorTint = EternalHorror.MainPurpleColor * 0.75f;
 
                 Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * 0.5f;
