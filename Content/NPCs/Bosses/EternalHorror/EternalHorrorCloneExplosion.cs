@@ -170,6 +170,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
         }
 
         if (PlayerIndex >= 0 && PlayerIndex != Main.myPlayer) {
+            Projectile.Kill();
             return;
         }
 
