@@ -1,7 +1,6 @@
 ﻿using Consolaria.Common.ModSystems;
 using Consolaria.Common.Particles;
 using Microsoft.Xna.Framework;
-using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +10,12 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Events;
 using Terraria.Graphics.Renderers;
-using Terraria.ID;
 using Terraria.ModLoader;
-using static Consolaria.Content.NPCs.Bosses.EternalHorror.EternalHorror;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed partial class EternalHorror : ModNPC {
-    public static byte CLONECOUNTAVAILABLE => 4;
+    public static byte CLONECOUNTAVAILABLE => 10;
     private static ushort CLONEACTIVETIME => Helper.SecondsToFrames(10);
     private static byte RAYCOUNTMAX => 10;
     private static byte SPAWNRAYCOUNTONSPAWN => RAYCOUNTMAX;
@@ -931,7 +928,7 @@ sealed partial class EternalHorror : ModNPC {
         int damage = IsInSecondPhase ? GetLaserDamage_Phase2() : GetLaserDamage_Phase1();
         float knockBack = IsInSecondPhase ? GetLaserKnockback_Phase2() : GetLaserKnockback_Phase1();
         Projectile.NewProjectile(NPC.GetSource_FromAI(), vector8.X, vector8.Y, speedX, speedY, ModContent.ProjectileType<EternalHorrorLaser>(),
-            damage, knockBack, Owner: Main.myPlayer, ai2: reflectedFromStart.ToInt(), ai1: playerIndex);
+            damage, knockBack, Owner: Main.myPlayer, ai2: reflectedFromStart.ToInt(), ai0: playerIndex);
     }
 
     private void MakeTrailDust(float velocityFactor = 1f, float rotation = float.MaxValue) {

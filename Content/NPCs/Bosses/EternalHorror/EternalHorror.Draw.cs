@@ -296,7 +296,7 @@ sealed partial class EternalHorror : ModNPC {
         }
     }
 
-    string ShockwaveName => ShaderLoader.EternalHorrorShockwaveFilterName_Base + 4;
+    string ShockwaveName => ShaderLoader.EternalHorrorShockwaveFilterName_Base + EternalHorror.CLONECOUNTAVAILABLE;
     Filter ShockwaveFilter => Filters.Scene[ShockwaveName];
 
     void HandleShockwave(float distortStrength, float progress) {

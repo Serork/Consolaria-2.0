@@ -21,7 +21,7 @@ sealed class EternalHorrorCloneExplosion : ModProjectile, IEternalHorrorProjecti
 
     private int _explosionIndex;
 
-    public int PlayerIndex => (int)(Projectile.ai[1] - 1);
+    public int PlayerIndex => (int)(Projectile.ai[1]);
 
     public override string Texture => "Consolaria/Assets/Textures/Empty";
 

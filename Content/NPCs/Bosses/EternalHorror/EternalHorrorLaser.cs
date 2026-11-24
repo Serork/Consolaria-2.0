@@ -22,7 +22,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
 
     public ref float ReflectedValue => ref Projectile.ai[2];
 
-    public int PlayerIndex => (int)(Projectile.ai[1] - 1);
+    public int PlayerIndex => (int)(Projectile.ai[0]);
 
     public bool Reflected {
         get => ReflectedValue != 0f;
@@ -63,7 +63,7 @@ sealed class EternalHorrorLaser : ModProjectile, IEternalHorrorProjectile {
     }
 
     public override bool PreAI() {
-        //Projectile.ai[1] = 1f;
+        Projectile.ai[1] = 1f;
 
         return true;
     }
