@@ -23,8 +23,7 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.CursedInferno] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Position = new Vector2(-2f, 0f),
-                Velocity = 1f
+                Position = new Vector2(-1f, 21f)
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
