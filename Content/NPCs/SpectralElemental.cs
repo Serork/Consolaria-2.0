@@ -103,6 +103,13 @@ namespace Consolaria.Content.NPCs {
                 return true;
             }
 
+            Color npcColor = drawColor;
+            npcColor = NPC.GetNPCColorTintedByBuffs(npcColor);
+            drawColor = npcColor;
+            if (NPC.IsABestiaryIconDummy) {
+                drawColor = NPC.GetBestiaryEntryColor();
+            }
+
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>(Texture);
             SpriteEffects effects = (NPC.spriteDirection == -1) ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
             Vector2 origin = new Vector2(texture.Width / 2, texture.Height / Main.npcFrameCount[NPC.type] / 2);

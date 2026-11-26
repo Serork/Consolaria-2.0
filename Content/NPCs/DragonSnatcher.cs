@@ -142,8 +142,12 @@ namespace Consolaria.Content.NPCs {
                 ai2 = NPC.Center.Y + 100;
             }
 
-            if (NPC.IsABestiaryIconDummy)
+            Color npcColor = drawColor;
+            npcColor = NPC.GetNPCColorTintedByBuffs(npcColor);
+            drawColor = npcColor;
+            if (NPC.IsABestiaryIconDummy) {
                 drawColor = NPC.GetBestiaryEntryColor();
+            }
 
             float drawPosX = ai1 - vector.X;
             float drawPosY = ai2 - vector.Y;
