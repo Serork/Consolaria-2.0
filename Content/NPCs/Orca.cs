@@ -22,7 +22,10 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 1f
+                Position = new Vector2(35f, 4f),
+                Velocity = 1f,
+                PortraitPositionXOverride = 5f,
+                IsWet = true
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 

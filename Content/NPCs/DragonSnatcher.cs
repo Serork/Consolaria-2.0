@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
@@ -31,8 +32,8 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                CustomTexturePath = "Consolaria/Assets/Textures/Bestiary/DragonSnatcher_Bestiary",
-                Rotation = (float)Math.PI / 2f
+                Position = new Vector2(4f, -6f),
+                Rotation = (float)Math.PI * 3f / 4f
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
@@ -93,6 +94,8 @@ namespace Consolaria.Content.NPCs {
                 NPC.netUpdate = true;
             }
 
+            FixExploitManEaters.ProtectSpot((int)NPC.ai[1], (int)NPC.ai[2]);
+
             if (timer > 180) {
                 timer = 0;
                 posX = player.position.X + (player.width * 0.5f);
@@ -130,13 +133,26 @@ namespace Consolaria.Content.NPCs {
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/NPCs/DragonSnatcherChain");
             Vector2 vector = new(NPC.Center.X, NPC.Center.Y);
-            float drawPosX = NPC.ai[1] - vector.X;
-            float drawPosY = NPC.ai[2] - vector.Y;
+
+            float ai1 = NPC.ai[1];
+            float ai2 = NPC.ai[2];
+
+            if (NPC.IsABestiaryIconDummy) {
+                ai1 = NPC.Center.X - 102f;
+                ai2 = NPC.Center.Y + 100;
+            }
+
+            if (NPC.IsABestiaryIconDummy)
+                drawColor = NPC.GetBestiaryEntryColor();
+
+            float drawPosX = ai1 - vector.X;
+            float drawPosY = ai2 - vector.Y;
 
             float rotation = (float)Math.Atan2(drawPosY, drawPosX) - 1.57f;
             bool flag = true;
             while (flag) {
                 float drawPos = (float)Math.Sqrt(drawPosX * drawPosX + drawPosY * drawPosY);
+
                 if (drawPos < 28f) flag = false;
                 else {
                     drawPos = 28f / drawPos;
@@ -144,10 +160,10 @@ namespace Consolaria.Content.NPCs {
                     drawPosY *= drawPos;
                     vector.X += drawPosX;
                     vector.Y += drawPosY;
-                    drawPosX = NPC.ai[1] - vector.X;
-                    drawPosY = NPC.ai[2] - vector.Y;
+                    drawPosX = ai1 - vector.X;
+                    drawPosY = ai2 - vector.Y;
 
-                    Main.spriteBatch.Draw(texture, new Vector2(vector.X - Main.screenPosition.X, vector.Y - Main.screenPosition.Y), new Rectangle?(new Rectangle(0, 0, texture.Width, texture.Height)), drawColor, rotation, new Vector2(texture.Width * 0.5f, texture.Height * 0.5f), 1f, SpriteEffects.None, 0f);
+                    Main.spriteBatch.Draw(texture, new Vector2(vector.X - screenPos.X, vector.Y - screenPos.Y), new Rectangle?(new Rectangle(0, 0, texture.Width, texture.Height)), drawColor, rotation, new Vector2(texture.Width * 0.5f, texture.Height * 0.5f), 1f, SpriteEffects.None, 0f);
                 }
             }
             return true;
