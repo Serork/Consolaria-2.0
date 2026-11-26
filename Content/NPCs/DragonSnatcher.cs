@@ -96,6 +96,13 @@ namespace Consolaria.Content.NPCs {
 
             FixExploitManEaters.ProtectSpot((int)NPC.ai[1], (int)NPC.ai[2]);
 
+            if (!Main.tile[(int)NPC.ai[1], (int)NPC.ai[2]].HasTile) {
+                NPC.life = -1;
+                NPC.HitEffect();
+                NPC.active = false;
+                return;
+            }
+
             if (timer > 180) {
                 timer = 0;
                 posX = player.position.X + (player.width * 0.5f);
