@@ -504,69 +504,68 @@ public static class ThoriumUtils {
         if (projectile.owner != Main.myPlayer) {
             return false;
         }
-        //_ = ThoriumMod.mod;
-        Player val = Main.player[projectile.owner];
-        ThoriumPlayer thoriumPlayer = val.GetThoriumPlayer();
-        ThoriumPlayer thoriumPlayer2 = target.GetThoriumPlayer();
+        Player player = Main.player[projectile.owner];
+        ThoriumPlayer thoriumPlayer = player.GetThoriumPlayer();
+        ThoriumPlayer thoriumTarget = target.GetThoriumPlayer();
         int heals = healAmount;
         int selfHeals = 0;
-        bool flag = val == target;
-        customHealing?.Invoke(val, target, ref heals, ref selfHeals);
+        bool self = player == target;
+        customHealing?.Invoke(player, target, ref heals, ref selfHeals);
         if (bonusHealing) {
             heals += thoriumPlayer.healBonus;
         }
         if (onHealEffects) {
             if (thoriumPlayer.accForgottenCrossNecklace) {
-                target.AddBuff(ModContent.BuffType<ForgottenCrossNecklaceBuff>(), 60 * ForgottenCrossNecklace.DurationSeconds, false, false);
+                target.AddBuff(ModContent.BuffType<ForgottenCrossNecklaceBuff>(), 60 * ForgottenCrossNecklace.DurationSeconds, quiet: false);
             }
             if (thoriumPlayer.setBlooming) {
-                target.AddBuff(ModContent.BuffType<BloomingSetBuff>(), 600, false, false);
+                target.AddBuff(ModContent.BuffType<BloomingSetBuff>(), 600, quiet: false);
             }
             if (thoriumPlayer.setLifeBinder) {
-                target.AddBuff(ModContent.BuffType<LifeBinderSetBuff>(), 600, false, false);
+                target.AddBuff(ModContent.BuffType<LifeBinderSetBuff>(), 600, quiet: false);
             }
             if (thoriumPlayer.accVerdantOrnament) {
-                target.AddBuff(ModContent.BuffType<VerdantOrnamentBuff>(), 300, false, false);
+                target.AddBuff(ModContent.BuffType<VerdantOrnamentBuff>(), 300, quiet: false);
             }
             if (thoriumPlayer.buffDreamWeaversHoodDream) {
-                target.AddBuff(ModContent.BuffType<DreamWeaversHoodDreamAllyBuff>(), 60, false, false);
+                target.AddBuff(ModContent.BuffType<DreamWeaversHoodDreamAllyBuff>(), 60, quiet: false);
             }
-            if (!flag && thoriumPlayer.honeyHeart && target.statLife <= val.statLife) {
+            if (!self && thoriumPlayer.honeyHeart && target.statLife <= player.statLife) {
                 target.AddPVPBuff(48, 300);
             }
-            ref int setCoralShieldCounter = ref thoriumPlayer.setCoralShieldCounter;
-            if (!flag && target != val && thoriumPlayer.setCoral && setCoralShieldCounter > 0) {
-                thoriumPlayer.HandleCoralSetTransfer(thoriumPlayer2, setCoralShieldCounter, request: true);
-                setCoralShieldCounter = 0;
+            ref int coralShieldCounter = ref thoriumPlayer.setCoralShieldCounter;
+            if (!self && target != player && thoriumPlayer.setCoral && coralShieldCounter > 0) {
+                thoriumPlayer.HandleCoralSetTransfer(thoriumTarget, coralShieldCounter, request: true);
+                coralShieldCounter = 0;
             }
-            if (!flag && thoriumPlayer.accPrydwen) {
+            if (!self && thoriumPlayer.accPrydwen) {
                 selfHeals += Prydwen.Heal;
             }
-            if (!flag && thoriumPlayer.innerFlame.Active && thoriumPlayer.LowestPlayer != ((Entity)val).whoAmI) {
-                Projectile.NewProjectile(val.GetSource_Accessory(thoriumPlayer.innerFlame.Item, (string)null), ((Entity)val).Center.X, ((Entity)val).Center.Y - 50f, 0f, 0f, ModContent.ProjectileType<InnerFlamePro>(), 0, 0f, ((Entity)val).whoAmI, 0f, 0f, 0f);
+            if (!self && thoriumPlayer.innerFlame.Active && thoriumPlayer.LowestPlayer != player.whoAmI) {
+                Projectile.NewProjectile(player.GetSource_Accessory(thoriumPlayer.innerFlame.Item), player.Center.X, player.Center.Y - 50f, 0f, 0f, ModContent.ProjectileType<InnerFlamePro>(), 0, 0f, player.whoAmI);
             }
-            if (!flag && thoriumPlayer.accAloeLeaf) {
-                thoriumPlayer2.SetLifeRecoveryEffect(LifeRecoveryEffectType.AloeLeaf, (short)(60 * AloeLeaf.DurationSeconds), request: true);
+            if (!self && thoriumPlayer.accAloeLeaf) {
+                thoriumTarget.SetLifeRecoveryEffect(LifeRecoveryEffectType.AloeLeaf, (short)(60 * AloeLeaf.DurationSeconds), request: true);
             }
-            if (!flag && thoriumPlayer.accMedicalBag && !thoriumPlayer2.OutOfCombat) {
-                thoriumPlayer2.SetLifeRecoveryEffect(LifeRecoveryEffectType.MedicalBag, (short)(60 * MedicalBag.DurationSeconds), request: true);
+            if (!self && thoriumPlayer.accMedicalBag && !thoriumTarget.OutOfCombat) {
+                thoriumTarget.SetLifeRecoveryEffect(LifeRecoveryEffectType.MedicalBag, (short)(60 * MedicalBag.DurationSeconds), request: true);
             }
-            if (!flag && thoriumPlayer.accEqualizer) {
-                thoriumPlayer2.SetLifeRecoveryEffect(LifeRecoveryEffectType.EqualizerBase, 600, request: true);
-                ((val.statLife > target.statLife) ? thoriumPlayer2 : thoriumPlayer).SetLifeRecoveryEffect(LifeRecoveryEffectType.Equalizer, 300, request: true);
+            if (!self && thoriumPlayer.accEqualizer) {
+                thoriumTarget.SetLifeRecoveryEffect(LifeRecoveryEffectType.EqualizerBase, 600, request: true);
+                ((player.statLife > target.statLife) ? thoriumTarget : thoriumPlayer).SetLifeRecoveryEffect(LifeRecoveryEffectType.Equalizer, 300, request: true);
             }
         }
         if (heals > 0) {
-            target.HealLife(heals, val, healOverMax: true, statistics);
-            thoriumPlayer2.mostRecentHeal = heals;
-            thoriumPlayer2.mostRecentHealer = ((Entity)val).whoAmI;
+            target.HealLife(heals, player, healOverMax: true, statistics);
+            thoriumTarget.mostRecentHeal = heals;
+            thoriumTarget.mostRecentHealer = player.whoAmI;
             if (!ignoreSetTarget) {
-                thoriumPlayer.healedTarget = ((Entity)target).whoAmI;
+                thoriumPlayer.healedTarget = target.whoAmI;
             }
-            val.ApplyInteractionNearbyNPCs();
+            player.ApplyInteractionNearbyNPCs();
         }
         if (selfHeals > 0) {
-            val.HealLife(selfHeals);
+            player.HealLife(selfHeals);
         }
         if (projectile.penetrate > 0) {
             projectile.penetrate--;
@@ -579,31 +578,32 @@ public static class ThoriumUtils {
     }
 
     public static bool CanBeHealed(this Projectile projectile, Player healer, Player target, float radius = 0f, Func<Player, bool> canHealPlayer = null, int specificPlayer = -1, bool ignoreHealer = true) {
-        bool flag = specificPlayer > -1 && specificPlayer < 255;
-        if (!((Entity)target).active || target.dead || target.statLife >= target.statLifeMax2 || (!flag && ignoreHealer && ((Entity)healer).whoAmI == ((Entity)target).whoAmI) || (flag && specificPlayer != ((Entity)target).whoAmI) || (canHealPlayer != null && !canHealPlayer(target)) || (healer.team != target.team && healer.team != 0)) {
+        bool isSpecificPlayer = specificPlayer > -1 && specificPlayer < 255;
+        if (!target.active || target.dead || target.statLife >= target.statLifeMax2 || (!isSpecificPlayer && ignoreHealer && healer.whoAmI == target.whoAmI) || (isSpecificPlayer && specificPlayer != target.whoAmI) || (canHealPlayer != null && !canHealPlayer(target)) || (healer.team != target.team && healer.team != 0)) {
             return false;
         }
-        if (radius != 0f && ((Entity)target).DistanceSQ(((Entity)projectile).Center) > radius * radius) {
+        if (radius != 0f && projectile != null && target.DistanceSQ(projectile.Center) > radius * radius) {
             return false;
         }
         return true;
     }
 
-    public static void ThoriumHeal(this Projectile projectile, int healAmount, float radius = 30f, bool onHealEffects = true, bool bonusHealing = true, CustomHealing customHealing = null, Func<Player, bool> canHealPlayer = null, int specificPlayer = -1, bool ignoreHealer = true, bool ignoreSetTarget = false, bool statistics = true) {
+    internal static void ThoriumHeal(this Projectile projectile, int healAmount, float radius = 30f, bool onHealEffects = true, bool bonusHealing = true, CustomHealing customHealing = null, Func<Player, bool> canHealPlayer = null, int specificPlayer = -1, bool ignoreHealer = true, bool ignoreSetTarget = false, bool statistics = true) {
+        //IL_00e6: Unknown result type (might be due to invalid IL or missing references)
         if (projectile.owner != Main.myPlayer) {
             return;
         }
-        Player val = Main.player[projectile.owner];
+        Player healer = Main.player[projectile.owner];
         if (specificPlayer > -1 && specificPlayer < 255) {
             Player target = Main.player[specificPlayer];
-            if (projectile.CanBeHealed(val, target, radius, canHealPlayer, specificPlayer, ignoreHealer)) {
+            if (projectile.CanBeHealed(healer, target, radius, canHealPlayer, specificPlayer, ignoreHealer)) {
                 projectile.ThoriumHealTarget(target, healAmount, onHealEffects, bonusHealing, ignoreSetTarget, statistics, customHealing);
             }
         }
         else {
             for (int i = 0; i < 255; i++) {
                 Player target = Main.player[i];
-                if (projectile.CanBeHealed(val, target, radius, canHealPlayer, specificPlayer, ignoreHealer) && projectile.ThoriumHealTarget(target, healAmount, onHealEffects, bonusHealing, ignoreSetTarget, statistics, customHealing)) {
+                if (projectile.CanBeHealed(healer, target, radius, canHealPlayer, specificPlayer, ignoreHealer) && projectile.ThoriumHealTarget(target, healAmount, onHealEffects, bonusHealing, ignoreSetTarget, statistics, customHealing)) {
                     break;
                 }
             }
@@ -611,20 +611,20 @@ public static class ThoriumUtils {
         if (projectile.penetrate == 0) {
             return;
         }
-        ThoriumPlayer thoriumPlayer = val.GetThoriumPlayer();
-        int num = ModContent.NPCType<HealingDummy>();
-        for (int j = 0; j < Main.maxNPCs; j++) {
-            NPC val2 = Main.npc[j];
-            if (((Entity)val2).active && val2.type == num && !(((Entity)val2).DistanceSQ(((Entity)projectile).Center) > radius * radius)) {
-                int num2 = healAmount;
+        ThoriumPlayer thoriumPlayer = healer.GetThoriumPlayer();
+        int dummyType = ModContent.NPCType<HealingDummy>();
+        for (int u = 0; u < Main.maxNPCs; u++) {
+            NPC dummy = Main.npc[u];
+            if (dummy.active && dummy.type == dummyType && !(dummy.DistanceSQ(projectile.Center) > radius * radius)) {
+                int heals = healAmount;
                 if (bonusHealing) {
-                    num2 += thoriumPlayer.healBonus;
+                    heals += thoriumPlayer.healBonus;
                 }
-                thoriumPlayer.AddHPS(num2);
-                val2.life += num2;
-                val2.HealEffect(num2, true);
-                if (val2.localAI[0] <= 0f) {
-                    val2.localAI[0] = 300f;
+                thoriumPlayer.AddHPS(heals);
+                dummy.life += heals;
+                dummy.HealEffect(heals);
+                if (dummy.localAI[0] <= 0f) {
+                    dummy.localAI[0] = 300f;
                 }
                 if (projectile.penetrate > 0) {
                     projectile.penetrate--;
@@ -638,41 +638,79 @@ public static class ThoriumUtils {
     }
 
     public static bool CanHitLine(this Entity start, Entity end) {
-        return CanHitLine(Utils.ToTileCoordinates(start.Center), Utils.ToTileCoordinates(end.Center));
+        //IL_0001: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0006: Unknown result type (might be due to invalid IL or missing references)
+        //IL_000c: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0011: Unknown result type (might be due to invalid IL or missing references)
+        return CanHitLine(start.Center.ToTileCoordinates(), end.Center.ToTileCoordinates());
     }
 
+    /// <summary>
+    /// Checks if there is line of sight (no solid tiles) between the start and end vector coordinates.
+    /// Made because vanilla Collision.CanHit seems unreliable.
+    /// </summary>
+    /// <param name="start">The starting vector.</param>
+    /// <param name="end">The end vector.</param>
     public static bool CanHitLine(Vector2 start, Vector2 end) {
-        return CanHitLine(Utils.ToTileCoordinates(start), Utils.ToTileCoordinates(end));
+        //IL_0000: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0001: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0006: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0007: Unknown result type (might be due to invalid IL or missing references)
+        return CanHitLine(start.ToTileCoordinates(), end.ToTileCoordinates());
     }
 
+    /// <summary>
+    /// Checks if there is line of sight (no solid tiles) between the start and end point coordinates.
+    /// Made because vanilla Collision.CanHit seems unreliable.
+    /// </summary>
+    /// <param name="start">The starting point.</param>
+    /// <param name="end">The end point.</param>
     public static bool CanHitLine(Point start, Point end) {
-        if (!WorldGen.InWorld(start.X, start.Y, 0) || !WorldGen.InWorld(end.X, end.Y, 0) || WorldGen.SolidTile3(Framing.GetTileSafely(start))) {
+        //IL_0000: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0006: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0014: Unknown result type (might be due to invalid IL or missing references)
+        //IL_001a: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0028: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0037: Unknown result type (might be due to invalid IL or missing references)
+        //IL_003d: Unknown result type (might be due to invalid IL or missing references)
+        //IL_004a: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0050: Unknown result type (might be due to invalid IL or missing references)
+        //IL_005d: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0063: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0072: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0078: Unknown result type (might be due to invalid IL or missing references)
+        //IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+        //IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+        //IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+        //IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0138: Unknown result type (might be due to invalid IL or missing references)
+        if (!WorldGen.InWorld(start.X, start.Y) || !WorldGen.InWorld(end.X, end.Y) || WorldGen.SolidTile3(Framing.GetTileSafely(start))) {
             return false;
         }
-        int num = Math.Abs(end.X - start.X);
-        int num2 = Math.Abs(end.Y - start.Y);
-        int num3 = ((end.X - start.X > 0) ? 1 : (-1));
-        int num4 = ((end.Y - start.Y > 0) ? 1 : (-1));
-        int num5 = 0;
-        int num6 = 0;
-        while (num5 < num || num6 < num2) {
-            int num7 = ((1 + 2 * num5) * num2).CompareTo((1 + 2 * num6) * num);
-            if (num7 == 0) {
-                if (WorldGen.SolidTile3(Framing.GetTileSafely(start.X + num3, start.Y)) || WorldGen.SolidTile3(Framing.GetTileSafely(start.X, start.Y + num4))) {
+        int distX = Math.Abs(end.X - start.X);
+        int distY = Math.Abs(end.Y - start.Y);
+        int sign_x = ((end.X - start.X > 0) ? 1 : (-1));
+        int sign_y = ((end.Y - start.Y > 0) ? 1 : (-1));
+        int ix = 0;
+        int iy = 0;
+        while (ix < distX || iy < distY) {
+            int xyDiff = ((1 + 2 * ix) * distY).CompareTo((1 + 2 * iy) * distX);
+            if (xyDiff == 0) {
+                if (WorldGen.SolidTile3(Framing.GetTileSafely(start.X + sign_x, start.Y)) || WorldGen.SolidTile3(Framing.GetTileSafely(start.X, start.Y + sign_y))) {
                     return false;
                 }
-                start.X += num3;
-                start.Y += num4;
-                num5++;
-                num6++;
+                start.X += sign_x;
+                start.Y += sign_y;
+                ix++;
+                iy++;
             }
-            else if (num7 < 0) {
-                start.X += num3;
-                num5++;
+            else if (xyDiff < 0) {
+                start.X += sign_x;
+                ix++;
             }
             else {
-                start.Y += num4;
-                num6++;
+                start.Y += sign_y;
+                iy++;
             }
             if (WorldGen.SolidTile3(Framing.GetTileSafely(start))) {
                 return false;
@@ -681,21 +719,26 @@ public static class ThoriumUtils {
         return true;
     }
 
-    public static NPC FindNearestNPC(this Projectile projectile, float maxRange, bool absoluteDistance = true, bool ignoreDontTakeDamage = false, Func<NPC, bool> isValidTarget = null, bool checkCollision = true) {
-        NPC result = null;
+    public static NPC FindNearestNPC(this Projectile projectile, float maxRange, bool absoluteDistance = true, bool ignoreDontTakeDamage = false, Func<NPC, bool> isValidTarget = null) {
+        //IL_0071: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0035: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0040: Unknown result type (might be due to invalid IL or missing references)
+        //IL_0051: Unknown result type (might be due to invalid IL or missing references)
+        //IL_005c: Unknown result type (might be due to invalid IL or missing references)
+        NPC nearest = null;
         if (!absoluteDistance) {
             maxRange *= maxRange;
         }
         for (int i = 0; i < Main.maxNPCs; i++) {
-            NPC val = Main.npc[i];
-            if (val.CanBeChasedBy((object)projectile, ignoreDontTakeDamage) && (isValidTarget == null || isValidTarget(val))) {
-                float num = ((!absoluteDistance) ? ((Entity)projectile).DistanceSQ(((Entity)val).Center) : (Math.Abs(((Entity)projectile).Center.X - ((Entity)val).Center.X) + Math.Abs(((Entity)projectile).Center.Y - ((Entity)val).Center.Y)));
-                if (num < maxRange && ((Entity)(object)projectile).CanHitLine((Entity)(object)val)) {
-                    maxRange = num;
-                    result = val;
+            NPC npc = Main.npc[i];
+            if (npc.CanBeChasedBy(projectile, ignoreDontTakeDamage) && (isValidTarget == null || isValidTarget(npc))) {
+                float currentDistance = ((!absoluteDistance) ? projectile.DistanceSQ(npc.Center) : (Math.Abs(projectile.Center.X - npc.Center.X) + Math.Abs(projectile.Center.Y - npc.Center.Y)));
+                if (currentDistance < maxRange && ((Entity)projectile).CanHitLine((Entity)npc)) {
+                    maxRange = currentDistance;
+                    nearest = npc;
                 }
             }
         }
-        return result;
+        return nearest;
     }
 }
