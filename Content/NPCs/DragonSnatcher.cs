@@ -94,9 +94,9 @@ namespace Consolaria.Content.NPCs {
                 NPC.netUpdate = true;
             }
 
-            FixExploitManEaters.ProtectSpot((int)NPC.ai[1], (int)NPC.ai[2]);
+            FixExploitManEaters.ProtectSpot((int)NPC.ai[1] / 16, (int)NPC.ai[2] / 16);
 
-            if (!Main.tile[(int)NPC.ai[1], (int)NPC.ai[2]].HasTile) {
+            if (!Main.tile[(int)NPC.ai[1] / 16, (int)NPC.ai[2] / 16].HasTile) {
                 NPC.life = -1;
                 NPC.HitEffect();
                 NPC.active = false;
