@@ -23,10 +23,8 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Ichor] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 0.8f,
-                Position = new Vector2(20f, 10f),
-                PortraitPositionXOverride = -5f,
-                PortraitPositionYOverride = 12f
+                Position = new Vector2(-2f, 0f),
+                Velocity = 1f
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 

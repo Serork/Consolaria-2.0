@@ -26,9 +26,9 @@ namespace Consolaria.Content.NPCs {
         public override void SetStaticDefaults() {
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
                 CustomTexturePath = "Consolaria/Assets/Textures/Bestiary/ArchWyvern_Bestiary",
-                Position = new Vector2(20f, 14f),
-                PortraitPositionXOverride = 30f,
-                PortraitPositionYOverride = -6f
+                Position = new Vector2(55f, 15f),
+                PortraitPositionXOverride = 4f,
+                PortraitPositionYOverride = 10f
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
@@ -78,8 +78,9 @@ namespace Consolaria.Content.NPCs {
         }
 
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
-            scale = 1.1f;
-            return new bool?();
+            scale = 1.5f;
+
+            return base.DrawHealthBar(hbPosition, ref scale, ref position);
         }
 
         public override void AI() {

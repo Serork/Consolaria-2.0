@@ -32,7 +32,7 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 1f
+                Position = new Vector2(0f, 8f)
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
@@ -73,6 +73,10 @@ namespace Consolaria.Content.NPCs {
 
         public override void AI() {
             Player player = Main.player[NPC.target];
+
+            if (NPC.IsABestiaryIconDummy) {
+                NPC.rotation = 0f;
+            }
 
             aiTimer++;
             NPC.TargetClosest();

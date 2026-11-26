@@ -19,6 +19,10 @@ namespace Consolaria.Content.NPCs {
         public override void SetStaticDefaults() {
             Main.npcFrameCount[NPC.type] = 2;
 
+            NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
+            };
+            NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
+
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
 
             BestiaryText = this.GetLocalization("Bestiary");
