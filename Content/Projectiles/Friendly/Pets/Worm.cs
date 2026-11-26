@@ -338,13 +338,18 @@ namespace Consolaria.Content.Projectiles.Friendly.Pets {
         //public override void PostAI()
         //    => _soundManager.Update();
 
-        //private class CheckKilledBossesSystem : GlobalNPC {
-        //    public override void OnKill(NPC npc) {
-        //        if (!npc.boss) {
-        //            return;
-        //        }
-        //        _soundManager.PlayWormSound(WormSoundManager.VICTORY, noQueue: true);
-        //    }
-        //}
+        private class CheckKilledBossesSystem : GlobalNPC {
+            public override void OnKill(NPC npc) {
+                if (!npc.boss) {
+                    return;
+                }
+
+                foreach (Projectile projectile in Main.ActiveProjectiles) {
+                    if (projectile.type == ModContent.ProjectileType<Worm>()) {
+                        (projectile.ModProjectile as Worm).PlayWormSound(VICTORY, noQueue: true);
+                    }
+                }
+            }
+        }
     }
 }
