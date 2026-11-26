@@ -1,4 +1,5 @@
-﻿using Consolaria.Content.Tiles;
+﻿using Consolaria.Content.Projectiles.Friendly.Pets;
+using Consolaria.Content.Tiles;
 
 using Microsoft.Xna.Framework;
 
@@ -9,6 +10,40 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.Projectiles.Friendly;
 
 public class WormTombstone : ModProjectile {
+    public override void Load() {
+        On_NPC.DropTombstoneTownNPC += On_NPC_DropTombstoneTownNPC;
+    }
+
+    private void On_NPC_DropTombstoneTownNPC(On_NPC.orig_DropTombstoneTownNPC orig, NPC self, Terraria.Localization.NetworkText deathText) {
+        if (Main.player[Player.FindClosest(self.position, self.width, self.height)].GetModPlayer<WormData>().IsWormPetActive) {
+            if (Main.netMode != 1) {
+                float num = 0.1f;
+                if (Main.rand.Next(2) == 0)
+                    num = -0.1f;
+
+                float num2;
+                for (num2 = (float)Main.rand.Next(-35, 36) * 0.1f; num2 < 2f && num2 > -2f; num2 += (float)Main.rand.Next(-30, 31) * 0.1f) {
+                }
+
+                //int num3 = Main.rand.Next(6);
+                //if (self.type != 17 && self.type != 441) {
+                //    num3 = ((num3 != 0) ? (num3 + 200) : 43);
+                //}
+                //else {
+                //    num3 = Main.rand.Next(5);
+                //    num3 += 527;
+                //}
+                int num3 = ModContent.ProjectileType<WormTombstone>();
+
+                int num4 = Projectile.NewProjectile(self.GetSource_FromAI(), self.position.X + (float)(self.width / 2), self.position.Y + (float)(self.height / 2), (float)Main.rand.Next(10, 30) * num + num2, (float)Main.rand.Next(-40, -20) * 0.1f, num3, 0, 0f, Main.myPlayer);
+                Main.projectile[num4].miscText = deathText.ToString();
+            }
+            return;
+        }
+
+        orig(self, deathText);
+    }
+
     public override void SetDefaults() {
         Projectile.width = 30;
         Projectile.height = 32;
