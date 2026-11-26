@@ -89,6 +89,9 @@ namespace Consolaria.Content.Projectiles.Friendly {
                 Projectile.Kill();
                 player.reuseDelay = 2;
             }
+
+            glowRotation += 0.1f;
+            if (glowRotation > Math.PI * 2f) glowRotation -= (float)Math.PI * 2f;
         }
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) {
@@ -126,8 +129,6 @@ namespace Consolaria.Content.Projectiles.Friendly {
             }
             Texture2D glow = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/Projectiles/LightTrail_1");
             Vector2 glowOrigin = new Vector2(glow.Width / 2, glow.Height / 2);
-            glowRotation += 0.1f;
-            if (glowRotation > Math.PI * 2f) glowRotation -= (float)Math.PI * 2f;
             for (int k = 0; k < Projectile.oldPos.Length - 1; k++) {
                 Vector2 glowPosition = new Vector2(Projectile.width, Projectile.height) / 2f + Vector2.UnitY * Projectile.gfxOffY - Main.screenPosition;
                 float glowRotation = (float)Math.Atan2(Projectile.oldPos[k].Y - Projectile.oldPos[k + 1].Y, Projectile.oldPos[k].X - Projectile.oldPos[k + 1].X);
