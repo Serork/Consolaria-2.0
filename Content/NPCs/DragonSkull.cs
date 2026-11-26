@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -21,7 +21,7 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 1f
+                Position = new Vector2(1f, 0f)
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
@@ -70,8 +70,17 @@ namespace Consolaria.Content.NPCs {
             NPC.frame.Y = currentFrame * frameHeight;
         }
 
-        public override void AI()
-            => NPC.velocity *= 1.015f;
+        public override void AI() {
+            NPC.velocity *= 1.015f;
+        }
+
+        public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+            if (NPC.IsABestiaryIconDummy) {
+                NPC.direction = NPC.spriteDirection = 1;
+            }
+
+            return base.PreDraw(spriteBatch, screenPos, drawColor);
+        }
 
         public override Color? GetAlpha(Color lightColor)
             => new Color(255, 255, 255, 200);

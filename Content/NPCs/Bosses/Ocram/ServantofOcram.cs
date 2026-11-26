@@ -24,7 +24,9 @@ namespace Consolaria.Content.NPCs.Bosses.Ocram {
             NPCID.Sets.BossBestiaryPriority.Add(Type);
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 1f
+                Position = new Vector2(0f, 2f),
+                PortraitPositionXOverride = 0f,
+                PortraitPositionYOverride = -17f
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 

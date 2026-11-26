@@ -25,8 +25,7 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 1f,
-                Position = new Vector2(0f, 4f)
+                Position = new Vector2(-2f, -5f)
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 

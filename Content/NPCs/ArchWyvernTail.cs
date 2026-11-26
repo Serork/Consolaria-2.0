@@ -58,6 +58,13 @@ namespace Consolaria.Content.NPCs {
         }
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+            Color npcColor = drawColor;
+            npcColor = NPC.GetNPCColorTintedByBuffs(npcColor);
+            drawColor = npcColor;
+            if (NPC.IsABestiaryIconDummy) {
+                drawColor = NPC.GetBestiaryEntryColor();
+            }
+
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>(Texture);
             Vector2 origin = new Vector2(texture.Width / 2, texture.Height / 2);
             SpriteEffects effects = SpriteEffects.None;

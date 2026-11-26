@@ -31,8 +31,7 @@ namespace Consolaria.Content.NPCs {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                CustomTexturePath = "Consolaria/Assets/Textures/Bestiary/AlbinoAntlion_Bestiary",
-                Position = new Vector2(0f, 4f)
+
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
@@ -78,8 +77,19 @@ namespace Consolaria.Content.NPCs {
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
             Texture2D texture = (Texture2D)ModContent.Request<Texture2D>(Texture);
             Texture2D bodyTexture = (Texture2D)ModContent.Request<Texture2D>("Consolaria/Assets/Textures/NPCs/AlbinoAntlionBody");
-            Vector2 position = new Vector2(NPC.position.X, NPC.position.Y) - Main.screenPosition;
+            Vector2 position = new Vector2(NPC.position.X, NPC.position.Y) - screenPos;
             Vector2 drawOrigin = new Vector2(texture.Width * 0.5f, NPC.height * 0.5f);
+
+            Color npcColor = drawColor;
+            npcColor = NPC.GetNPCColorTintedByBuffs(npcColor);
+            drawColor = npcColor;
+            if (NPC.IsABestiaryIconDummy) {
+                drawColor = NPC.GetBestiaryEntryColor();
+
+                position.X += 12f;
+                position.Y += 4f;
+            }
+
             var spriteEffects = NPC.direction > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
             spriteBatch.Draw(bodyTexture, new Vector2(position.X, position.Y + 20), NPC.frame, drawColor, 0, drawOrigin, NPC.scale, SpriteEffects.None, 1f);
             spriteBatch.Draw(texture, new Vector2(position.X, position.Y), NPC.frame, drawColor, NPC.rotation / 2, drawOrigin, NPC.scale, spriteEffects, 0f);

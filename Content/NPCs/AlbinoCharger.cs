@@ -29,7 +29,8 @@ namespace Consolaria.Content.NPCs {
             Main.npcFrameCount[NPC.type] = 6;
 
             NPCID.Sets.NPCBestiaryDrawModifiers value = new NPCID.Sets.NPCBestiaryDrawModifiers() {
-                Velocity = 1f
+                Velocity = 1f,
+                Position = new Vector2(0f, 0f)
             };
             NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, value);
 
