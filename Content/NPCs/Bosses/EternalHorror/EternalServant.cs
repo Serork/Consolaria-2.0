@@ -10,6 +10,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
+using ThoriumMod.Empowerments;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
@@ -48,7 +49,7 @@ sealed class EternalServant : ModNPC {
     }
 
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
-        NPC.lifeMax = (int)((float)NPC.lifeMax * 0.7f * balance * bossAdjustment);
+        NPC.lifeMax = (int)((float)NPC.lifeMax * balance * bossAdjustment);
         NPC.damage = (int)((double)NPC.damage * 1.15);
     }
 

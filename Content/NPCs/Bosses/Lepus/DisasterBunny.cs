@@ -55,8 +55,11 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
                 NPC.value = Item.buyPrice(silver: 5);
         }
 
-        public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
-            => NPC.lifeMax = 105;
+        public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
+            if (NPC.AnyNPCs(ModContent.NPCType<Lepus>())) {
+                NPC.lifeMax = (int)((float)NPC.lifeMax * 0.75f * bossAdjustment);
+            }
+        }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {

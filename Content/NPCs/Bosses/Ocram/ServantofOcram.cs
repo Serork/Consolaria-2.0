@@ -8,6 +8,7 @@ using Terraria.GameContent.Bestiary;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using ThoriumMod.Empowerments;
 
 namespace Consolaria.Content.NPCs.Bosses.Ocram {
     public class ServantofOcram : ModNPC {
@@ -48,8 +49,8 @@ namespace Consolaria.Content.NPCs.Bosses.Ocram {
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
-            NPC.lifeMax = 650 + (int)(numPlayers > 1 ? NPC.lifeMax * 0.35f * numPlayers : 0);
-            NPC.damage = 115;
+            NPC.lifeMax = (int)((float)NPC.lifeMax * balance * bossAdjustment);
+            NPC.damage = (int)((double)NPC.damage * 1.15);
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {

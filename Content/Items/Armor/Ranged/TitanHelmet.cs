@@ -146,6 +146,151 @@ namespace Consolaria.Content.Items.Armor.Ranged {
            => titanPower = false;
 
         public override void PostUpdateEquips() {
+            //{
+            //    if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+            //        Vector2 pos = Player.Center;
+            //        Point16 pos2 = pos.ToTileCoordinates16();
+            //        int size = 100;
+            //        for (int i = -size / 2; i < size / 2; i++) {
+            //            for (int j = -size / 2; j < size / 2; j++) {
+            //                Tile tile = Framing.GetTileSafely(pos2.X + i, pos2.Y + j);
+            //                tile.TileType = TileID.StardustBrick;
+            //                WorldGen.SquareTileFrame(pos2.X + i, pos2.Y + j);
+            //            }
+            //        }
+            //    }
+            //}
+            //{
+            //    if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.F1)) {
+            //        //Vector2 pos = Player.Center;
+            //        //Point16 pos2 = pos.ToTileCoordinates16();
+            //        //int size = 100;
+            //        //for (int i = -size / 2; i < size / 2; i++) {
+            //        //    for (int j = -size / 2; j < size / 2; j++) {
+            //        //        Tile tile = Framing.GetTileSafely(pos2.X + i, pos2.Y + j);
+            //        //        //tile.WallType = WallID.None;
+            //        //        WorldGen.SquareTileFrame(pos2.X + i, pos2.Y + j);
+            //        //    }
+            //        //}
+
+            //        for (int num583 = 20; num583 < Main.maxTilesX - 20; num583++) {
+            //            double value11 = (double)num583 / (double)Main.maxTilesX;
+            //            //progress.Set(value11);
+            //            for (int num584 = 20; num584 < Main.maxTilesY - 20; num584++) {
+            //                if (Main.tile[num583, num584].TileType != 48 && Main.tile[num583, num584].TileType != 137 && Main.tile[num583, num584].TileType != 232 && Main.tile[num583, num584].TileType != 191 && Main.tile[num583, num584].TileType != 151 && Main.tile[num583, num584].TileType != 274) {
+            //                    if (!Main.tile[num583, num584 - 1].HasTile && Main.tile[num583 - 1, num584].TileType != 136 && Main.tile[num583 + 1, num584].TileType != 136) {
+            //                        if (WorldGen.SolidTile(num583, num584) && TileID.Sets.CanBeClearedDuringGeneration[Main.tile[num583, num584].TileType]) {
+            //                            if (!Main.tile[num583 - 1, num584].IsHalfBlock && !Main.tile[num583 + 1, num584].IsHalfBlock && Main.tile[num583 - 1, num584].Slope == 0 && Main.tile[num583 + 1, num584].Slope == 0) {
+            //                                if (WorldGen.SolidTile(num583, num584 + 1)) {
+            //                                    if (!WorldGen.SolidTile(num583 - 1, num584) && !Main.tile[num583 - 1, num584 + 1].IsHalfBlock && WorldGen.SolidTile(num583 - 1, num584 + 1) && WorldGen.SolidTile(num583 + 1, num584) && !Main.tile[num583 + 1, num584 - 1].HasTile) {
+            //                                        if (WorldGen.genRand.Next(2) == 0)
+            //                                            WorldGen.SlopeTile(num583, num584, 2);
+            //                                        else
+            //                                            WorldGen.PoundTile(num583, num584);
+            //                                    }
+            //                                    else if (!WorldGen.SolidTile(num583 + 1, num584) && !Main.tile[num583 + 1, num584 + 1].IsHalfBlock && WorldGen.SolidTile(num583 + 1, num584 + 1) && WorldGen.SolidTile(num583 - 1, num584) && !Main.tile[num583 - 1, num584 - 1].HasTile) {
+            //                                        if (WorldGen.genRand.Next(2) == 0)
+            //                                            WorldGen.SlopeTile(num583, num584, 1);
+            //                                        else
+            //                                            WorldGen.PoundTile(num583, num584);
+            //                                    }
+            //                                    else if (WorldGen.SolidTile(num583 + 1, num584 + 1) && WorldGen.SolidTile(num583 - 1, num584 + 1) && !Main.tile[num583 + 1, num584].HasTile && !Main.tile[num583 - 1, num584].HasTile) {
+            //                                        WorldGen.PoundTile(num583, num584);
+            //                                    }
+
+            //                                    if (WorldGen.SolidTile(num583, num584)) {
+            //                                        if (WorldGen.SolidTile(num583 - 1, num584) && WorldGen.SolidTile(num583 + 1, num584 + 2) && !Main.tile[num583 + 1, num584].HasTile && !Main.tile[num583 + 1, num584 + 1].HasTile && !Main.tile[num583 - 1, num584 - 1].HasTile) {
+            //                                            WorldGen.KillTile(num583, num584);
+            //                                        }
+            //                                        else if (WorldGen.SolidTile(num583 + 1, num584) && WorldGen.SolidTile(num583 - 1, num584 + 2) && !Main.tile[num583 - 1, num584].HasTile && !Main.tile[num583 - 1, num584 + 1].HasTile && !Main.tile[num583 + 1, num584 - 1].HasTile) {
+            //                                            WorldGen.KillTile(num583, num584);
+            //                                        }
+            //                                        else if (!Main.tile[num583 - 1, num584 + 1].HasTile && !Main.tile[num583 - 1, num584].HasTile && WorldGen.SolidTile(num583 + 1, num584) && WorldGen.SolidTile(num583, num584 + 2)) {
+            //                                            if (WorldGen.genRand.Next(5) == 0)
+            //                                                WorldGen.KillTile(num583, num584);
+            //                                            else if (WorldGen.genRand.Next(5) == 0)
+            //                                                WorldGen.PoundTile(num583, num584);
+            //                                            else
+            //                                                WorldGen.SlopeTile(num583, num584, 2);
+            //                                        }
+            //                                        else if (!Main.tile[num583 + 1, num584 + 1].HasTile && !Main.tile[num583 + 1, num584].HasTile && WorldGen.SolidTile(num583 - 1, num584) && WorldGen.SolidTile(num583, num584 + 2)) {
+            //                                            if (WorldGen.genRand.Next(5) == 0)
+            //                                                WorldGen.KillTile(num583, num584);
+            //                                            else if (WorldGen.genRand.Next(5) == 0)
+            //                                                WorldGen.PoundTile(num583, num584);
+            //                                            else
+            //                                                WorldGen.SlopeTile(num583, num584, 1);
+            //                                        }
+            //                                    }
+            //                                }
+
+            //                                if (WorldGen.SolidTile(num583, num584) && !Main.tile[num583 - 1, num584].HasTile && !Main.tile[num583 + 1, num584].HasTile)
+            //                                    WorldGen.KillTile(num583, num584);
+            //                            }
+            //                        }
+            //                        else if (!Main.tile[num583, num584].HasTile && Main.tile[num583, num584 + 1].TileType != 151 && Main.tile[num583, num584 + 1].TileType != 274) {
+            //                            if (Main.tile[num583 + 1, num584].TileType != 190 && Main.tile[num583 + 1, num584].TileType != 48 && Main.tile[num583 + 1, num584].TileType != 232 && WorldGen.SolidTile(num583 - 1, num584 + 1) && WorldGen.SolidTile(num583 + 1, num584) && !Main.tile[num583 - 1, num584].HasTile && !Main.tile[num583 + 1, num584 - 1].HasTile) {
+            //                                if (Main.tile[num583 + 1, num584].TileType == 495)
+            //                                    WorldGen.PlaceTile(num583, num584, Main.tile[num583 + 1, num584].TileType);
+            //                                else
+            //                                    WorldGen.PlaceTile(num583, num584, Main.tile[num583, num584 + 1].TileType);
+
+            //                                if (WorldGen.genRand.Next(2) == 0)
+            //                                    WorldGen.SlopeTile(num583, num584, 2);
+            //                                else
+            //                                    WorldGen.PoundTile(num583, num584);
+            //                            }
+
+            //                            if (Main.tile[num583 - 1, num584].TileType != 190 && Main.tile[num583 - 1, num584].TileType != 48 && Main.tile[num583 - 1, num584].TileType != 232 && WorldGen.SolidTile(num583 + 1, num584 + 1) && WorldGen.SolidTile(num583 - 1, num584) && !Main.tile[num583 + 1, num584].HasTile && !Main.tile[num583 - 1, num584 - 1].HasTile) {
+            //                                if (Main.tile[num583 - 1, num584].TileType == 495)
+            //                                    WorldGen.PlaceTile(num583, num584, Main.tile[num583 - 1, num584].TileType);
+            //                                else
+            //                                    WorldGen.PlaceTile(num583, num584, Main.tile[num583, num584 + 1].TileType);
+
+            //                                if (WorldGen.genRand.Next(2) == 0)
+            //                                    WorldGen.SlopeTile(num583, num584, 1);
+            //                                else
+            //                                    WorldGen.PoundTile(num583, num584);
+            //                            }
+            //                        }
+            //                    }
+            //                    else if (!Main.tile[num583, num584 + 1].HasTile && WorldGen.genRand.Next(2) == 0 && WorldGen.SolidTile(num583, num584) && !Main.tile[num583 - 1, num584].IsHalfBlock && !Main.tile[num583 + 1, num584].IsHalfBlock && Main.tile[num583 - 1, num584].Slope == 0 && Main.tile[num583 + 1, num584].Slope == 0 && WorldGen.SolidTile(num583, num584 - 1)) {
+            //                        if (WorldGen.SolidTile(num583 - 1, num584) && !WorldGen.SolidTile(num583 + 1, num584) && WorldGen.SolidTile(num583 - 1, num584 - 1))
+            //                            WorldGen.SlopeTile(num583, num584, 3);
+            //                        else if (WorldGen.SolidTile(num583 + 1, num584) && !WorldGen.SolidTile(num583 - 1, num584) && WorldGen.SolidTile(num583 + 1, num584 - 1))
+            //                            WorldGen.SlopeTile(num583, num584, 4);
+            //                    }
+
+            //                    if (TileID.Sets.Conversion.Sand[Main.tile[num583, num584].TileType])
+            //                        Tile.SmoothSlope(num583, num584, applyToNeighbors: false);
+            //                }
+            //            }
+            //        }
+
+            //        for (int num585 = 20; num585 < Main.maxTilesX - 20; num585++) {
+            //            for (int num586 = 20; num586 < Main.maxTilesY - 20; num586++) {
+            //                if (WorldGen.genRand.Next(2) == 0 && !Main.tile[num585, num586 - 1].HasTile && Main.tile[num585, num586].TileType != 137 && Main.tile[num585, num586].TileType != 48 && Main.tile[num585, num586].TileType != 232 && Main.tile[num585, num586].TileType != 191 && Main.tile[num585, num586].TileType != 151 && Main.tile[num585, num586].TileType != 274 && Main.tile[num585, num586].TileType != 75 && Main.tile[num585, num586].TileType != 76 && WorldGen.SolidTile(num585, num586) && Main.tile[num585 - 1, num586].TileType != 137 && Main.tile[num585 + 1, num586].TileType != 137) {
+            //                    if (WorldGen.SolidTile(num585, num586 + 1) && WorldGen.SolidTile(num585 + 1, num586) && !Main.tile[num585 - 1, num586].HasTile)
+            //                        WorldGen.SlopeTile(num585, num586, 2);
+
+            //                    if (WorldGen.SolidTile(num585, num586 + 1) && WorldGen.SolidTile(num585 - 1, num586) && !Main.tile[num585 + 1, num586].HasTile)
+            //                        WorldGen.SlopeTile(num585, num586, 1);
+            //                }
+
+            //                if (Main.tile[num585, num586].Slope == (SlopeType)1 && !WorldGen.SolidTile(num585 - 1, num586)) {
+            //                    WorldGen.SlopeTile(num585, num586);
+            //                    WorldGen.PoundTile(num585, num586);
+            //                }
+
+            //                if (Main.tile[num585, num586].Slope == (SlopeType)2 && !WorldGen.SolidTile(num585 + 1, num586)) {
+            //                    WorldGen.SlopeTile(num585, num586);
+            //                    WorldGen.PoundTile(num585, num586);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
             if (titanPower2 && !titanPower) {
                 titanPower2 = false;
             }

@@ -28,6 +28,7 @@ using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using ThoriumMod.Empowerments;
 
 namespace Consolaria.Content.NPCs.Bosses.Turkor {
     [AutoloadBossHead]
@@ -84,8 +85,8 @@ namespace Consolaria.Content.NPCs.Bosses.Turkor {
         }
 
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
-            NPC.lifeMax = (int)((double)NPC.lifeMax * 0.5f * (double)balance * (double)bossAdjustment);
-            NPC.damage = (int)((double)NPC.damage * 0.65f);
+            NPC.lifeMax = (int)((double)NPC.lifeMax * 0.75 * (double)balance * (double)bossAdjustment);
+            NPC.damage = (int)((double)NPC.damage * 0.85);
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
