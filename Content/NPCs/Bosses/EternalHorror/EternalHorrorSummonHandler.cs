@@ -15,32 +15,6 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalHorrorSummonHandler : ModSystem {
-    class cameratest : ModPlayer {
-        private float _cameraFactor = 0f;
-
-        public override void ModifyScreenPosition() {
-            if (NPC.AnyNPCs(EternalHorror.SelfType)) {
-                Vector2 cameraPosition = Player.Center;
-                foreach (NPC npc in Main.ActiveNPCs) {
-                    if (npc.type == EternalHorror.SelfType) {
-                        cameraPosition = npc.Center;
-                        break;
-                    }
-                }
-
-                Main.screenPosition = Vector2.Lerp(Main.screenPosition, cameraPosition - Main.ScreenSize.ToVector2() / 2f, 0.5f * _cameraFactor);
-
-                FilterPosition = Vector2.Lerp(FilterPosition, cameraPosition, 0.5f * _cameraFactor);
-
-                _cameraFactor = Helper.Approach(_cameraFactor, 1f, 1 / 60f * 0.125f);
-
-                return;
-            }
-
-            _cameraFactor = Helper.Approach(_cameraFactor, 0f, 0.125f);
-        }
-    }
-
     private static ushort TIMEBEFOREBOSSSPAWN => Helper.SecondsToFrames(2);
     private static byte EYESPAWNCYCLECOUNT => 4;
     private static float EYESCALEMAX => 5f;
