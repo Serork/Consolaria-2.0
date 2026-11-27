@@ -154,6 +154,8 @@ sealed partial class EternalHorror : ModNPC {
         SetDebuffImmuneData();
 
         SetBestiaryInfo();
+
+        BestiaryText = this.GetLocalization("Bestiary");
     }
 
     private partial void SetBestiaryInfo();

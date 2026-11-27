@@ -1853,7 +1853,11 @@ Mods: {
 				DisplayName: Enjambrador Albino Gigante
 			}
 
-			// EternalHorror.DisplayName: Emperor of Darkness
+			EternalHorror: {
+				// DisplayName: Emperor of Darkness
+				// Bestiary: Mods.Consolaria.NPCs.EternalHorror.Bestiary
+			}
+
 			// EternalServant.DisplayName: Dark Servant
 		}
 
