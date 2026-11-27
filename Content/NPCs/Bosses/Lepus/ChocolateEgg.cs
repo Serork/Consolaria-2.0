@@ -40,6 +40,8 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
             NPC.DeathSound = SoundID.NPCDeath1;
 
             NPC.noTileCollide = false;
+
+            NPC.netAlways = true;
         }
 
         public override void FindFrame(int frameHeight) {

@@ -1,5 +1,6 @@
 using Consolaria.Content.Items.Armor.Ranged;
 using Consolaria.Content.NPCs.Bosses.EternalHorror;
+using Consolaria.Content.NPCs.Bosses.Lepus;
 using System.IO;
 
 using Terraria;
@@ -10,7 +11,8 @@ namespace Consolaria {
     public partial class Consolaria : Mod {
         internal enum MessageType : byte {
             TitanPower,
-            EternalHorrorSummon
+            EternalHorrorSummon,
+            SpawnChocolateEgg
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
@@ -34,6 +36,18 @@ namespace Consolaria {
                         EternalHorrorSummonHandler.PlayerIndexWhoSummon = playerNumber;
 
                         EternalHorrorSummonHandler.StartSummoningEternalHorror();
+                    }
+                    break;
+                case MessageType.SpawnChocolateEgg: {
+                        byte playerNumber = reader.ReadByte();
+                        float x = reader.ReadSingle();
+                        float y = reader.ReadSingle();
+
+                        int npc = NPC.NewNPC(Main.player[playerNumber].GetSource_FromThis(), (int)x, (int)y, ModContent.NPCType<ChocolateEgg>());
+                        NetMessage.SendData(MessageID.SyncNPC, number: whoAmI);
+                        if (Main.netMode == NetmodeID.Server && whoAmI < Main.maxNPCs) {
+                            NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npc, 0f, 0f, 0f, 0, 0, 0);
+                        }
                     }
                     break;
                 default:
