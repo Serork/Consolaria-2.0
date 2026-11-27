@@ -27,7 +27,8 @@ sealed class DesertSecondRoom : ILoadable {
 
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight) {
             int genIndexToReplace = tasks.FindIndex(genpass => genpass.Name.Equals("Pyramids"));
-            if (!HasFargos) {
+            //if (!HasFargos)
+            {
                 tasks.RemoveAt(genIndexToReplace);
             }
             tasks.Insert(genIndexToReplace, new PassLegacy("Pyramids", Pyramids, 0.3045f));
