@@ -102,6 +102,12 @@ sealed partial class EternalHorror : ModNPC {
 
     public static bool CanEternalHorrorExistInAWorld => Main.getGoodWorld || ModContent.GetInstance<ConsolariaConfig>().Ocram;
 
+    public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+        scale = 1.5f;
+
+        return base.DrawHealthBar(hbPosition, ref scale, ref position);
+    }
+
     public override void Load() {
         Load_BackgroundHooks();
 

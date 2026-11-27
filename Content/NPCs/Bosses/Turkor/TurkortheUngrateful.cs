@@ -55,6 +55,12 @@ namespace Consolaria.Content.NPCs.Bosses.Turkor {
             BestiaryText = this.GetLocalization("Bestiary");
         }
 
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+            scale = 1.5f;
+
+            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+        }
+
         public override void SetDefaults() {
             int width = 200; int height = 100;
             NPC.Size = new Vector2(width, height);

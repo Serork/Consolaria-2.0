@@ -79,7 +79,13 @@ namespace Consolaria.Content.NPCs {
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
             scale = 1.5f;
 
-            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+            return DrawWormHealthBar();
+        }
+
+        private bool DrawWormHealthBar() {
+            ArchWyvernHead.DrawInterface_Healthbar_Worm(NPC, ModContent.NPCType<MythicalWyvernHead>(), NPC.scale);
+
+            return false;
         }
 
         public override void AI() {

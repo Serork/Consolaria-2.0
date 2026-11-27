@@ -66,11 +66,11 @@ sealed partial class EternalHorror : ModNPC {
     public Color CloneStateEffectColor => Color.Lerp(MainPurpleColor * 0.5f, Color.White * MathHelper.Lerp(0.25f, 0.375f, 0.5f), AICounter < 0f ? 1f : 0f);
     public float СloneStateEffectOpacity => /*Ease.CubeIn*/(_cloneStateEffectOpacity);
 
-    public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
-        scale = 1.25f;
+    //public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+    //    scale = 1.25f;
 
-        return base.DrawHealthBar(hbPosition, ref scale, ref position);
-    }
+    //    return base.DrawHealthBar(hbPosition, ref scale, ref position);
+    //}
 
     public override void BossHeadRotation(ref float rotation) {
         rotation = NPC.rotation;

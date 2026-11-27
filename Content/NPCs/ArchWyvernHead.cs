@@ -77,10 +77,26 @@ namespace Consolaria.Content.NPCs {
             });
         }
 
-        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
-            scale = 1.5f;
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+            => DrawWormHealthBar();
 
-            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+        private bool DrawWormHealthBar() {
+            DrawInterface_Healthbar_Worm(NPC, ModContent.NPCType<ArchWyvernTail>(), NPC.scale);
+
+            return false;
+        }
+
+        public static void DrawInterface_Healthbar_Worm(NPC head, int tailID, float scale) {
+            NPC nPC = head;
+            for (int i = head.whoAmI + 1; i < 200; i++) {
+                if (Main.npc[i].active && Main.npc[i].type == tailID) {
+                    nPC = Main.npc[i];
+                    break;
+                }
+            }
+
+            Vector2 vector = (head.position + nPC.position) / 2f;
+            Main.instance.DrawHealthBar(vector.X + (float)(head.width / 2), vector.Y + (float)(head.height / 2), head.life, head.lifeMax, Lighting.Brightness((int)((head.position.X + (float)(head.width / 2)) / 16f), (int)((head.position.Y + (float)(head.height / 2) + head.gfxOffY) / 16f)), scale);
         }
 
         public override void AI() {

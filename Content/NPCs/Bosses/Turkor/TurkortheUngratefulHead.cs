@@ -77,6 +77,12 @@ namespace Consolaria.Content.NPCs.Bosses.Turkor {
         private Rectangle GetFrame(int number)
             => new Rectangle(0, NPC.frame.Height * (number - 1), NPC.frame.Width, NPC.frame.Height);
 
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+            scale = 1.5f;
+
+            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+        }
+
         public override void FindFrame(int frameHeight) {
             if (!attackingPhase || charge && timer > 230 || projSpam) {
                 /*if (!projSpam && NPC.velocity.X * NPC.direction < 0 && turntimer < 15) {

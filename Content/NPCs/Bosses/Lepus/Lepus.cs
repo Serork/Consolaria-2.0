@@ -130,6 +130,12 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
         public ref float AdvancedJumpCount
             => ref NPC.ai[3];
 
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+            scale = 1.5f;
+
+            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+        }
+
         public override void SetStaticDefaults() {
             base.SetStaticDefaults();
 

@@ -217,6 +217,12 @@ sealed class EternalServant : ModNPC {
         }
     }
 
+    public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+        scale = 1.5f;
+
+        return base.DrawHealthBar(hbPosition, ref scale, ref position);
+    }
+
     public override void AI() {
         if (NPC.localAI[0] == 0f) {
             NPC.localAI[0] = 1 / 60f;

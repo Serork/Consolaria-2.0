@@ -43,8 +43,11 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)/* tModPorter Note: bossLifeScale -> balance (bossAdjustment is different, see the docs for details) */
             => NPC.lifeMax = (int)((float)NPC.lifeMax * 0.75f * bossAdjustment);
 
-        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
-            => false;
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+            scale = 1.5f;
+
+            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+        }
 
         public override void AI() {
             NPC.direction = 0;

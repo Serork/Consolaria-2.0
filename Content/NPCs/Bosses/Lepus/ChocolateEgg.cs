@@ -58,9 +58,15 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
             golden = reader.ReadBoolean();
         }
 
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
+            scale = 1.5f;
+
+            return base.DrawHealthBar(hbPosition, ref scale, ref position);
+        }
+
         public override void AI() {
             if (Main.netMode != NetmodeID.MultiplayerClient) {
-                golden = Main.rand.NextBool(100);
+                golden = Main.rand.NextBool(500);
 
                 NPC.homeless = false;
                 NPC.homeTileX = -1;
