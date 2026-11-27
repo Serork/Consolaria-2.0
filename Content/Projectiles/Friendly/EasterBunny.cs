@@ -80,8 +80,8 @@ sealed class EasterBunny : ModProjectile {
         Projectile.DamageType = DamageClass.Summon;
 
         Projectile.decidesManualFallThrough = true;
-        Projectile.usesIDStaticNPCImmunity = true;
-        Projectile.idStaticNPCHitCooldown = 10;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 15;
 
         Projectile.netImportant = true;
     }
