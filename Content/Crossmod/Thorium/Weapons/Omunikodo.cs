@@ -31,7 +31,7 @@ public sealed class Omunikodo : ThoriumItem_BardBase {
         Item.SetShopValues(Terraria.Enums.ItemRarityColor.Lime7, Item.sellPrice(5));
         Item.SetShootableValues<Omunikodo_Shot>(12f);
 
-        Item.SetWeaponValues(85, 4f, 6);
+        Item.SetWeaponValues(69, 4f, 6);
         Item.SetDefaultsToUsable(ItemUseStyleID.Shoot, 18, autoReuse: true, useSound: null);
 
         Item.holdStyle = ItemHoldStyleID.HoldHeavy;
