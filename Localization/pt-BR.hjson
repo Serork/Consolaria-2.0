@@ -1843,7 +1843,10 @@ Mods: {
 				// Bestiary: Mods.Consolaria.NPCs.EternalHorror.Bestiary
 			}
 
-			// EternalServant.DisplayName: Dark Servant
+			EternalServant: {
+				// DisplayName: Dark Servant
+				// Bestiary: Mods.Consolaria.NPCs.EternalServant.Bestiary
+			}
 		}
 
 		Projectiles: {

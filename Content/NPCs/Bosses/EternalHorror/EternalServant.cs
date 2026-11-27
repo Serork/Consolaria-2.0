@@ -3,18 +3,26 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Bestiary;
+using Terraria.Graphics.CameraModifiers;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using ThoriumMod.Empowerments;
 
 namespace Consolaria.Content.NPCs.Bosses.EternalHorror;
 
 sealed class EternalServant : ModNPC {
+    public static LocalizedText BestiaryText {
+        get; private set;
+    }
+
     private static Asset<Texture2D> _eyeTexture = null,
                                     _glowTexture = null;
 
@@ -46,6 +54,18 @@ sealed class EternalServant : ModNPC {
             _eyeTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Eye");
             _glowTexture = ModContent.Request<Texture2D>("Consolaria/Content/NPCs/Bosses/EternalHorror/EternalServant_Glow");
         }
+
+        BestiaryText = this.GetLocalization("Bestiary");
+    }
+
+    public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
+        int associatedNPCType = ModContent.NPCType<EternalHorror>();
+        bestiaryEntry.UIInfoProvider = new CommonEnemyUICollectionInfoProvider(ContentSamples.NpcBestiaryCreditIdsByNpcNetIds[associatedNPCType], quickUnlock: true);
+
+        bestiaryEntry.Info.AddRange(new List<IBestiaryInfoElement> {
+                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Times.NightTime,
+                new FlavorTextBestiaryInfoElement(BestiaryText.ToString())
+            });
     }
 
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
