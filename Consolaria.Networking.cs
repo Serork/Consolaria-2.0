@@ -44,10 +44,10 @@ namespace Consolaria {
                         float y = reader.ReadSingle();
 
                         int npc = NPC.NewNPC(Main.player[playerNumber].GetSource_FromThis(), (int)x, (int)y, ModContent.NPCType<ChocolateEgg>());
-                        NetMessage.SendData(MessageID.SyncNPC, number: whoAmI);
-                        if (Main.netMode == NetmodeID.Server && whoAmI < Main.maxNPCs) {
-                            NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npc, 0f, 0f, 0f, 0, 0, 0);
-                        }
+                        //NetMessage.SendData(MessageID.SyncNPC, number: whoAmI);
+                        //if (Main.netMode == NetmodeID.Server && whoAmI < Main.maxNPCs) {
+                        //    NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npc, 0f, 0f, 0f, 0, 0, 0);
+                        //}
                     }
                     break;
                 default:
