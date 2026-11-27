@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
-
+using System;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -8,7 +9,7 @@ using Terraria.ModLoader;
 namespace Consolaria.Content.NPCs.Bosses.Lepus {
     public class ChocolateEgg : ModNPC {
         private int duration;
-        private bool golden = Main.rand.NextBool(1000);
+        private bool golden;
         public override void SetStaticDefaults() {
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Confused] = true;
             NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Poisoned] = true;
@@ -49,8 +50,18 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
             else NPC.frame.Y = 0;
         }
 
+        public override void SendExtraAI(BinaryWriter writer) {
+            writer.Write(golden);
+        }
+
+        public override void ReceiveExtraAI(BinaryReader reader) {
+            golden = reader.ReadBoolean();
+        }
+
         public override void AI() {
             if (Main.netMode != NetmodeID.MultiplayerClient) {
+                golden = Main.rand.NextBool(100);
+
                 NPC.homeless = false;
                 NPC.homeTileX = -1;
                 NPC.homeTileY = -1;
@@ -81,20 +92,22 @@ namespace Consolaria.Content.NPCs.Bosses.Lepus {
 
         public override void HitEffect(NPC.HitInfo hit) {
             if (NPC.life <= 0) {
-                for (int i = 0; i < (golden ? 5 : Main.rand.Next(1, 2)); i++) {
-                    int item = Item.NewItem(NPC.GetSource_Death(), NPC.position, NPC.width, NPC.height, ItemID.Star, 1, false, 0, false, false);
-                    if (Main.netMode == NetmodeID.MultiplayerClient && item >= 0)
-                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, item, 1f, 0f, 0f, 0, 0, 0);
-                }
-                for (int i = 0; i < (golden ? 5 : Main.rand.Next(1, 2)); i++) {
-                    int item = Item.NewItem(NPC.GetSource_Death(), NPC.position, NPC.width, NPC.height, ItemID.Heart, 1, false, 0, false, false);
-                    if (Main.netMode == NetmodeID.MultiplayerClient && item >= 0)
-                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, item, 1f, 0f, 0f, 0, 0, 0);
-                }
-                for (int i = 0; i < (golden ? Main.rand.Next(3, 8) : 0); i++) {
-                    int item = Item.NewItem(NPC.GetSource_Death(), NPC.position, NPC.width, NPC.height, ItemID.GoldCoin, 1, false, 0, false, false);
-                    if (Main.netMode == NetmodeID.MultiplayerClient && item >= 0)
-                        NetMessage.SendData(MessageID.SyncItem, -1, -1, null, item, 1f, 0f, 0f, 0, 0, 0);
+                if (!Helper.IsClient()) {
+                    for (int i = 0; i < (golden ? 5 : Main.rand.Next(1, 2)); i++) {
+                        int item = Item.NewItem(NPC.GetSource_Death(), NPC.position, NPC.width, NPC.height, ItemID.Star, 1, false, 0, false, false);
+                        if (Main.netMode != 0)
+                            NetMessage.SendData(21, -1, -1, null, item);
+                    }
+                    for (int i = 0; i < (golden ? 5 : Main.rand.Next(1, 2)); i++) {
+                        int item = Item.NewItem(NPC.GetSource_Death(), NPC.position, NPC.width, NPC.height, ItemID.Heart, 1, false, 0, false, false);
+                        if (Main.netMode != 0)
+                            NetMessage.SendData(21, -1, -1, null, item);
+                    }
+                    for (int i = 0; i < (golden ? Main.rand.Next(3, 8) : 0); i++) {
+                        int item = Item.NewItem(NPC.GetSource_Death(), NPC.position, NPC.width, NPC.height, ItemID.GoldCoin, 1, false, 0, false, false);
+                        if (Main.netMode != 0)
+                            NetMessage.SendData(21, -1, -1, null, item);
+                    }
                 }
                 if (Main.netMode != NetmodeID.Server) {
                     int chocolateEggGore = golden ? ModContent.Find<ModGore>("Consolaria/GoldenEggGore").Type : ModContent.Find<ModGore>("Consolaria/ChocolateEggGore").Type;
